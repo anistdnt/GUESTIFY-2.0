@@ -1,7 +1,10 @@
+// Importing Components 
+import DisplayCard from "@/components/DisplayCard/DisplayCard";
+
 export default function Home() {
   return (
-    <div>
-      This is Home Page
+    <div className="flex justify-center items-center min-h-screen">
+      <DisplayCard/>
     </div>
   );
 }
