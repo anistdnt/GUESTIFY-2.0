@@ -92,7 +92,9 @@ export default function Header() {
                 ) : (
                   <div className="hidden sm:block">
                     <Link href="/login">
-                      <button className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg">
+                      <button className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg" onClick={()=>{
+                        setisLoggedIn(true);
+                      }}>
                         Login/Sign-Up
                       </button>
                     </Link>
