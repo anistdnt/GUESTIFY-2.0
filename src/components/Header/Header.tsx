@@ -1,5 +1,6 @@
 "use client";
 import { ArrowUp, List } from "@phosphor-icons/react/dist/ssr";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -40,10 +41,12 @@ export default function Header() {
             </div>
             <div className="flex flex-1 items-center justify-center gap-8 sm:items-stretch sm:justify-start">
               <div className="flex shrink-0 items-center">
-                <img
-                  alt="Your Company"
-                  src="/assets/new_logo.png"
-                  className="h-12 w-auto"
+                <Image
+                  src={"/assets/new_logo.png"}
+                  alt="Logo"
+                  width={130}
+                  height={50}
+                  loading="eager"
                 />
               </div>
               <div className="hidden sm:flex flex-row justify-center items-center space-x-4">
