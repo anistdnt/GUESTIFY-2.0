@@ -19,12 +19,12 @@ export default function DisplayCard() {
         <div className="text-cardTitle text-cardTitleCol font-medium font-cardTitle">
           Sample PG Title
         </div>
-        <div className="text-cardDesCol">
+        <div className="text-cardDesCol text-cardDescription">
           27, Navakrishna Guie Lane , Kolkata-700010 , West Bengal, to this
           occation os
         </div>
         <div>
-          <Rating no_of_star={3}/>
+          <Rating no_of_star={5}/>
         </div>
         <div className="flex flex-row justify-between mt-2">
           <div className="flex flex-row justify-center items-center gap-2 text-cardTitle text-cardTitleCol font-semibold">
