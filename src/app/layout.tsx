@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex flex-col justify-between min-h-screen">
         <Header />
-        <main className="flex flex-wrap justify-center items-center">
+        <main className="max-w-7xl mx-auto">
           {children}
         </main>
         <Footer />

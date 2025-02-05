@@ -19,6 +19,8 @@ export default {
         cardsBackground : "#fcf5d6",
         cardTitleCol : "#5b645d",
         cardDesCol : "#788b7c",
+        aboutBackground : "#fcf5d6",
+        aboutContent : "#c29a00"
       },
     },
   },
