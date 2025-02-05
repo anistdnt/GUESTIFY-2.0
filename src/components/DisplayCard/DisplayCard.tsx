@@ -2,9 +2,11 @@ import Image from "next/image";
 import Rating from "../Rating/Rating";
 import { CurrencyInr } from "@phosphor-icons/react/dist/ssr";
 
-// type Props = {};
+type Props = {
+  number_of_stars : number;
+};
 
-export default function DisplayCard() {
+export default function DisplayCard({number_of_stars} : Props) {
   return (
     <div className="flex flex-col justify-center items-start bg-cardsBackground m-4 px-1 pt-1 pb-3 max-w-96 rounded-md">
       <Image
@@ -24,7 +26,7 @@ export default function DisplayCard() {
           occation os
         </div>
         <div>
-          <Rating no_of_star={5}/>
+          <Rating no_of_star={number_of_stars}/>
         </div>
         <div className="flex flex-row justify-between mt-2">
           <div className="flex flex-row justify-center items-center gap-2 text-cardTitle text-cardTitleCol font-semibold">
