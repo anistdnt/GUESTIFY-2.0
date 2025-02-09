@@ -12,6 +12,7 @@ const navigation: {
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   { name: "Contact Us", href: "/contact-us" },
+  { name: "Add PG", href: "/add-pg" },
 ];
 
 export default function Header() {
@@ -25,7 +26,7 @@ export default function Header() {
   return (
     <header className="sticky z-50 top-0">
       <nav className="bg-white">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
               {/* Mobile menu button */}
@@ -107,18 +108,27 @@ export default function Header() {
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => {
+                        setshowProfileDropdown((prev) => !prev);
+                      }}
                     >
                       Your Profile
                     </Link>
                     <Link
                       href="/settings"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => {
+                        setshowProfileDropdown((prev) => !prev);
+                      }}
                     >
                       Settings
                     </Link>
                     <Link
                       href="#"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => {
+                        setshowProfileDropdown((prev) => !prev);
+                      }}
                     >
                       Sign out
                     </Link>
