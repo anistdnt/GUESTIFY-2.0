@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { FaEdit, FaEnvelope } from "react-icons/fa";
 export default function ProfileSettings() {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
