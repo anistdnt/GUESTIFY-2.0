@@ -4,10 +4,30 @@ import Image from "next/image";
 import { FaEdit, FaEnvelope } from "react-icons/fa";
 export default function ProfileSettings() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [image, setImage] = useState<string>('/assets/profile.png');
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setImage(imageUrl);
+    }
+  };
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
+
+  const currentDate = new Date();
+  const date = currentDate.toLocaleDateString('en-GB', {
+    weekday: 'short',  // 'Tue'
+    day: '2-digit',    // '07'
+    month: 'long',     // 'June'
+    year: 'numeric',   // '2022'
+  });
+
+  const [weekday, day, month, year] = date.split(' ');
+  const formattedDate = `${weekday}, ${day} ${month} ${year}`;
 
   return (
     <div className="min-h-screen bg-gray-50 p-10">
@@ -16,7 +36,7 @@ export default function ProfileSettings() {
         <div className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-semibold text-gray-800">Welcome, Arkabrata</h1>
-            <p className="text-gray-500 mt-1">Tue, 07 June 2022</p>
+            <p className="text-gray-500 mt-1">{formattedDate}</p>
           </div>
           <div className="flex items-center space-x-4">
             <input
@@ -26,7 +46,7 @@ export default function ProfileSettings() {
             />
             <div className="relative w-12 h-12">
               <Image
-                src="/assets/profile.png"
+                src={image}
                 alt="Profile Avatar"
                 className="rounded-full"
                 fill
@@ -42,27 +62,43 @@ export default function ProfileSettings() {
           <div className="w-full flex flex-row justify-between mb-10">
             <div>
 
-            <div className="relative w-28 h-28 mb-4">
-              <Image
-                src="/assets/profile.png"
-                alt="Profile Image"
-                className="rounded-full"
-                fill
-                objectFit="cover"
-              />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-800">Arkabrata Chandra</h2>
-            <p className="text-gray-600">abcdefg@gmail.com</p>
+              <div className="relative w-28 h-28 mb-4">
+                <Image
+                  src={image}
+                  alt="Profile Image"
+                  className="rounded-full"
+                  fill
+                  objectFit="cover"
+                />
+                <button
+                  onClick={() => document.getElementById('fileInput')?.click()}
+                  className={isEditing ? "absolute h-9 w-9 bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-100" : "hidden"}
+                  
+                >
+                  <i className="fas fa-pencil-alt  text-gray-700"></i>
+                </button>
+                {/* delete button will be implemented with api */}
+
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-800">Arkabrata Chandra</h2>
+              <p className="text-gray-600">abcdefg@gmail.com</p>
             </div>
             <button
-              className="flex items-center w-[93px] h-[44px] mt-6 px-6 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80"
+              className="flex items-center justify-center w-[93px] h-[44px] mt-6 px-6 bg-black/70 text-white rounded-lg hover:bg-black/80"
               onClick={handleEditToggle}
             >
-              <FaEdit className="mr-2" /> {isEditing ? "Confirm" : "Edit"}
+              <i className={!isEditing ? "fa-solid fa-pen-to-square text-[14px] mr-3 mb-1" : "hidden"}></i> {isEditing ? "Confirm" : "Edit"}
             </button>
           </div>
 
-          {/* Right Section */}
+          {/* down Section */}
           <div className="flex-1 grid grid-cols-2 gap-8">
             <div>
               <label className="block text-gray-700 font-medium">Full Name</label>
