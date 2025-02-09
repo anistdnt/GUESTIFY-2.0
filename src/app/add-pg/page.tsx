@@ -12,16 +12,16 @@ export default function PGForm() {
 
   const addRoom = () => setRooms([...rooms, { image: null }]);
 
-  const handlePGImageChange = (event: any) => {
-    const file = event.target.files[0];
+  const handlePGImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setPgImage(imageUrl);
     }
   };
 
-  const handleRoomImageChange = (index: number, event: any) => {
-    const file = event.target.files[0];
+  const handleRoomImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       const updatedRooms = [...rooms];
