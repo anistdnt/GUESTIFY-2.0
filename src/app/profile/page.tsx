@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
 import Image from "next/image";
-import { FaEdit, FaEnvelope } from "react-icons/fa";
+import { FaEnvelope } from "react-icons/fa";
 export default function ProfileSettings() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [image, setImage] = useState<string>('/assets/profile.png');
