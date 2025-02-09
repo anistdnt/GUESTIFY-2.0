@@ -12,6 +12,7 @@ const navigation: {
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   { name: "Contact Us", href: "/contact-us" },
+  { name: "Add PG", href: "/add-pg" },
 ];
 
 export default function Header() {
