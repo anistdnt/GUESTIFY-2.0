@@ -20,7 +20,7 @@ export default function PGForm() {
     }
   };
 
-  const handleRoomImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRoomImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) : void => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
       const imageUrl = URL.createObjectURL(file);
@@ -30,16 +30,24 @@ export default function PGForm() {
     }
   };
 
-  const removeRoom = (index: number) => {
+  const removeRoom = (index: number):void => {
     if (rooms.length > 1) {
       const updatedRooms = rooms.filter((_, i) => i !== index);
       setRooms(updatedRooms);
     }
   };
 
+  async function handleFormSubmit (e : React.FormEvent<HTMLElement>) : Promise<void> {
+    
+    e.preventDefault();
+
+    // the submit api will be handled here
+
+  }
+
   return (
     <div className="bg-yellow-100 min-h-screen py-8 px-4">
-      <div className="mx-auto">
+      <form className="mx-auto" onSubmit={handleFormSubmit}>
         <h2 className="text-2xl font-bold mb-4">PG Information</h2>
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -177,7 +185,10 @@ export default function PGForm() {
         >
           <FaPlus /> Add Your Room
         </button>
-      </div>
+        <div className="w-full flex flex-row justify-center py-10">
+          <button type="submit" className="bg-buttons text-white px-6 rounded-lg py-2">Submit</button>
+        </div>
+      </form>
     </div>
   );
 }

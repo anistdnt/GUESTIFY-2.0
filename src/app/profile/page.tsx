@@ -2,9 +2,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { FaEnvelope } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
+
+
 export default function ProfileSettings() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [image, setImage] = useState<string>('/assets/profile.png');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [query, setQuery] = useState<string>("");
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -12,6 +17,10 @@ export default function ProfileSettings() {
       const imageUrl = URL.createObjectURL(file);
       setImage(imageUrl);
     }
+  };
+
+  const handleModal = () => {
+    setIsModalOpen(!isModalOpen);
   };
 
   const handleEditToggle = () => {
@@ -31,19 +40,15 @@ export default function ProfileSettings() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-10">
-      <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-8">
+      <div className="w-full mx-auto bg-white rounded-xl shadow-md p-4 sm:p-8">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-10">
           <div>
-            <h1 className="text-3xl font-semibold text-gray-800">Welcome, Arkabrata</h1>
-            <p className="text-gray-500 mt-1">{formattedDate}</p>
+            <h1 className=" text-xl sm:text-3xl font-semibold text-gray-800">Welcome, Arkabrata</h1>
+            <p className="text-gray-500 mt-1 max-sm:text-sm">{formattedDate}</p>
           </div>
           <div className="flex items-center space-x-4">
-            <input
-              type="text"
-              placeholder="Search"
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600"
-            />
+            <i onClick={handleModal} className="fa-solid fa-magnifying-glass text-black/50 sm:mr-4 cursor-pointer"></i>
             <div className="relative w-12 h-12">
               <Image
                 src={image}
@@ -55,6 +60,43 @@ export default function ProfileSettings() {
             </div>
           </div>
         </div>
+
+        {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Search</h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Type your search..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              />
+            </div>
+
+            {/* Search Results Placeholder */}
+            <div className="mt-4">
+              {query ? (
+                <p className="text-gray-700">Searching for: {query}</p>
+              ) : (
+                <p className="text-gray-500">Start typing to search...</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
         {/* Profile Info Section */}
         <div className="flex flex-col">
@@ -73,7 +115,7 @@ export default function ProfileSettings() {
                 <button
                   onClick={() => document.getElementById('fileInput')?.click()}
                   className={isEditing ? "absolute h-9 w-9 bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-100" : "hidden"}
-                  
+
                 >
                   <i className="fas fa-pencil-alt  text-gray-700"></i>
                 </button>
@@ -99,7 +141,7 @@ export default function ProfileSettings() {
           </div>
 
           {/* down Section */}
-          <div className="flex-1 grid grid-cols-2 gap-8">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <label className="block text-gray-700 font-medium">Full Name</label>
               <input
