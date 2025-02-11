@@ -15,12 +15,13 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         buttons : "#c29a00",
-        ratingStarCol : "#c29a00",
+        buttonsHover : "#c29a00",
+        ratingStarCol : "#b39009",
         cardsBackground : "#fcf5d6",
         cardTitleCol : "#5b645d",
         cardDesCol : "#788b7c",
-        aboutBackground : "#fcf5d6",
-        aboutContent : "#c29a00"
+        headingCol : "c29a00",
+        subheadingCol : "c29a00"
       },
     },
   },

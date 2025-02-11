@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 
@@ -15,9 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex flex-col justify-between min-h-screen">
+      <body className="">
         <Header />
-        <main className="max-w-7xl mx-auto">
+        <main className="">
           {children}
         </main>
         <Footer />

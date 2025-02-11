@@ -2,8 +2,14 @@
 import Head from "next/head";
 import { useState } from "react";
 
+type Formdata = {
+  name : string;
+  email : string;
+  message : string;
+}
+
 const Contact = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Formdata>({
     name: "",
     email: "",
     message: "",
@@ -26,15 +32,18 @@ const Contact = () => {
         <meta name="description" content="Get in touch with Guestify for inquiries about PG accommodations in West Bengal." />
       </Head>
 
-      <div className="bg-gray-100 max-w-7xl">
+      <div className="bg-gray-100">
         {/* Hero Section */}
-        <section className="bg-blue-600 text-white py-20 text-center">
-          <h1 className="text-4xl font-bold">Contact Us</h1>
+        <section className="relative bg-[url('/assets/contact-us-banner.jpg')] bg-fixed bg-center text-white h-72 flex flex-row justify-center items-center">
+        <div className="absolute inset-0 bg-black bg-opacity-35"></div>
+          <div className="relative text-center">
+          <h1 className="text-5xl font-bold">Contact Us</h1>
           <p className="mt-2 text-lg">Have questions? We’d love to hear from you.</p>
+          </div>
         </section>
 
         {/* Contact Form */}
-        <section className="mx-auto py-16 px-6">
+        <section className="mx-auto py-16 px-6 max-w-7xl">
           <h2 className="text-3xl font-bold text-gray-800 text-center">Send Us a Message</h2>
           <form onSubmit={handleSubmit} className="mt-8 bg-white p-8 rounded-lg shadow-md">
             <div className="mb-4">
@@ -44,6 +53,7 @@ const Contact = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                placeholder="eg : John Doe"
                 required
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -55,6 +65,7 @@ const Contact = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                placeholder="eg : John@gmail.com"
                 required
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -65,12 +76,13 @@ const Contact = () => {
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
+                placeholder="Type Message here...."
                 required
                 rows={4}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
-            <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            <button type="submit" className="w-full bg-buttons text-white py-2 rounded-lg hover:bg-buttonsHover">
               Send Message
             </button>
           </form>
