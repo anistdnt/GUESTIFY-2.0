@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex flex-col justify-between min-h-screen container mx-auto">
+      <body className="">
         <Header />
         <main className="">
           {children}
