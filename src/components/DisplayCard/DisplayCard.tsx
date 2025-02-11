@@ -24,7 +24,7 @@ export default function DisplayCard() {
           occation os
         </div>
         <div>
-          <Rating no_of_star={3}/>
+          <Rating no_of_star={4}/>
         </div>
         <div className="flex flex-row justify-between mt-2">
           <div className="flex flex-row justify-center items-center gap-2 text-cardTitle text-cardTitleCol font-semibold">
