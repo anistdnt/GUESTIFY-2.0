@@ -41,7 +41,7 @@ export default function Header() {
               </button>
             </div>
             <div className="flex flex-1 items-center justify-center gap-8 sm:items-stretch sm:justify-start">
-              <div className="flex shrink-0 items-center">
+              <Link href="/" className="flex shrink-0 items-center">
                 <Image
                   src={"/assets/new_logo.png"}
                   alt="Logo"
@@ -49,7 +49,7 @@ export default function Header() {
                   height={50}
                   loading="eager"
                 />
-              </div>
+              </Link>
               <div className="hidden sm:flex flex-row justify-center items-center space-x-4">
                 {navigation.map((item) => (
                   <Link
@@ -94,7 +94,7 @@ export default function Header() {
                   <div className="hidden sm:block">
                     <Link href="/login">
                       <button className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg" onClick={()=>{
-                        setisLoggedIn(true);
+                        setisLoggedIn(false);
                       }}>
                         Login/Sign-Up
                       </button>

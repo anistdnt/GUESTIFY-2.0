@@ -38,7 +38,7 @@ const Contact = () => {
         <div className="absolute inset-0 bg-black bg-opacity-35"></div>
           <div className="relative text-center">
           <h1 className="text-5xl font-bold">Contact Us</h1>
-          <p className="mt-2 text-lg">Have questions? We’d love to hear from you.</p>
+          <p className="mt-2 text-lg">Have questions? We would love to hear from you.</p>
           </div>
         </section>
 
