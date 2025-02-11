@@ -11,7 +11,7 @@ const navigation: {
 }[] = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
-  { name: "Contact Us", href: "/contact-us" },
+  { name: "Contact Us", href: "/contact" },
 ];
 
 export default function Header() {
