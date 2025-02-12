@@ -1,5 +1,4 @@
 // Importing Components
-import DisplayCard from "@/components/DisplayCard/DisplayCard";
 import Image from "next/image";
 
 export default function Home() {
