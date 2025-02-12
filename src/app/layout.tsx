@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import Header from "@/components/Header/Header";
+import Footer from "@/components/Footer/Footer";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,8 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex justify-center align-bottom">
-        {children}
+      <body className="">
+        <Header />
+        <main className="">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

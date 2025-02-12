@@ -15,13 +15,15 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         buttons : "#c29a00",
+        buttonsHover : "#c29a00",
+        ratingStarCol : "#b39009",
         cardsBackground : "#fcf5d6",
         cardTitleCol : "#5b645d",
         cardDesCol : "#788b7c",
+        headingCol : "c29a00",
+        subheadingCol : "c29a00",
+        primaryText:'5B645D'
       },
-      fontSize : {
-        cardTitle : '24px'
-      }
     },
   },
   plugins: [],
