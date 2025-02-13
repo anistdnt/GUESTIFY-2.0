@@ -141,7 +141,7 @@ const Login = () => {
           </form>
           <p className="mt-4 text-center text-gray-600">
             <span className=" me-2">Don&apos;t have an account?</span>
-            <Link href="/" className="text-buttons">
+            <Link href="/signup" className="text-buttons">
               Sign Up
             </Link>
           </p>
