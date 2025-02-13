@@ -21,7 +21,8 @@ export default {
         cardTitleCol : "#5b645d",
         cardDesCol : "#788b7c",
         headingCol : "c29a00",
-        subheadingCol : "c29a00"
+        subheadingCol : "c29a00",
+        primaryText:'5B645D'
       },
     },
   },
