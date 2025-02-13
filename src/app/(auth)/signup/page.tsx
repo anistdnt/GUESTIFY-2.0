@@ -106,6 +106,8 @@ const SignUp = () => {
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
+                minLength={1}
+                maxLength={30}
                 required
                 placeholder="eg : John"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -120,6 +122,8 @@ const SignUp = () => {
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
+                minLength={1}
+                maxLength={30}
                 required
                 placeholder="eg : Doe"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
