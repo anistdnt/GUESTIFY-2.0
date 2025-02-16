@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Rating from "../Rating/Rating";
-import { CurrencyInr } from "@phosphor-icons/react/dist/ssr";
+import { CurrencyInr, MapPin } from "@phosphor-icons/react/dist/ssr";
 
 type Props = {
   number_of_stars: number;
@@ -62,7 +62,7 @@ export default function DisplayCard({ number_of_stars }: Props) {
             <p className="text-sm text-gray-600">27, Nabakrishna Guie Lane, Near College, Kolkata-700021</p>
           </div>
           <div className="text-right">
-            <p className="text-xl font-bold flex flex-row justify-center items-center text-red-600"><span><CurrencyInr size={15}/></span><span>10,000</span></p>
+            <p className="text-xl font-bold flex flex-row justify-center items-center text-priceCol"><span><CurrencyInr size={15}/></span><span>10,000</span></p>
             <p className="text-sm text-gray-500">onwards</p>
           </div>
         </div>
@@ -80,11 +80,11 @@ export default function DisplayCard({ number_of_stars }: Props) {
         <div className="flex flex-row">
           <div className="flex flex-col justify-start items-start text-sm text-gray-500 p-2">
             <p>Single Bed</p>
-            <p className="font-bold flex flex-row justify-center items-center text-red-600"><span><CurrencyInr size={10}/></span><span>10,000</span></p>
+            <p className="font-bold flex flex-row justify-center items-center text-priceCol"><span><CurrencyInr size={10}/></span><span>10,000</span></p>
           </div>
           <div className="flex flex-col justify-start items-start text-sm text-gray-500 border-l p-2">
             <p>Double Bed</p>
-            <p className="font-bold flex flex-row justify-center items-center text-red-600"><span><CurrencyInr size={10}/></span><span>20,000</span></p>
+            <p className="font-bold flex flex-row justify-center items-center text-priceCol"><span><CurrencyInr size={10}/></span><span>20,000</span></p>
           </div>
         </div>
 
@@ -98,12 +98,12 @@ export default function DisplayCard({ number_of_stars }: Props) {
         </p>
 
         <div className="flex flex-row flex-wrap gap-3 justify-between items-center text-sm text-gray-500 mt-3">
-          <span>📍 0.7 km from the choosen location</span>
+          <p className="flex flex-row justify-center items-center gap-2"><span><MapPin size={18} weight="fill" /></span> <span>0.7 km from the choosen location</span></p>
           <div className="flex gap-4">
-          <button className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+          <button className="bg-buttons text-white px-4 py-2 rounded hover:bg-red-700">
             View full details
           </button>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+          <button className="bg-buttonsSecondary text-white px-4 py-2 rounded hover:bg-orange-600">
             Contact Owner
           </button>
         </div>

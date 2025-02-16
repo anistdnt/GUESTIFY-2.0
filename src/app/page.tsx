@@ -41,7 +41,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className=" grid grid-cols-2 max-w-7xl mx-auto gap-5 py-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
         <DisplayCard number_of_stars={5} />
         <DisplayCard number_of_stars={5}/>
       </div>
