@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 
 export default function Profile() {
-    const [image, setImage] = useState<string>('/assets/profile.png');
+    // const [image, setImage] = useState<string>('/assets/profile.png');
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [query, setQuery] = useState<string>("");
     const pathname = usePathname();
@@ -44,7 +44,7 @@ export default function Profile() {
                     <i onClick={handleModal} className="fa-solid fa-magnifying-glass text-black/50 sm:mr-4 cursor-pointer"></i>
                     <div className="relative w-12 h-12">
                         <Image
-                            src={image}
+                            src="/assets/profile.png"
                             alt="Profile Avatar"
                             className="rounded-full"
                             fill
