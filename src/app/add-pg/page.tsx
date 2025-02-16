@@ -46,7 +46,7 @@ export default function PGForm() {
   }
 
   return (
-    <div className="bg-yellow-100 min-h-screen py-8 px-4">
+    <div className="bg-gray-100 min-h-screen py-8 px-4">
       <form className="mx-auto max-w-7xl" onSubmit={handleFormSubmit}>
         <h2 className="text-2xl font-bold mb-4">PG Information</h2>
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">

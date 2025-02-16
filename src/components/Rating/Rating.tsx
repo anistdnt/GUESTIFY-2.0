@@ -17,13 +17,13 @@ export default function Rating({ no_of_star }: Props) {
     <div className="flex flex-row gap-3">
       <div className="flex flex-row">
         {Array.from({ length: no_of_star }, (_, index) => (
-          <Star key={index} size={20} weight="fill" className=" text-ratingStarCol" />
+          <Star key={index} size={15} weight="fill" className=" text-ratingStarCol" />
         ))}
         {Array.from({ length: 5-no_of_star }, (_, index) => (
-          <Star key={index} size={20}/>
+          <Star key={index} size={15}/>
         ))}
       </div>
-      <div className={`${ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5].color} px-3 text-sm rounded-md text-white`}>{ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5].comment}</div>
+      <div className={`${ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5].color} px-2 text-xs rounded-md text-white`}>{ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5].comment}</div>
     </div>
   );
 }

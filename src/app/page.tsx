@@ -1,33 +1,32 @@
 // Importing Components
+import DisplayCard from "@/components/DisplayCard/DisplayCard";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <>
-    <div className="flex items-center  px-8 lg:px-16 bg-white">
-     
-      <div className="w-full lg:w-1/2  text-center lg:text-left">
-        <h1 className="text-4xl text-center lg:text-7xl font-bold text-gray-600 ">
-          Discover Your Perfect PG Stay
-        </h1>
-     
-        <p className="mt-4 text-lg lg:text-medium text-gray-600 text-center">
-          Find your ideal paying guest accommodation with ease.
-        </p>
+      <div className="flex items-center  px-8 lg:px-16 bg-white">
+        <div className="w-full lg:w-1/2  text-center lg:text-left">
+          <h1 className="text-4xl text-center lg:text-7xl font-bold text-gray-600 ">
+            Discover Your Perfect PG Stay
+          </h1>
+
+          <p className="mt-4 text-lg lg:text-medium text-gray-600 text-center">
+            Find your ideal paying guest accommodation with ease.
+          </p>
+        </div>
+
+        <div className="hidden md:block md:w-1/2 lg:block w-1/2">
+          <Image
+            src="/assets/mainImage.png"
+            alt="PG Stay"
+            width={500} // Set actual width
+            height={500} // Set actual height
+            className="w-full mb-9 "
+          />
+        </div>
       </div>
 
- 
-      <div className="hidden md:block md:w-1/2 lg:block w-1/2">
-      <Image
-          src="/assets/mainImage.png"
-          alt="PG Stay"
-          width={500} // Set actual width
-          height={500} // Set actual height
-          className="w-full mb-9 "
-          />
-      </div>
-    </div>
-  
       <div className="mx-auto lg:w-4/5 p-4 bg-white rounded-lg shadow-lg">
         <div className="flex items-center border w-full border-gray-300 rounded-lg overflow-hidden">
           <div></div>
@@ -41,8 +40,11 @@ export default function Home() {
           </button>
         </div>
       </div>
-   
-    
-          </>
+
+      <div className=" grid grid-cols-2 max-w-7xl mx-auto gap-5 py-10">
+        <DisplayCard number_of_stars={5} />
+        <DisplayCard number_of_stars={5}/>
+      </div>
+    </>
   );
 }
