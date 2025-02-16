@@ -2,9 +2,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { FaEnvelope } from "react-icons/fa";
-import Link from "next/link";
 
-const page = () => {
+
+const Page = () => {
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
       const [image, setImage] = useState<string>('/assets/profile.png');
@@ -155,4 +155,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
