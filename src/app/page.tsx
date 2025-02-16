@@ -28,7 +28,7 @@ export default function Home() {
 
       <div className="mx-auto lg:w-3/5 p-4 bg-white rounded-lg shadow-lg">
         <div className="flex items-center border w-full border-gray-300 rounded-lg overflow-hidden">
-          <select name="" id="" className="mr-3 ml-3">
+          <select name="" id="" className=" w-1/2  border-l-purple-600">
             <option value="">College</option>
             <option value="">College</option>
             <option value="">College</option>
