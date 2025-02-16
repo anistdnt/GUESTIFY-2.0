@@ -8,16 +8,16 @@ type Props = {
 
 export default function DisplayCard({number_of_stars} : Props) {
   return (
-    <div className="flex flex-col justify-center items-start bg-cardsBackground m-4 px-1 pt-1 pb-3 max-w-96 rounded-md">
+    <div className="flex flex-col justify-center items-start bg-cardsBackground m-4 px-1 pt-1 pb-3 w-full rounded-md">
       <Image
         src={"/assets/sample1.jpg"}
         alt="House"
         width={400}
         height={400}
         loading="eager"
-        className="rounded-md"
+        className="rounded-md w-full"
       />
-      <div className="flex flex-col gap-2 mt-3 px-2">
+      <div className="flex flex-col gap-2 mt-3 px-2 w-full">
         <div className="text-cardTitle text-cardTitleCol font-medium font-cardTitle">
           Sample PG Title
         </div>
