@@ -55,6 +55,14 @@ export default function PGForm() {
             <input type="text" placeholder="Street Name" className="p-2 border rounded" />
             <input type="text" placeholder="House No" className="p-2 border rounded" />
             <input type="text" placeholder="State" className="p-2 border rounded" />
+            <input type="number" placeholder="Rent" className="p-2 border rounded" />
+            <select className="p-2 border rounded">
+              <option>Deposit Duration</option>
+              <option>monthly</option>
+              <option>quarterly</option>
+              <option>half-yearly</option>
+              <option>yearly</option>
+            </select>
             <select className="p-2 border rounded">
               <option>Country</option>
               <option>India</option>
