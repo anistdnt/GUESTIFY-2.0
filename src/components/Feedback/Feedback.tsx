@@ -20,19 +20,22 @@ const Feedback: React.FC = () => {
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([
     {
       name: "Emma Johnson",
-      comment: "The room was beautiful and the service was excellent. I had a great stay!",
+      comment:
+        "The room was beautiful and the service was excellent. I had a great stay!",
       rating: 5,
       imageUrl: room1,
     },
     {
       name: "Michael Brown",
-      comment: "Excellent location and really comfortable rooms. Highly recommended!",
+      comment:
+        "Excellent location and really comfortable rooms. Highly recommended!",
       rating: 4,
       imageUrl: room2,
     },
     {
       name: "Sarah Davis",
-      comment: "Loved the spa and the room view was breathtaking. Will come back soon!",
+      comment:
+        "Loved the spa and the room view was breathtaking. Will come back soon!",
       rating: 4,
       imageUrl: room3,
     },
@@ -56,7 +59,7 @@ const Feedback: React.FC = () => {
     },
   ]);
 
-  // State for new feedback form
+  // State for new feedback
   const [newName, setNewName] = useState("");
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
@@ -68,7 +71,7 @@ const Feedback: React.FC = () => {
   const itemsPerView = 2;
   const totalItems = feedbackList.length;
 
-  const pairsCount = Math.ceil(totalItems / itemsPerView); 
+  const pairsCount = Math.ceil(totalItems / itemsPerView);
   const maxIndex = pairsCount > 0 ? pairsCount - 1 : 0;
 
   // Convert uploaded file to base64
@@ -114,189 +117,67 @@ const Feedback: React.FC = () => {
     setCurrentIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
   };
 
-  // Container
-  const containerStyle: React.CSSProperties = {
-    width: "80%",
-    maxWidth: "1200px",
-    margin: "0 auto",
-    minHeight: "100vh",
-    backgroundColor: "#fafafa",
-    fontFamily: "Helvetica, Arial, sans-serif",
-    padding: "2rem 0",
-    display: "flex",
-    flexDirection: "column",
-    gap: "3rem",
-  };
-
-  // Headings
-  const headingStyle: React.CSSProperties = {
-    fontSize: "2rem",
-    fontWeight: 700,
-    margin: "0 0 1.5rem",
-    color: "#333",
-    textAlign: "center",
-  };
-
-  // Carousel wrapper: 800px wide => 2 items at 400px each
-  const carouselWrapperStyle: React.CSSProperties = {
-    position: "relative",
-    width: "800px",
-    margin: "0 auto",
-    overflow: "hidden",
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    padding: "1rem 0",
-  };
-
-  // Track: each item is 400px wide => totalItems * 400
-  const trackStyle: React.CSSProperties = {
-    display: "flex",
-    transition: "transform 0.4s ease-in-out",
-    width: `${400 * totalItems}px`,
-    transform: `translateX(-${currentIndex * 800}px)`,
-  };
-
-  // Card: 400px wide
-  const cardStyle: React.CSSProperties = {
-    width: "400px",
-    boxSizing: "border-box",
-    padding: "2rem 1.5rem",
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    backgroundColor: "#fff",
-  };
-
-  // Nav buttons
-  const navButtonStyle: React.CSSProperties = {
-    position: "absolute",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "#fff",
-    border: "1px solid #ccc",
-    borderRadius: "50%",
-    width: "40px",
-    height: "40px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    textAlign: "center",
-    lineHeight: "38px",
-    fontSize: "1.2rem",
-    userSelect: "none",
-  };
-
-  // Form container
-  const formContainerStyle: React.CSSProperties = {
-    backgroundColor: "#fff",
-    padding: "2rem",
-    borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-    width: "700px",
-    margin: "0 auto",
-  };
-
-  // Labels, inputs, etc.
-  const labelStyle: React.CSSProperties = {
-    fontSize: "1rem",
-    fontWeight: "bold",
-    display: "block",
-    marginBottom: "0.25rem",
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "0.75rem",
-    fontSize: "1rem",
-    borderRadius: "4px",
-    border: "1px solid #ddd",
-    outline: "none",
-  };
-
-  const submitButtonStyle: React.CSSProperties = {
-    background: "linear-gradient(to right, #FF6A9C, #FF3D7F)",
-    color: "#fff",
-    padding: "0.75rem 1.5rem",
-    border: "none",
-    borderRadius: "30px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "1rem",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    transition: "opacity 0.3s ease",
-    marginTop: "1rem",
-    alignSelf: "flex-start",
-  };
-
-  // Text wrapping
-  const textWrapStyle: React.CSSProperties = {
-    whiteSpace: "normal",
-    overflowWrap: "break-word",
-    wordBreak: "break-word",
-    margin: 0,
-  };
-
   return (
-    <div style={containerStyle}>
-      {/* Carousel Section */}
+    <div className="w-4/5 max-w-[1200px] mx-auto min-h-screen bg-[#fafafa] py-8 flex flex-col gap-12">
+      {/* 1) Carousel Section */}
       <div>
-        <h2 style={headingStyle}>Feedback</h2>
-        <div style={carouselWrapperStyle}>
-          <div style={trackStyle}>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
+          Feedback
+        </h2>
+
+        {/* Carousel Wrapper (800px wide => 2 items at 400px each) */}
+        <div className="relative w-[800px] mx-auto overflow-hidden bg-white rounded-md shadow p-4">
+          {/* Track (dynamic width, translateX) */}
+          <div
+            className="flex transition-transform duration-300 ease-in-out"
+            style={{
+              width: `${400 * totalItems}px`,
+              transform: `translateX(-${currentIndex * 800}px)`,
+            }}
+          >
             {feedbackList.map((feedback, index) => (
-              <div key={index} style={cardStyle}>
-                {/* Image */}
+              <div
+                key={index}
+                className="w-[400px] box-border p-6 flex flex-col gap-4 bg-white whitespace-normal break-words"
+              >
+                {/* Image (optional) */}
                 {feedback.imageUrl && (
-                  <div style={{ textAlign: "center" }}>
+                  <div className="text-center">
                     {typeof feedback.imageUrl === "string" ? (
                       <img
                         src={feedback.imageUrl}
                         alt={`${feedback.name} feedback`}
-                        style={{
-                          width: "250px",
-                          height: "250px",
-                          objectFit: "cover",
-                          borderRadius: "50%",
-                        }}
+                        className="w-[250px] h-[250px] object-cover rounded-full mx-auto"
                       />
                     ) : (
                       <img
                         src={feedback.imageUrl.src}
                         alt={`${feedback.name} feedback`}
-                        style={{
-                          width: "250px",
-                          height: "250px",
-                          objectFit: "cover",
-                          borderRadius: "50%",
-                        }}
+                        className="w-[250px] h-[250px] object-cover rounded-full mx-auto"
                       />
                     )}
                   </div>
                 )}
 
                 {/* Comment & Rating */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  <p style={{ ...textWrapStyle, fontStyle: "italic" }}>
+                <div className="flex flex-col gap-2">
+                  <p className="italic m-0">
                     “{feedback.comment}”
                   </p>
                   <div>
                     {Array.from({ length: 5 }, (_, i) => (
                       <span
                         key={i}
-                        style={{
-                          color: i < feedback.rating ? "gold" : "lightgray",
-                          fontSize: "1.3rem",
-                          marginRight: "2px",
-                        }}
+                        className={`${
+                          i < feedback.rating ? "text-gold" : "text-gray-300"
+                        } text-xl mr-[2px]`}
                       >
                         ★
                       </span>
                     ))}
                   </div>
-                  <p style={{ ...textWrapStyle, textAlign: "right" }}>
-                    <strong>- {feedback.name}</strong>
+                  <p className="text-right m-0 font-semibold">
+                    - {feedback.name}
                   </p>
                 </div>
               </div>
@@ -306,73 +187,79 @@ const Feedback: React.FC = () => {
           {/* Prev / Next Buttons */}
           <button
             onClick={handlePrev}
-            style={{ ...navButtonStyle, left: "1rem" }}
+            className="absolute top-1/2 -translate-y-1/2 left-4 bg-white border border-gray-300 rounded-full w-10 h-10 cursor-pointer font-bold shadow text-center leading-[2.5rem] text-xl select-none"
           >
             ←
           </button>
           <button
             onClick={handleNext}
-            style={{ ...navButtonStyle, right: "1rem" }}
+            className="absolute top-1/2 -translate-y-1/2 right-4 bg-white border border-gray-300 rounded-full w-10 h-10 cursor-pointer font-bold shadow text-center leading-[2.5rem] text-xl select-none"
           >
             →
           </button>
         </div>
       </div>
 
-      {/* Form Section */}
-      <div style={formContainerStyle}>
+      {/* 2) Form Section */}
+      <div className="bg-white p-8 rounded-md shadow w-[700px] mx-auto">
         <form
           onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          className="flex flex-col gap-4"
         >
           {/* Name */}
           <div>
-            <label style={labelStyle}>Your Name</label>
+            <label className="block text-sm font-bold mb-1">
+              Your Name
+            </label>
             <input
               type="text"
               placeholder="Enter your name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              style={inputStyle}
+              className="border border-gray-300 rounded px-3 py-2 outline-none text-base w-full"
             />
           </div>
 
           {/* Comment */}
           <div>
-            <label style={labelStyle}>Write Your Feedback</label>
+            <label className="block text-sm font-bold mb-1">
+              Write Your Feedback
+            </label>
             <textarea
               placeholder="Write your feedback here..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               rows={4}
-              style={{ ...inputStyle, resize: "none" }}
+              className="border border-gray-300 rounded px-3 py-2 outline-none text-base w-full resize-none"
             />
           </div>
 
           {/* Image Upload */}
           <div>
-            <label style={labelStyle}>Upload Image (Optional)</label>
+            <label className="block text-sm font-bold mb-1">
+              Upload Image (Optional)
+            </label>
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              style={{ fontSize: "1rem" }}
+              className="text-sm"
             />
           </div>
 
           {/* Rating */}
           <div>
-            <label style={labelStyle}>Rate:</label>
-            <div style={{ display: "flex", gap: "0.5rem" }}>
+            <label className="block text-sm font-bold mb-1">
+              Rate:
+            </label>
+            <div className="flex gap-2">
               {Array.from({ length: 5 }, (_, i) => (
                 <span
                   key={i}
-                  style={{
-                    cursor: "pointer",
-                    color: i < newRating ? "gold" : "gray",
-                    fontSize: "1.5rem",
-                  }}
                   onClick={() => setNewRating(i + 1)}
+                  className={`cursor-pointer text-2xl ${
+                    i < newRating ? "text-gold" : "text-gray-300"
+                  }`}
                 >
                   ★
                 </span>
@@ -383,9 +270,7 @@ const Feedback: React.FC = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            style={submitButtonStyle}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            className="bg-gradient-to-r from-[#FF6A9C] to-[#FF3D7F] text-white py-3 px-6 rounded-full cursor-pointer font-bold text-base uppercase tracking-wide transition-opacity duration-300 mt-4 hover:opacity-80"
           >
             Submit Feedback
           </button>
