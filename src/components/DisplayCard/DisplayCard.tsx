@@ -1,12 +1,16 @@
+"use client"
 import Image from "next/image";
 import Rating from "../Rating/Rating";
 import { CurrencyInr } from "@phosphor-icons/react/dist/ssr";
+import { useRouter } from "next/navigation";
+
 
 type Props = {
   number_of_stars : number;
 };
 
 export default function DisplayCard({number_of_stars} : Props) {
+  const router = useRouter()
   return (
     <div className="flex flex-col justify-center items-start bg-cardsBackground m-4 px-1 pt-1 pb-3 w-full rounded-md">
       <Image
@@ -34,7 +38,7 @@ export default function DisplayCard({number_of_stars} : Props) {
             <span>3000</span> 
             <span className="text-sm">p.m</span>
           </div>
-          <button className="bg-buttons px-4 rounded-md font-semibold text-white">View</button>
+          <button onClick={()=>router.push("/pginfo")} className="bg-buttons px-4 rounded-md font-semibold text-white">View</button>
         </div>
       </div>
     </div>

@@ -15,7 +15,7 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         buttons : "#c29a00",
-        buttonsHover : "#c29a00",
+        buttonsHover : "#a38300",
         ratingStarCol : "#b39009",
         cardsBackground : "#fcf5d6",
         cardTitleCol : "#5b645d",
