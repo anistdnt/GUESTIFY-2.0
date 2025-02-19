@@ -13,7 +13,7 @@ const About = () => {
         <section className="relative bg-[url('/assets/about-us-banner.jpg')] bg-fixed bg-bottom bg-cover text-white h-72 flex flex-row justify-center items-center">
         <div className="absolute inset-0 bg-black bg-opacity-35"></div>
           <div className="relative mx-auto max-w-7xl text-center">
-            <h1 className="text-5xl font-bold">About Guestify</h1>
+            <h1 className="text-5xl font-bold">About Us</h1>
             <p className="mt-4 text-lg">
               Your trusted platform for finding paying guest accommodations in West Bengal.
             </p>
