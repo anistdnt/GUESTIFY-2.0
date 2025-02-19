@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import DisplayCard from "@/components/DisplayCard/DisplayCard";
 
 export default function Home() {
   const [placeholder, setPlaceholder] = useState("Search...");
@@ -109,6 +110,11 @@ export default function Home() {
             South 24 Parganas
           </div>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
+        <DisplayCard number_of_stars={5} />
+        <DisplayCard number_of_stars={5}/>
       </div>
     </>
   );
