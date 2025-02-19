@@ -4,7 +4,8 @@ import Feedback from '@/components/Feedback/Feedback';
 // import { useEffect, useState } from 'react';
 // import { useRouter } from 'next/router';
 // import { Swiper, SwiperSlide } from 'swiper/react';
-import { ForkKnife, WifiHigh, ThermometerCold } from '@phosphor-icons/react';
+import { ForkKnife, WifiHigh, ThermometerCold, ArrowLeft } from '@phosphor-icons/react';
+import { useRouter } from 'next/navigation';
 
 // import 'swiper/css';
 
@@ -25,13 +26,17 @@ const PGDetails = () => {
     //     return <p className="text-center mt-10">Loading PG details...</p>;
     // }
 
+    const router = useRouter()
     return (
-        <div className=" mx-auto p-6">
+        <div className=" mx-auto">
+            <ArrowLeft size={32} onClick={()=>router.back()} className='mb-4 cursor-pointer'/>
             <div className='flex flex-col sm:flex-row gap-6'>
 
                 <img src="/assets/sample1.jpg"
                     alt="PG Image"
-                    className="sm:w-[70%] rounded-lg max-h-[440px]" />
+                    className="sm:w-[70%] rounded-lg max-h-[480px]" />
+                
+                {/* for slider use , will use it later */}
 
                 {/* <Swiper spaceBetween={10} slidesPerView={1} className="mb-6">
                     {pgDetails.images.map((img, index) => (
@@ -47,7 +52,7 @@ const PGDetails = () => {
                 </Swiper> */}
 
                 <div className='w-full sm:w-full sm:max-w-[300px]'>
-                    <h1 className="text-3xl font-bold mb-4">PG Name</h1>
+                    <h1 className="text-3xl font-bold mb-6">PG Name</h1>
 
                     <p className="text-xl font-semibold mb-4">Rent: <span className='text-3xl text-red-500'>₹12000</span></p>
                     <p className='flex flex-row gap-3 items-center mb-3'><WifiHigh size={20} /> <span className='font-semibold'>Wifi :</span> Available</p> {/* {pgDetails.wifi ? 'Available' : 'Not Available'} */}
