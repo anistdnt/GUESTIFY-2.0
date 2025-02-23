@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeSlash } from "@phosphor-icons/react/dist/ssr";
+// import type { Metadata } from "next";
+
+// const metadata:Metadata = {
+//   title: "Login | Explore the perfect habitate",
+//   description: "Explore the perfect habitate",
+// };
 
 type LoginFormData = {
   email: string;
@@ -48,14 +53,6 @@ const Login = () => {
 
   return (
     <>
-      <Head>
-        <title>Login - Guestify</title>
-        <meta
-          name="description"
-          content="Login to your Guestify account and explore paying guest accommodations."
-        />
-      </Head>
-
       <div className="min-h-[85vh] flex flex-col lg:flex-row  items-center justify-evenly bg-gray-100 py-10">
         <Image
           src="/assets/login_illustration.webp"
@@ -86,7 +83,7 @@ const Login = () => {
               </label>
               <div className="relative">
                 <input
-                  type={!showPassToggle ? 'password' : 'text'}
+                  type={!showPassToggle ? "password" : "text"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}

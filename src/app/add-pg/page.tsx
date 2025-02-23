@@ -46,7 +46,7 @@ export default function PGForm() {
   }
 
   return (
-    <div className="bg-yellow-100 min-h-screen py-8 px-4">
+    <div className="bg-gray-100 min-h-screen py-8 px-4">
       <form className="mx-auto max-w-7xl" onSubmit={handleFormSubmit}>
         <h2 className="text-2xl font-bold mb-4">PG Information</h2>
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -55,6 +55,14 @@ export default function PGForm() {
             <input type="text" placeholder="Street Name" className="p-2 border rounded" />
             <input type="text" placeholder="House No" className="p-2 border rounded" />
             <input type="text" placeholder="State" className="p-2 border rounded" />
+            <input type="number" placeholder="Rent" className="p-2 border rounded" />
+            <select className="p-2 border rounded">
+              <option>Deposit Duration</option>
+              <option>monthly</option>
+              <option>quarterly</option>
+              <option>half-yearly</option>
+              <option>yearly</option>
+            </select>
             <select className="p-2 border rounded">
               <option>Country</option>
               <option>India</option>

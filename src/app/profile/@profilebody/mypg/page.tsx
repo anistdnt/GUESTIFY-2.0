@@ -12,7 +12,7 @@ const Page = () => {
     router.push("/add-pg")
   }
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 justify-items-center">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 justify-items-center">
       <DisplayCard number_of_stars={4}/>
       <DisplayCard number_of_stars={3}/>
       <DisplayCard number_of_stars={2}/>
