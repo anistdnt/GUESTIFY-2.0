@@ -4,23 +4,23 @@ const CollegeSchema = new Schema(
   {
     college_name: {
       type: String,
-      required: true,
-      minlength: 5,
+      required: [true, "College name is required"],
+      minlength: [5, "College name must be at least 5 characters long"],
       unique: true,
     },
     address: {
       type: String,
-      required: true,
-      minlength: 5,
+      required: [true, "Address is required"],
+      minlength: [5, "Address must be at least 5 characters long"],
     },
     district: {
       type: String,
-      required: true,
-      minlength: 5,
+      required: [true, "District is required"],
+      minlength: [2, "District must be at least 2 characters long"],
     },
     pincode: {
       type: Number,
-      required: true,
+      required: [true, "Pincode is required"],
       validate: {
         validator: (value: number) => /^\d{6}$/.test(value.toString()),
         message: "Pincode must be exactly 6 digits",
@@ -28,7 +28,7 @@ const CollegeSchema = new Schema(
     },
     image_url: {
       type: String,
-      required: true,
+      required: [true, "Image URL is required"],
     },
   },
   { timestamps: true }
