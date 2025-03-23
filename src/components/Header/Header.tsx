@@ -22,9 +22,7 @@ export default function Header() {
 
   const pathname = usePathname();
 
-  useEffect(()=>{
-    
-  },[pathname])
+  useEffect(() => {}, [pathname]);
 
   return (
     <header className="sticky z-50 top-0">
@@ -96,7 +94,12 @@ export default function Header() {
                 ) : (
                   <div className="hidden sm:block">
                     <Link href="/login">
-                      <button className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg">
+                      <button
+                        className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg"
+                        onClick={() => {
+                          setisLoggedIn(false);
+                        }}
+                      >
                         Login/Sign-Up
                       </button>
                     </Link>
