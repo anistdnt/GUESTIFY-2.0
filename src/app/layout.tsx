@@ -3,6 +3,7 @@ import "./globals.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Guestify",
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body className="">
         <Header />
         <main className="">
+          <Toaster/>
           {children}
         </main>
         <Footer />

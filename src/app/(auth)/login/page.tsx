@@ -4,18 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeSlash } from "@phosphor-icons/react/dist/ssr";
-// import type { Metadata } from "next";
-
-// const metadata:Metadata = {
-//   title: "Login | Explore the perfect habitate",
-//   description: "Explore the perfect habitate",
-// };
-
-type LoginFormData = {
-  email: string;
-  password: string | number | readonly string[] | undefined;
-  rememberMe: boolean;
-};
+import { LoginFormData } from "@/types/auth_type";
+import { CrudService } from "@/lib/crud_services";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
@@ -24,13 +17,14 @@ const Login = () => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
-    rememberMe: false,
   });
   const [passwordError, setPasswordError] = useState<string>("");
   const [showPassToggle, setshowPassToggle] = useState<boolean>(false);
+  const [isloading,setisloading] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value} = e.target;
 
     // check if the password follows the regex
     if (name === "password") {
@@ -43,12 +37,26 @@ const Login = () => {
       }
     }
 
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      setisloading(true);
+      const res = await CrudService.add("loginUser",formData);
+      if(res.status===200){
+        router.push("/");
+        toast.success(res.data?.message || "Loggged In successfully");
+      }
+    } catch (error:unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    }
+    finally{
+      setisloading(false);
+    }
   };
 
   return (
@@ -118,10 +126,9 @@ const Login = () => {
               <div className="flex flex-row justify-center items-center gap-2">
                 <input
                   type="checkbox"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
+                  checked={true}
                   className="size-4 accent-buttons cursor-pointer"
+                  disabled
                 />
                 <label htmlFor="rememberMe">Remember Me</label>
               </div>
@@ -132,8 +139,9 @@ const Login = () => {
             <button
               type="submit"
               className="w-full bg-buttons text-white py-2 rounded-lg hover:bg-buttonsHover"
+              disabled = {isloading}
             >
-              Login
+              {isloading ? "Loading.....":"Login"}
             </button>
           </form>
           <p className="mt-4 text-center text-gray-600">
