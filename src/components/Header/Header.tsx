@@ -3,7 +3,7 @@ import { ArrowUp, List } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navigation: {
   name: string;
@@ -21,6 +21,8 @@ export default function Header() {
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
 
   const pathname = usePathname();
+
+  useEffect(() => {}, [pathname]);
 
   return (
     <header className="sticky z-50 top-0">
@@ -92,9 +94,12 @@ export default function Header() {
                 ) : (
                   <div className="hidden sm:block">
                     <Link href="/login">
-                      <button className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg" onClick={()=>{
-                        setisLoggedIn(false);
-                      }}>
+                      <button
+                        className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg"
+                        onClick={() => {
+                          setisLoggedIn(false);
+                        }}
+                      >
                         Login/Sign-Up
                       </button>
                     </Link>
