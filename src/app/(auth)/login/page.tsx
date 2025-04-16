@@ -9,6 +9,7 @@ import { CrudService } from "@/lib/crud_services";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next/client";
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
@@ -20,7 +21,7 @@ const Login = () => {
   });
   const [passwordError, setPasswordError] = useState<string>("");
   const [showPassToggle, setshowPassToggle] = useState<boolean>(false);
-  const [isloading,setisloading] = useState(false);
+  const [isloading,setisloading] = useState<boolean>(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,12 +47,16 @@ const Login = () => {
       setisloading(true);
       const res = await CrudService.add("loginUser",formData);
       if(res.status===200){
+        setCookie("authToken",res.data?.token,{
+          maxAge : 2*60*60 //2 hours
+        });
+        
         router.push("/");
         toast.success(res.data?.message || "Loggged In successfully");
       }
     } catch (error:unknown) {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Something went wrong");
+        toast.error(error.response?.data?.error || "Something went wrong");
       }
     }
     finally{
