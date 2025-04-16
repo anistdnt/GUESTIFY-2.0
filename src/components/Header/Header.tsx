@@ -1,9 +1,14 @@
 "use client";
-import { ArrowUp, List } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUp, Bell, List } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { deleteCookie, hasCookie } from "cookies-next/client";
+import { CrudService } from "@/lib/crud_services";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import { decodeToken } from "@/lib/decodeToken";
 
 const navigation: {
   name: string;
@@ -14,15 +19,66 @@ const navigation: {
   { name: "Contact Us", href: "/contact" },
 ];
 
+interface UserInfo {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  image_url: string | null;
+}
+
 export default function Header() {
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
+  const [showNotification,setshowNotification] = useState<boolean>(false);
+  const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
+  // const [isloading,setisloading] = useState<boolean>(false);
 
   const pathname = usePathname();
+  const router = useRouter();
 
-  useEffect(() => {}, [pathname]);
+  //Sign-out function
+  const logout_user = async () => {
+    try {
+      // setisloading(true);
+      const res = await CrudService.getAll("logoutUser");
+      if (res.status === 200) {
+        deleteCookie("authToken");
+        setisLoggedIn(false);
+        setshowProfileDropdown(false);
+        router.push("/");
+        toast.success(res.data?.message || "Loggged out successfully");
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.error || "Something went wrong");
+      }
+    } finally {
+      // setisloading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (hasCookie("authToken")) {
+      setisLoggedIn(true);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    if (hasCookie("authToken")) {
+      const user_info_fromToken = decodeToken("authToken");
+      
+      setuserInfo({
+        user_id: user_info_fromToken.user_id,
+        first_name: user_info_fromToken.first_name,
+        last_name: user_info_fromToken.last_name,
+        email: user_info_fromToken.email,
+        image_url: user_info_fromToken.image_url,
+      });
+    }
+  }, [isLoggedIn]);
 
   return (
     <header className="sticky z-50 top-0">
@@ -67,8 +123,10 @@ export default function Header() {
             </div>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {/* Profile dropdown */}
-              <div className="relative ml-3">
+              <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
+
+                <Bell size={24} weight="bold" onClick={()=>setshowNotification((prev)=>!prev)} className="cursor-pointer"/>
 
                 {isLoggedIn ? (
                   <div
@@ -78,7 +136,7 @@ export default function Header() {
                     }}
                   >
                     <span className="text-gray-700 text-sm hidden sm:block">
-                      Username
+                      {userInfo?.first_name}
                     </span>
                     <button
                       className="relative flex rounded-full text-sm border border-gray-500"
@@ -86,7 +144,7 @@ export default function Header() {
                     >
                       <img
                         alt="profile-picture"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        src={userInfo?.image_url ? userInfo?.image_url : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
                         className="h-10 w-10 rounded-full"
                       />
                     </button>
@@ -94,12 +152,7 @@ export default function Header() {
                 ) : (
                   <div className="hidden sm:block">
                     <Link href="/login">
-                      <button
-                        className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg"
-                        onClick={() => {
-                          setisLoggedIn(false);
-                        }}
-                      >
+                      <button className="bg-buttons text-white font-semibold text-sm px-4 py-2 rounded-lg">
                         Login/Sign-Up
                       </button>
                     </Link>
@@ -108,7 +161,7 @@ export default function Header() {
 
                 {/* Dropdown  */}
                 {showProfileDropdown && (
-                  <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                  <div className="absolute right-0 top-10 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -130,14 +183,17 @@ export default function Header() {
                     <Link
                       href="#"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => {
-                        setshowProfileDropdown((prev) => !prev);
-                      }}
+                      onClick={logout_user}
                     >
                       Sign out
                     </Link>
                   </div>
                 )}
+
+                {/* Notification Dropdown  */}
+                {showNotification && <div className="absolute right-0 top-10 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                  
+                  </div>}
               </div>
             </div>
           </div>
