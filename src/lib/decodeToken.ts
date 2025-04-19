@@ -25,6 +25,7 @@ export const tokenIsVerified = (token: string) => {
 
     return true;
   } catch (error:unknown) {
+    console.error("Error in verifying token:", error);
     toast.error("Invalid Token");
     return false;
   }
