@@ -1,4 +1,4 @@
-import { getCookie } from "cookies-next/client";
+import { getCookie, deleteCookie} from "cookies-next/client";
 import { JwtPayload } from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import toast from "react-hot-toast";
@@ -15,7 +15,7 @@ export const tokenIsVerified = (token: string) => {
 
     if (exp !== undefined) {
       if (Date.now() >= exp * 1000) {
-        localStorage.removeItem("loginjwt");
+        deleteCookie("authToken");
         toast.error("Token is expired!! Please login again");
         return false;
       }
@@ -24,7 +24,7 @@ export const tokenIsVerified = (token: string) => {
     }
 
     return true;
-  } catch (error) {
+  } catch (error:unknown) {
     toast.error("Invalid Token");
     return false;
   }
@@ -42,7 +42,7 @@ export const decodeToken = (cookieName: string): JwtPayload => {
 
     if (tokenIsVerified(authToken)) {
       const decoded = jwtDecode(authToken);
-      // console.log("✅ Decoded token:", decoded);
+      // console.log("Decoded token:", decoded);
       return decoded as JwtPayload;
     }
     else{
@@ -50,7 +50,7 @@ export const decodeToken = (cookieName: string): JwtPayload => {
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error("❌ Error in decodeToken:", error);
+      console.error("Error in decodeToken:", error);
       toast.error(`Error while parsing the Token : ${error.message}`);
     }
 
