@@ -1,29 +1,58 @@
-import { getCookie } from "cookies-next/client";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { getCookie, deleteCookie} from "cookies-next/client";
+import { JwtPayload } from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 import toast from "react-hot-toast";
 
-export const decodeToken = (token: string): JwtPayload => {
+export const tokenIsVerified = (token: string) => {
+  //Check if the token not exists
+  if (!token) {
+    return false;
+  }
+
+  // check whether the token is expired or not
   try {
-    const authToken = getCookie(token);
-    console.log(authToken);
-    if (!authToken) {
-      throw new Error("User Authorization failed : Token not available");
+    const { exp } = jwtDecode(token);
+
+    if (exp !== undefined) {
+      if (Date.now() >= exp * 1000) {
+        deleteCookie("authToken");
+        toast.error("Token is expired!! Please login again");
+        return false;
+      }
+    } else {
+      return false;
     }
-    const decoded_token = jwt.verify(
-      authToken,
-      "GKeyForAll"
-    ) as JwtPayload;
-    console.log(decoded_token);
-    console.log("Hello");
-    return decoded_token;
+
+    return true;
+  } catch (error:unknown) {
+    console.error("Error in verifying token:", error);
+    toast.error("Invalid Token");
+    return false;
+  }
+};
+
+export const decodeToken = (cookieName: string): JwtPayload => {
+  try {
+    const authToken = getCookie(cookieName);
+    // console.log("Raw authToken:", authToken);
+
+    if (!authToken || typeof authToken !== "string") {
+      throw new Error("Token is not available or is not a string.");
+    }
+    // const decoded = jwt.verify(authToken, "GKeyForAll");
+
+    if (tokenIsVerified(authToken)) {
+      const decoded = jwtDecode(authToken);
+      // console.log("Decoded token:", decoded);
+      return decoded as JwtPayload;
+    }
+    else{
+      throw new Error("Token is not valid");
+    }
   } catch (error: unknown) {
-    if (
-      error instanceof jwt.JsonWebTokenError ||
-      error instanceof jwt.NotBeforeError ||
-      error instanceof jwt.TokenExpiredError || 
-      error instanceof Error
-    ) {
-      toast.error(error.message);
+    if (error instanceof Error) {
+      console.error("Error in decodeToken:", error);
+      toast.error(`Error while parsing the Token : ${error.message}`);
     }
 
     return {} as JwtPayload;

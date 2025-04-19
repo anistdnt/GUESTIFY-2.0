@@ -23,6 +23,7 @@ interface UserInfo {
   user_id: string;
   first_name: string;
   last_name: string;
+  full_name: string;
   email: string;
   image_url: string | null;
 }
@@ -69,16 +70,19 @@ export default function Header() {
   useEffect(() => {
     if (hasCookie("authToken")) {
       const user_info_fromToken = decodeToken("authToken");
+
+      console.log("Header input",user_info_fromToken);
       
       setuserInfo({
         user_id: user_info_fromToken.user_id,
         first_name: user_info_fromToken.first_name,
         last_name: user_info_fromToken.last_name,
+        full_name : user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
         email: user_info_fromToken.email,
         image_url: user_info_fromToken.image_url,
       });
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn,pathname]);
 
   return (
     <header className="sticky z-50 top-0">
@@ -126,17 +130,29 @@ export default function Header() {
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
 
-                <Bell size={24} weight="bold" onClick={()=>setshowNotification((prev)=>!prev)} className="cursor-pointer"/>
+                <Bell size={24} weight="bold" onClick={()=>{setshowNotification((prev)=>!prev);setshowProfileDropdown(false)}} className="cursor-pointer"/>
+
+                {/* Notification Dropdown  */}
+                {showNotification && <div className="absolute left-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                  <ul>
+                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
+                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
+                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
+                  </ul>
+                  </div>}
+
+                <div className="border-2" style={{height : "3em"}}></div>
 
                 {isLoggedIn ? (
                   <div
                     className="flex flex-row justify-center items-center gap-3 cursor-pointer"
                     onClick={() => {
                       setshowProfileDropdown((prev) => !prev);
+                      setshowNotification(false);
                     }}
                   >
-                    <span className="text-gray-700 text-sm hidden sm:block">
-                      {userInfo?.first_name}
+                    <span className="text-gray-700 text-sm hidden sm:block font-semibold">
+                      {userInfo?.full_name}
                     </span>
                     <button
                       className="relative flex rounded-full text-sm border border-gray-500"
@@ -161,7 +177,8 @@ export default function Header() {
 
                 {/* Dropdown  */}
                 {showProfileDropdown && (
-                  <div className="absolute right-0 top-10 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                  <div className="absolute right-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                    <div className="block px-4 py-2 text-sm text-gray-700 border-b-2">Welcome, <span className="font-bold">{userInfo?.full_name}</span></div>
                     <Link
                       href="/profile"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -189,11 +206,6 @@ export default function Header() {
                     </Link>
                   </div>
                 )}
-
-                {/* Notification Dropdown  */}
-                {showNotification && <div className="absolute right-0 top-10 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                  
-                  </div>}
               </div>
             </div>
           </div>
