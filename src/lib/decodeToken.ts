@@ -1,5 +1,5 @@
 import { getCookie } from "cookies-next/client";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import toast from "react-hot-toast";
 
