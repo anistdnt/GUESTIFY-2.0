@@ -49,8 +49,7 @@ const Login = () => {
       if(res.status===200){
         setCookie("authToken",res.data?.token,{
           maxAge : 2*60*60 //2 hours
-        });
-        
+        });   
         router.push("/");
         toast.success(res.data?.message || "Loggged In successfully");
       }

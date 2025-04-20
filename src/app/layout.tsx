@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
+import { ReduxProvider } from "@/redux/Provider";
 
 export const metadata: Metadata = {
   title: "Guestify",
@@ -15,16 +16,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   return (
     <html lang="en">
       <body className="">
-        <Header />
-        <main className="">
-          <Toaster/>
-          {children}
-        </main>
-        <Footer />
+        <ReduxProvider>
+          <Header />
+          <main className="">
+            <Toaster />
+            {children}
+          </main>
+          <Footer />
+        </ReduxProvider>
       </body>
     </html>
   );
