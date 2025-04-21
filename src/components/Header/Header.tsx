@@ -33,7 +33,7 @@ interface UserInfo {
 }
 
 export interface GetNotification_Type {
-  notification : any
+  notification : string
 }
 
 interface HeaderProps {
