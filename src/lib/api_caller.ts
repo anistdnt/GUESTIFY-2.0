@@ -14,11 +14,6 @@ export interface ApiReturn<T> {
     error?: string;
     status?: number;
 }
-interface ApiParams<T> {
-    method: "POST" | "GET" | "PUT" | "DELETE";
-    url: string;
-    data?: any;
-}
 
 const handleApiRequest = async <T>(
     config: AxiosRequestConfig
