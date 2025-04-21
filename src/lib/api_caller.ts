@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, isAxiosError } from "axios";
 import { axios_ins, axios_base } from "./axios_ins";
 
 interface BaseApiResponse<T> {
@@ -34,10 +34,16 @@ const handleApiRequest = async <T>(
             message: response.data.message,
             status: response.data.status,
         };
-    } catch (error: any) {
-        const status = error.response?.status || 500;
-        const errorMessage =
-            error.response?.data?.message || error.message || "Something went wrong";
+    } catch (err: unknown) {
+        let errorMessage = "Something went wrong";
+        let status = 500;
+
+        if (isAxiosError(err)) {
+            status = err.response?.status || 500;
+            errorMessage = err.response?.data?.message || err.message || errorMessage;
+        } else if (err instanceof Error) {
+            errorMessage = err.message;
+        }
 
         return {
             success: false,
@@ -48,7 +54,11 @@ const handleApiRequest = async <T>(
 };
 
 // the api caller  
-export const api_caller = async <T, R = any>(method: "POST" | "GET" | "PUT" | "DELETE", url: string, data?: R): Promise<ApiReturn<T>> => {
+export const api_caller = async <T, R = unknown>(
+    method: "POST" | "GET" | "PUT" | "DELETE",
+    url: string,
+    data?: R
+): Promise<ApiReturn<T>> => {
     const result = await handleApiRequest<T>({
         method,
         url,
@@ -63,4 +73,3 @@ export const api_caller = async <T, R = any>(method: "POST" | "GET" | "PUT" | "D
         return result;
     }
 };
-
