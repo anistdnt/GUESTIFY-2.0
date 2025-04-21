@@ -12,6 +12,7 @@ import { decodeToken } from "@/lib/decodeToken";
 import { useDispatch } from "react-redux";
 import { setToken } from "@/redux/slices/userSlice";
 import { log } from "console";
+import {ApiReturn} from "@/lib/api_caller"
 
 const navigation: {
   name: string;
@@ -36,7 +37,7 @@ export interface GetNotification_Type {
 }
 
 interface HeaderProps {
-  notification_response: GetNotification_Type;
+  notification_response: ApiReturn<GetNotification_Type>;
 }
 
 export default function Header({notification_response} : HeaderProps) {
