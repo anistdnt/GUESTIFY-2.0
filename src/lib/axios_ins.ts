@@ -22,3 +22,8 @@ axios_ins.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Instance without interceptors (for login, public APIs)
+export const axios_base: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
+});

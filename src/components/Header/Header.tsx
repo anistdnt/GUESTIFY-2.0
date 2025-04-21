@@ -11,6 +11,7 @@ import { AxiosError } from "axios";
 import { decodeToken } from "@/lib/decodeToken";
 import { useDispatch } from "react-redux";
 import { setToken } from "@/redux/slices/userSlice";
+import { log } from "console";
 
 const navigation: {
   name: string;
@@ -30,7 +31,17 @@ interface UserInfo {
   image_url: string | null;
 }
 
-export default function Header() {
+export interface GetNotification_Type {
+  notification : any
+}
+
+interface HeaderProps {
+  notification_response: GetNotification_Type;
+}
+
+export default function Header({notification_response} : HeaderProps) {
+  console.log(notification_response);
+  
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
