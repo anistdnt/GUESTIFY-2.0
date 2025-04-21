@@ -41,7 +41,7 @@ interface HeaderProps {
 }
 
 export default function Header({notification_response} : HeaderProps) {
-  // console.log(notification_response);
+  console.log(notification_response);
   
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
