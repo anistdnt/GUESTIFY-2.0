@@ -67,6 +67,7 @@ export const api_caller = async <T, R = unknown>(
 
     if (result.success) {
         console.log("Success:", result.data);
+        console.log("hii")
         return result;
     } else {
         console.error("Error:", result.error);
