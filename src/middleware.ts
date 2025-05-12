@@ -12,7 +12,7 @@ export function middleware(req: NextRequest) {
     const oneYearInSeconds = 60 * 60 * 24 * 365;
 
     res.cookies.set("device_token", deviceToken, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       maxAge: oneYearInSeconds,
       sameSite: "lax",
