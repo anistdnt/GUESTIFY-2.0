@@ -10,6 +10,7 @@ interface BaseApiResponse<T> {
 export interface ApiReturn<T> {
     success: boolean;
     data?: T;
+    results?:T;
     message?: string;
     error?: string;
     status?: number;
@@ -30,24 +31,28 @@ const handleApiRequest = async <T>(
 
         return {
             success: true,
-            data: response.data.data,
+            data: response.data as T,
             message: response.data.message,
             status: response.data.status,
         };
     } catch (err: unknown) {
+        console.log(err);
         let errorMessage = "Something went wrong";
+        let CauseError = null;
         let status = 500;
 
         if (isAxiosError(err)) {
             status = err.response?.status || 500;
             errorMessage = err.response?.data?.message || err.message || errorMessage;
+            CauseError = err.response?.data?.error;
         } else if (err instanceof Error) {
             errorMessage = err.message;
         }
 
         return {
             success: false,
-            error: errorMessage,
+            error: CauseError,
+            message: errorMessage,
             status,
         };
     }

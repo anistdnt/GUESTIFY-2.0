@@ -11,16 +11,17 @@ import { AxiosError } from "axios";
 import { decodeToken } from "@/lib/decodeToken";
 import { useDispatch } from "react-redux";
 import { setToken } from "@/redux/slices/userSlice";
-import {ApiReturn} from "@/lib/api_caller"
+import { api_caller, ApiReturn } from "@/lib/api_caller"
+import { API } from "@/lib/api_const";
 
 const navigation: {
   name: string;
   href: string;
 }[] = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Contact Us", href: "/contact" },
-];
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Contact Us", href: "/contact" },
+  ];
 
 interface UserInfo {
   user_id: string;
@@ -32,22 +33,23 @@ interface UserInfo {
 }
 
 export interface GetNotification_Type {
-  notification : string
+  notification: string
 }
 
-interface HeaderProps {
-  notification_response: ApiReturn<GetNotification_Type>;
-}
+// interface HeaderProps {
+//   notification_response: ApiReturn<GetNotification_Type>;
+// }
 
-export default function Header({notification_response} : HeaderProps) {
-  console.log(notification_response);
-  
+export default function Header() {
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
-  const [showNotification,setshowNotification] = useState<boolean>(false);
+  const [showNotification, setshowNotification] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
+  const [notifications, setNotifications] = useState<any[]>()
+  const [loadingNotifications, setLoadingNotifications] = useState<boolean>(false);
+
   // const [isloading,setisloading] = useState<boolean>(false);
 
   const pathname = usePathname();
@@ -75,6 +77,30 @@ export default function Header({notification_response} : HeaderProps) {
     }
   };
 
+  // notification api handler
+  async function handleNotification(e: React.MouseEvent<HTMLButtonElement>) {
+    setshowNotification((prev) => !prev);
+    setshowProfileDropdown(false);
+
+    if (!showNotification) {
+      setLoadingNotifications(true);
+
+      try {
+        const resData: ApiReturn<any> = await api_caller<any>(
+          "GET",
+          API.NOTIFICATION.ALL_NOTIFICATIONS
+        );
+        console.log(resData);
+        setNotifications(resData?.data?.results);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      } finally {
+        setLoadingNotifications(false);
+      }
+    }
+  }
+
+
   useEffect(() => {
     if (hasCookie("authToken")) {
       setisLoggedIn(true);
@@ -86,17 +112,17 @@ export default function Header({notification_response} : HeaderProps) {
       const user_info_fromToken = decodeToken("authToken");
 
       dispatch(setToken("authToken"));
-      
+
       setuserInfo({
         user_id: user_info_fromToken.user_id,
         first_name: user_info_fromToken.first_name,
         last_name: user_info_fromToken.last_name,
-        full_name : user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
+        full_name: user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
         email: user_info_fromToken.email,
         image_url: user_info_fromToken.image_url,
       });
     }
-  }, [isLoggedIn,pathname]);
+  }, [isLoggedIn, pathname]);
 
   return (
     <header className="sticky z-50 top-0">
@@ -130,9 +156,8 @@ export default function Header({notification_response} : HeaderProps) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`text-sm ${
-                      item.href === pathname ? "font-semibold" : ""
-                    }`}
+                    className={`text-sm ${item.href === pathname ? "font-semibold" : ""
+                      }`}
                   >
                     {item.name}
                   </Link>
@@ -143,19 +168,42 @@ export default function Header({notification_response} : HeaderProps) {
               {/* Profile dropdown */}
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
-
-                <Bell size={24} weight="bold" onClick={()=>{setshowNotification((prev)=>!prev);setshowProfileDropdown(false)}} className="cursor-pointer"/>
+                <button onClick={handleNotification}>
+                  <Bell size={24} weight="bold" className="cursor-pointer" />
+                </button>
 
                 {/* Notification Dropdown  */}
-                {showNotification && <div className="absolute left-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                  <ul>
-                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
-                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
-                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
-                  </ul>
-                  </div>}
+                {showNotification && (
+                  <div className="absolute left-0 top-14 z-10 mt-2 w-52 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                    <ul>
+                      {loadingNotifications ? (
+                        Array(3)
+                          .fill(0)
+                          .map((_, idx) => (
+                            <li
+                              key={idx}
+                              className="px-4 py-2 animate-pulse text-sm text-gray-700"
+                            >
+                              <div className="h-4 bg-gray-300 rounded w-full"></div>
+                            </li>
+                          ))
+                      ) : (
+                        Array.isArray(notifications) && notifications.map((notif: any, idx: number) => (
+                            <li
+                              key={idx}
+                              className="flex flex-row gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-6 w-7 text-white rounded-full" /> : <></>}{notif.message}
+                            </li>
+                            
+                        ))
+                      )}
+                    </ul>
+                  </div>
+                )}
 
-                <div className="border-2" style={{height : "3em"}}></div>
+
+                <div className="border-2" style={{ height: "3em" }}></div>
 
                 {isLoggedIn ? (
                   <div
@@ -227,11 +275,10 @@ export default function Header({notification_response} : HeaderProps) {
 
         {showHamburger && (
           <div
-            className={`sm:hidden ${
-              showHamburger
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
-            } transition-opacity duration-300`}
+            className={`sm:hidden ${showHamburger
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+              } transition-opacity duration-300`}
           >
             <div className="flex flex-col gap-3 space-y-1 px-2 pb-3 pt-2">
               {isLoggedIn ? (
