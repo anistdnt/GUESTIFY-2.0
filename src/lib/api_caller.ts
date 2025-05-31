@@ -32,22 +32,26 @@ const handleApiRequest = async <T>(
             success: true,
             data: response.data.data,
             message: response.data.message,
-            status: response.data.status,
+            status: response.status,
         };
     } catch (err: unknown) {
+        console.log(err);
         let errorMessage = "Something went wrong";
+        let CauseError = null;
         let status = 500;
 
         if (isAxiosError(err)) {
             status = err.response?.status || 500;
             errorMessage = err.response?.data?.message || err.message || errorMessage;
+            CauseError = err.response?.data?.error;
         } else if (err instanceof Error) {
             errorMessage = err.message;
         }
 
         return {
             success: false,
-            error: errorMessage,
+            error: CauseError,
+            message : errorMessage,
             status,
         };
     }
@@ -70,7 +74,7 @@ export const api_caller = async <T, R = unknown>(
         console.log("hii")
         return result;
     } else {
-        console.error("Error:", result.error);
+        console.log("Error:", result.error);
         return result;
     }
 };

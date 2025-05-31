@@ -5,13 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { deleteCookie, hasCookie } from "cookies-next/client";
-import { CrudService } from "@/lib/crud_services";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
 import { decodeToken } from "@/lib/decodeToken";
 import { useDispatch } from "react-redux";
 import { setToken } from "@/redux/slices/userSlice";
-import {ApiReturn} from "@/lib/api_caller"
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import { setLoading } from "@/redux/slices/loaderSlice";
 
 const navigation: {
   name: string;
@@ -31,24 +31,14 @@ interface UserInfo {
   image_url: string | null;
 }
 
-export interface GetNotification_Type {
-  notification : string
-}
+export default function Header() {
 
-interface HeaderProps {
-  notification_response: ApiReturn<GetNotification_Type>;
-}
-
-export default function Header({notification_response} : HeaderProps) {
-  console.log(notification_response);
-  
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
-  const [showNotification,setshowNotification] = useState<boolean>(false);
+  const [showNotification, setshowNotification] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
-  // const [isloading,setisloading] = useState<boolean>(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -56,23 +46,18 @@ export default function Header({notification_response} : HeaderProps) {
 
   //Sign-out function
   const logout_user = async () => {
-    try {
-      // setisloading(true);
-      const res = await CrudService.getAll("logoutUser");
-      if (res.status === 200) {
-        deleteCookie("authToken");
-        setisLoggedIn(false);
-        setshowProfileDropdown(false);
-        router.push("/");
-        toast.success(res.data?.message || "Loggged out successfully");
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.error || "Something went wrong");
-      }
-    } finally {
-      // setisloading(false);
+    dispatch(setLoading({ loading: true }));
+    const res: ApiReturn<any> = await api_caller<any>("GET", API.USER.LOGOUT);
+    if (res.success) {
+      deleteCookie("authToken");
+      setisLoggedIn(false);
+      setshowProfileDropdown(false);
+      router.push("/");
+      toast.success(res.message || "Loggged out successfully");
+    } else {
+      toast.error(`${res.message} : ${res.error}`);
     }
+    dispatch(setLoading({ loading: false }));
   };
 
   useEffect(() => {
@@ -86,20 +71,21 @@ export default function Header({notification_response} : HeaderProps) {
       const user_info_fromToken = decodeToken("authToken");
 
       dispatch(setToken("authToken"));
-      
+
       setuserInfo({
         user_id: user_info_fromToken.user_id,
         first_name: user_info_fromToken.first_name,
         last_name: user_info_fromToken.last_name,
-        full_name : user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
+        full_name:
+          user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
         email: user_info_fromToken.email,
         image_url: user_info_fromToken.image_url,
       });
     }
-  }, [isLoggedIn,pathname]);
+  }, [isLoggedIn, pathname]);
 
   return (
-    <header className="sticky z-50 top-0">
+    <header className="sticky z-40 top-0">
       <nav className="bg-white">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
@@ -144,18 +130,34 @@ export default function Header({notification_response} : HeaderProps) {
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
 
-                <Bell size={24} weight="bold" onClick={()=>{setshowNotification((prev)=>!prev);setshowProfileDropdown(false)}} className="cursor-pointer"/>
+                <Bell
+                  size={24}
+                  weight="bold"
+                  onClick={() => {
+                    setshowNotification((prev) => !prev);
+                    setshowProfileDropdown(false);
+                  }}
+                  className="cursor-pointer"
+                />
 
                 {/* Notification Dropdown  */}
-                {showNotification && <div className="absolute left-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                  <ul>
-                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
-                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
-                    <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hello</li>
-                  </ul>
-                  </div>}
+                {showNotification && (
+                  <div className="absolute left-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                    <ul>
+                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Hello
+                      </li>
+                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Hello
+                      </li>
+                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Hello
+                      </li>
+                    </ul>
+                  </div>
+                )}
 
-                <div className="border-2" style={{height : "3em"}}></div>
+                <div className="border-2" style={{ height: "3em" }}></div>
 
                 {isLoggedIn ? (
                   <div
@@ -169,13 +171,19 @@ export default function Header({notification_response} : HeaderProps) {
                       {userInfo?.full_name}
                     </span>
                     <button
-                      className="relative flex rounded-full text-sm border border-gray-500"
+                      className="relative flex rounded-full text-sm border border-gray-500 h-10 w-10"
                       aria-label="Open user menu"
                     >
-                      <img
-                        alt="profile-picture"
-                        src={userInfo?.image_url ? userInfo?.image_url : "/assets/profile.png"}
-                        className="h-10 w-10 rounded-full"
+                      <Image
+                        src={
+                          userInfo?.image_url
+                            ? userInfo?.image_url
+                            : "/assets/profile.png"
+                        }
+                        alt="Profile Avatar"
+                        className="rounded-full"
+                        fill
+                        objectFit="cover"
                       />
                     </button>
                   </div>
@@ -192,7 +200,10 @@ export default function Header({notification_response} : HeaderProps) {
                 {/* Dropdown  */}
                 {showProfileDropdown && (
                   <div className="absolute right-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                    <div className="block px-4 py-2 text-sm text-gray-700 border-b-2">Welcome, <span className="font-bold">{userInfo?.full_name}</span></div>
+                    <div className="block px-4 py-2 text-sm text-gray-700 border-b-2">
+                      Welcome,{" "}
+                      <span className="font-bold">{userInfo?.full_name}</span>
+                    </div>
                     <Link
                       href={`/profile/${userInfo?.user_id}`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
