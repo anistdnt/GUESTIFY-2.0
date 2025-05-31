@@ -5,43 +5,38 @@ import { FaTimes } from "react-icons/fa";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useParams } from "next/navigation";
-import { CrudService } from "@/lib/crud_services";
-import { ProfileType } from "@/types/profile_type";
+// import { CrudService } from "@/lib/crud_services";
+// import { ProfileType } from "@/types/profile_type";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
-import { useDispatch } from "react-redux";
+// import { AxiosError } from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "@/redux/slices/userSlice";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import { RootState } from "@/redux/store";
 
 export default function Profile() {
   const { uid } = useParams();
+  const profile_info = useSelector(
+    (state: RootState) => state.user_slice.userData
+  );
   // const [image, setImage] = useState<string>('/assets/profile.png');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const pathname = usePathname();
-  const [profile_info, setprofile_info] = useState<ProfileType | null>(null);
 
   const dispatch = useDispatch();
 
   const fetcheUserProfile = async () => {
-    try {
-      // setisloading(true);
-      const res = await CrudService.getById(
-        "getProfile",
-        uid?.toString() as string
-      );
-      if (res.status === 200) {
-        dispatch(setUserData(res.data?.result[0]));
-        setprofile_info(res.data?.result[0]);
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.error ||
-            "Something went wrong while fetching profile information"
-        );
-      }
-    } finally {
-      // setisloading(false);
+    const res: ApiReturn<any> = await api_caller<any>(
+      "GET",
+      `${API.USER.INFO}/${uid}`
+    );
+    if (res.success) {
+      dispatch(setUserData(res?.data[0]));
+      // console.log(res?.data)
+    } else {
+      toast.error(`${res.message} : ${res.error}`);
     }
   };
 
@@ -74,7 +69,7 @@ export default function Profile() {
     fetcheUserProfile();
   }, []);
 
-  if (!profile_info) {
+  if (!profile_info || Object.keys(profile_info).length === 0) {
     return <ProfileSkeleton />;
   } else {
     return (
@@ -165,8 +160,6 @@ export default function Profile() {
     );
   }
 }
-
-
 
 // skeleton for the above code
 

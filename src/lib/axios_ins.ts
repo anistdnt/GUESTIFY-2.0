@@ -11,10 +11,12 @@ axios_ins.interceptors.request.use(
     if (hasCookie("authToken")) {
       const token = getCookie("authToken");
       config.headers["Authorization"] = `Bearer ${token}`;
+      console.log(token);
     }
     if (hasCookie("device_token")) {
       const deviceToken = getCookie("device_token");
       config.headers["device-token"] = deviceToken;
+      console.log(deviceToken);
     }
     return config;
   },
