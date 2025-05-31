@@ -6,6 +6,7 @@ import Footer from "@/components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { ReduxProvider } from "@/redux/Provider";
 import GlobalLoaderWrapper from "@/components/Loader/GlobalLoaderWrapper";
+import DefaultModal from "@/components/Modals/DefaultModal";
 // import { API } from "@/lib/api_const";
 // import { api_caller } from "@/lib/api_caller";
 // import {GetNotification_Type} from "@/components/Header/Header"
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="">
         <ReduxProvider>
+          <DefaultModal/>
           <GlobalLoaderWrapper/>
           <Header/>
           <main className="">
