@@ -12,6 +12,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { useDispatch } from "react-redux";
 import { setLoading } from "@/redux/slices/loaderSlice";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
@@ -137,9 +138,9 @@ const Login = () => {
                 />
                 <label htmlFor="rememberMe">Remember Me</label>
               </div>
-              <Link href="/" className="text-buttons text-sm">
+              <p className="text-buttons text-sm cursor-pointer" onClick={()=>{dispatch(setModalVisibility({open:true,type:"reset"}));}}>
                 Forgot Password?
-              </Link>
+              </p>
             </div>
             <button
               type="submit"

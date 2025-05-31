@@ -7,7 +7,8 @@ export const API = {
         LOGOUT : "/logoutUser",
         REGISTER: "/registerUser",
         INFO : "/getProfile",
-        UPDATE : "/updateProfile"
+        UPDATE : "/updateProfile",
+        FORGET_PASSWORD : "/forgetPassword"
     }
     
 }
