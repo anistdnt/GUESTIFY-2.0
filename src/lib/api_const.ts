@@ -8,7 +8,8 @@ export const API = {
         REGISTER: "/registerUser",
         INFO : "/getProfile",
         UPDATE : "/updateProfile",
-        FORGET_PASSWORD : "/forgetPassword"
+        FORGET_PASSWORD : "/forgetPassword",
+        CHANGE_PASSWORD : "/changePassword"
     }
     
 }
