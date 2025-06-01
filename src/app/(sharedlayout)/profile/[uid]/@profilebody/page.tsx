@@ -10,8 +10,10 @@ import { API } from "@/lib/api_const";
 import { setLoading } from "@/redux/slices/loaderSlice";
 import toast from "react-hot-toast";
 import { setUserData } from "@/redux/slices/userSlice";
-import { setCookie } from "cookies-next/client";
+import { getCookie, setCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { Trash } from "@phosphor-icons/react/dist/ssr";
 
 const Page = () => {
   const reduxUserData = useSelector(
@@ -394,11 +396,25 @@ const Page = () => {
           </div>
         </form>
         <div className="flex items-center gap-5">
-          <button className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-              Change Password
+          <button
+            className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+            onClick={() => {
+              toast.success("You are redirecting to the Reset Password Page")
+              setTimeout(() => {
+                window.open(`/reset-password/${getCookie("authToken")}`,'_blank')
+              }, 2000);
+            }}
+          >
+            Change Password
           </button>
-          <button className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-              Delete Account
+          <button
+            className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+            onClick={() => {
+              dispatch(setModalVisibility({ open: true, type: "delete" }));
+            }}
+          >
+            <Trash size={20} />
+            <p>Delete Account</p>
           </button>
         </div>
       </div>

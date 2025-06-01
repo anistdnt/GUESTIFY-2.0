@@ -6,6 +6,7 @@ import { RootState } from "@/redux/store";
 import ResetPasswordModal from "./ResetPasswordModal";
 import OwnerInfoModal from "./OwnerInfoModal";
 import { hideModal } from "@/redux/slices/modalSlice";
+import ConfirmationModal from "./ConfirmationModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -27,6 +28,9 @@ export default function DefaultModal() {
           )}
           {type === "ownerinfo" && (
             <OwnerInfoModal setshowModal={setshowModal} />
+          )}
+          {type === "delete" && (
+            <ConfirmationModal setshowModal={setshowModal}/>
           )}
         </div>
       )}

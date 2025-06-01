@@ -27,18 +27,18 @@ export default function Profile() {
 
   const dispatch = useDispatch();
 
-  const fetcheUserProfile = async () => {
-    const res: ApiReturn<any> = await api_caller<any>(
-      "GET",
-      `${API.USER.INFO}/${uid}`
-    );
-    if (res.success) {
-      dispatch(setUserData(res?.data[0]));
-      // console.log(res?.data)
-    } else {
-      toast.error(`${res.message} : ${res.error}`);
-    }
-  };
+  // const fetcheUserProfile = async () => {
+  //   const res: ApiReturn<any> = await api_caller<any>(
+  //     "GET",
+  //     `${API.USER.INFO}/${uid}`
+  //   );
+  //   if (res.success) {
+  //     dispatch(setUserData(res?.data[0]));
+  //     // console.log(res?.data)
+  //   } else {
+  //     toast.error(`${res.message} : ${res.error}`);
+  //   }
+  // };
 
   const linkClass = (path: string) =>
     `px-3 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 
@@ -65,9 +65,9 @@ export default function Profile() {
     return formattedDate;
   };
 
-  useEffect(() => {
-    fetcheUserProfile();
-  }, []);
+  // useEffect(() => {
+  //   fetcheUserProfile();
+  // }, []);
 
   if (!profile_info || Object.keys(profile_info).length === 0) {
     return <ProfileSkeleton />;

@@ -9,7 +9,8 @@ export const API = {
         INFO : "/getProfile",
         UPDATE : "/updateProfile",
         FORGET_PASSWORD : "/forgetPassword",
-        CHANGE_PASSWORD : "/changePassword"
+        CHANGE_PASSWORD : "/changePassword",
+        DELETE_ACCOUNT : "/deleteAccount"
     }
     
 }
