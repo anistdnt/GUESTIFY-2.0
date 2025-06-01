@@ -31,9 +31,9 @@ const handleApiRequest = async <T>(
 
         return {
             success: true,
-            data: response.data as T,
+            data: response.data.data as T,
             message: response.data.message,
-            status: response.data.status,
+            status: response.status,
         };
     } catch (err: unknown) {
         console.log(err);
@@ -52,7 +52,7 @@ const handleApiRequest = async <T>(
         return {
             success: false,
             error: CauseError,
-            message: errorMessage,
+            message : errorMessage,
             status,
         };
     }
@@ -75,7 +75,7 @@ export const api_caller = async <T, R = unknown>(
         console.log("hii")
         return result;
     } else {
-        console.error("Error:", result.error);
+        console.log("Error:", result.error);
         return result;
     }
 };

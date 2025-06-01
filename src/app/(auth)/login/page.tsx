@@ -5,11 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeSlash } from "@phosphor-icons/react/dist/ssr";
 import { LoginFormData } from "@/types/auth_type";
-import { CrudService } from "@/lib/crud_services";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next/client";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import { useDispatch } from "react-redux";
+import { setLoading } from "@/redux/slices/loaderSlice";
+import { log } from "console";
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
@@ -21,11 +24,11 @@ const Login = () => {
   });
   const [passwordError, setPasswordError] = useState<string>("");
   const [showPassToggle, setshowPassToggle] = useState<boolean>(false);
-  const [isloading,setisloading] = useState<boolean>(false);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value} = e.target;
+    const { name, value } = e.target;
 
     // check if the password follows the regex
     if (name === "password") {
@@ -43,23 +46,23 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      setisloading(true);
-      const res = await CrudService.add("loginUser",formData);
-      if(res.status===200){
-        setCookie("authToken",res.data?.token,{
-          maxAge : 2*60*60 //2 hours
-        });   
-        router.push("/");
-        toast.success(res.data?.message || "Loggged In successfully");
-      }
-    } catch (error:unknown) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.error || "Something went wrong");
-      }
-    }
-    finally{
-      setisloading(false);
+    dispatch(setLoading({loading:true}))
+    const res: ApiReturn<any> = await api_caller<any>(
+      "POST",
+      API.USER.LOGIN,
+      formData
+    );
+    if (res.success) {
+      
+      setCookie("authToken", res.data?.token, {
+        maxAge: 2 * 60 * 60, //2 hours
+      });
+      dispatch(setLoading({loading:false}))
+      router.push("/");
+      toast.success(res.message || "Loggged In successfully");
+    } else {
+      dispatch(setLoading({loading:false}))
+      toast.error(`${res.message} : ${res.error}`);
     }
   };
 
@@ -143,9 +146,8 @@ const Login = () => {
             <button
               type="submit"
               className="w-full bg-buttons text-white py-2 rounded-lg hover:bg-buttonsHover"
-              disabled = {isloading}
             >
-              {isloading ? "Loading.....":"Login"}
+              Login
             </button>
           </form>
           <p className="mt-4 text-center text-gray-600">

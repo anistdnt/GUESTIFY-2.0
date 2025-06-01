@@ -11,6 +11,7 @@ axios_ins.interceptors.request.use(
     if (hasCookie("authToken")) {
       const token = getCookie("authToken");
       config.headers["Authorization"] = `Bearer ${token}`;
+      console.log(token);
     }
     console.log(getCookie("device_token"));
     

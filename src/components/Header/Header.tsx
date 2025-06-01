@@ -5,14 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { deleteCookie, hasCookie } from "cookies-next/client";
-import { CrudService } from "@/lib/crud_services";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
 import { decodeToken } from "@/lib/decodeToken";
 import { useDispatch } from "react-redux";
 import { setToken } from "@/redux/slices/userSlice";
-import { api_caller, ApiReturn } from "@/lib/api_caller"
+import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
+import { setLoading } from "@/redux/slices/loaderSlice";
 
 const navigation: {
   name: string;
@@ -41,6 +40,7 @@ export interface GetNotification_Type {
 // }
 
 export default function Header() {
+
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
@@ -58,23 +58,18 @@ export default function Header() {
 
   //Sign-out function
   const logout_user = async () => {
-    try {
-      // setisloading(true);
-      const res = await CrudService.getAll("logoutUser");
-      if (res.status === 200) {
-        deleteCookie("authToken");
-        setisLoggedIn(false);
-        setshowProfileDropdown(false);
-        router.push("/");
-        toast.success(res.data?.message || "Loggged out successfully");
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.error || "Something went wrong");
-      }
-    } finally {
-      // setisloading(false);
+    dispatch(setLoading({ loading: true }));
+    const res: ApiReturn<any> = await api_caller<any>("GET", API.USER.LOGOUT);
+    if (res.success) {
+      deleteCookie("authToken");
+      setisLoggedIn(false);
+      setshowProfileDropdown(false);
+      router.push("/");
+      toast.success(res.message || "Loggged out successfully");
+    } else {
+      toast.error(`${res.message} : ${res.error}`);
     }
+    dispatch(setLoading({ loading: false }));
   };
 
   // notification api handler
@@ -91,7 +86,7 @@ export default function Header() {
           API.NOTIFICATION.ALL_NOTIFICATIONS
         );
         console.log(resData);
-        setNotifications(resData?.data?.results);
+        setNotifications(resData?.data);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
       } finally {
@@ -113,6 +108,7 @@ export default function Header() {
 
       dispatch(setToken("authToken"));
 
+
       setuserInfo({
         user_id: user_info_fromToken.user_id,
         first_name: user_info_fromToken.first_name,
@@ -124,8 +120,12 @@ export default function Header() {
     }
   }, [isLoggedIn, pathname]);
 
+  useEffect(() => {
+    console.log(userInfo?.image_url)
+  }, [userInfo])
+
   return (
-    <header className="sticky z-50 top-0">
+    <header className="sticky z-40 top-0">
       <nav className="bg-white">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
@@ -168,14 +168,18 @@ export default function Header() {
               {/* Profile dropdown */}
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
-                <button onClick={handleNotification}>
-                  <Bell size={24} weight="bold" className="cursor-pointer" />
-                </button>
+                <div className="relative">
+                  <button onClick={handleNotification}>
+                    <Bell size={24} weight="bold" className="cursor-pointer" />
+                  </button>
+                  {Array.isArray(notifications) && notifications.length > 0 && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>}
+                </div>
 
                 {/* Notification Dropdown  */}
                 {showNotification && (
-                  <div className="absolute left-0 top-14 z-10 mt-2 w-52 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                    <ul>
+                  <div className="absolute left-0 top-14 z-10 mt-2 w-64 h-72 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                    <span className="px-4"> Notifications</span>
+                    <ul className="border-t-[1px] border-black max-h-64 overflow-y-scroll">
                       {loadingNotifications ? (
                         Array(3)
                           .fill(0)
@@ -189,13 +193,13 @@ export default function Header() {
                           ))
                       ) : (
                         Array.isArray(notifications) && notifications.map((notif: any, idx: number) => (
-                            <li
-                              key={idx}
-                              className="flex flex-row gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-6 w-7 text-white rounded-full" /> : <></>}{notif.message}
-                            </li>
-                            
+                          <li
+                            key={idx}
+                            className="flex flex-row gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-6 w-7 text-white rounded-full" /> : <></>}{notif.message}
+                          </li>
+
                         ))
                       )}
                     </ul>
@@ -217,13 +221,19 @@ export default function Header() {
                       {userInfo?.full_name}
                     </span>
                     <button
-                      className="relative flex rounded-full text-sm border border-gray-500"
+                      className="relative flex rounded-full text-sm border border-gray-500 h-10 w-10"
                       aria-label="Open user menu"
                     >
-                      <img
-                        alt="profile-picture"
-                        src={userInfo?.image_url ? userInfo?.image_url : "/assets/profile.png"}
-                        className="h-10 w-10 rounded-full"
+                      <Image
+                        src={
+                          userInfo?.image_url
+                            ? userInfo?.image_url
+                            : "/assets/profile.png"
+                        }
+                        alt="Profile Avatar"
+                        className="rounded-full"
+                        fill
+                        objectFit="cover"
                       />
                     </button>
                   </div>
@@ -240,7 +250,10 @@ export default function Header() {
                 {/* Dropdown  */}
                 {showProfileDropdown && (
                   <div className="absolute right-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                    <div className="block px-4 py-2 text-sm text-gray-700 border-b-2">Welcome, <span className="font-bold">{userInfo?.full_name}</span></div>
+                    <div className="block px-4 py-2 text-sm text-gray-700 border-b-2">
+                      Welcome,{" "}
+                      <span className="font-bold">{userInfo?.full_name}</span>
+                    </div>
                     <Link
                       href={`/profile/${userInfo?.user_id}`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
