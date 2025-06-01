@@ -10,6 +10,7 @@ interface BaseApiResponse<T> {
 export interface ApiReturn<T> {
     success: boolean;
     data?: T;
+    results?:T;
     message?: string;
     error?: string;
     status?: number;
@@ -30,7 +31,7 @@ const handleApiRequest = async <T>(
 
         return {
             success: true,
-            data: response.data.data,
+            data: response.data.data as T,
             message: response.data.message,
             status: response.status,
         };

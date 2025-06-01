@@ -17,10 +17,10 @@ const navigation: {
   name: string;
   href: string;
 }[] = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Contact Us", href: "/contact" },
-];
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Contact Us", href: "/contact" },
+  ];
 
 interface UserInfo {
   user_id: string;
@@ -31,6 +31,14 @@ interface UserInfo {
   image_url: string | null;
 }
 
+export interface GetNotification_Type {
+  notification: string
+}
+
+// interface HeaderProps {
+//   notification_response: ApiReturn<GetNotification_Type>;
+// }
+
 export default function Header() {
 
   const [showProfileDropdown, setshowProfileDropdown] =
@@ -39,6 +47,10 @@ export default function Header() {
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
   const [showNotification, setshowNotification] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
+  const [notifications, setNotifications] = useState<any[]>()
+  const [loadingNotifications, setLoadingNotifications] = useState<boolean>(false);
+
+  // const [isloading,setisloading] = useState<boolean>(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -60,6 +72,30 @@ export default function Header() {
     dispatch(setLoading({ loading: false }));
   };
 
+  // notification api handler
+  async function handleNotification(e: React.MouseEvent<HTMLButtonElement>) {
+    setshowNotification((prev) => !prev);
+    setshowProfileDropdown(false);
+
+    if (!showNotification) {
+      setLoadingNotifications(true);
+
+      try {
+        const resData: ApiReturn<any> = await api_caller<any>(
+          "GET",
+          API.NOTIFICATION.ALL_NOTIFICATIONS
+        );
+        console.log(resData);
+        setNotifications(resData?.data);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      } finally {
+        setLoadingNotifications(false);
+      }
+    }
+  }
+
+
   useEffect(() => {
     if (hasCookie("authToken")) {
       setisLoggedIn(true);
@@ -72,17 +108,21 @@ export default function Header() {
 
       dispatch(setToken("authToken"));
 
+
       setuserInfo({
         user_id: user_info_fromToken.user_id,
         first_name: user_info_fromToken.first_name,
         last_name: user_info_fromToken.last_name,
-        full_name:
-          user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
+        full_name: user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
         email: user_info_fromToken.email,
         image_url: user_info_fromToken.image_url,
       });
     }
   }, [isLoggedIn, pathname]);
+
+  useEffect(() => {
+    console.log(userInfo?.image_url)
+  }, [userInfo])
 
   return (
     <header className="sticky z-40 top-0">
@@ -116,9 +156,8 @@ export default function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`text-sm ${
-                      item.href === pathname ? "font-semibold" : ""
-                    }`}
+                    className={`text-sm ${item.href === pathname ? "font-semibold" : ""
+                      }`}
                   >
                     {item.name}
                   </Link>
@@ -129,33 +168,44 @@ export default function Header() {
               {/* Profile dropdown */}
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
-
-                <Bell
-                  size={24}
-                  weight="bold"
-                  onClick={() => {
-                    setshowNotification((prev) => !prev);
-                    setshowProfileDropdown(false);
-                  }}
-                  className="cursor-pointer"
-                />
+                <div className="relative">
+                  <button onClick={handleNotification}>
+                    <Bell size={24} weight="bold" className="cursor-pointer" />
+                  </button>
+                  {Array.isArray(notifications) && notifications.length > 0 && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>}
+                </div>
 
                 {/* Notification Dropdown  */}
                 {showNotification && (
-                  <div className="absolute left-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                    <ul>
-                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Hello
-                      </li>
-                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Hello
-                      </li>
-                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Hello
-                      </li>
+                  <div className="absolute left-0 top-14 z-10 mt-2 w-64 h-72 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                    <span className="px-4"> Notifications</span>
+                    <ul className="border-t-[1px] border-black max-h-64 overflow-y-scroll">
+                      {loadingNotifications ? (
+                        Array(3)
+                          .fill(0)
+                          .map((_, idx) => (
+                            <li
+                              key={idx}
+                              className="px-4 py-2 animate-pulse text-sm text-gray-700"
+                            >
+                              <div className="h-4 bg-gray-300 rounded w-full"></div>
+                            </li>
+                          ))
+                      ) : (
+                        Array.isArray(notifications) && notifications.map((notif: any, idx: number) => (
+                          <li
+                            key={idx}
+                            className="flex flex-row gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-6 w-7 text-white rounded-full" /> : <></>}{notif.message}
+                          </li>
+
+                        ))
+                      )}
                     </ul>
                   </div>
                 )}
+
 
                 <div className="border-2" style={{ height: "3em" }}></div>
 
@@ -238,11 +288,10 @@ export default function Header() {
 
         {showHamburger && (
           <div
-            className={`sm:hidden ${
-              showHamburger
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
-            } transition-opacity duration-300`}
+            className={`sm:hidden ${showHamburger
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+              } transition-opacity duration-300`}
           >
             <div className="flex flex-col gap-3 space-y-1 px-2 pb-3 pt-2">
               {isLoggedIn ? (
