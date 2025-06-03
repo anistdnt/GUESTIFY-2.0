@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUp, Bell, List } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUp, Bell, EnvelopeSimple, List, XCircle } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -177,9 +177,9 @@ export default function Header() {
 
                 {/* Notification Dropdown  */}
                 {showNotification && (
-                  <div className="absolute left-0 top-14 z-10 mt-2 w-64 h-72 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                  <div className="absolute right-1 top-14 z-10 mt-2 w-80 max-h-80 origin-top-right rounded-md bg-white py-1 shadow-lg">
                     <span className="px-4"> Notifications</span>
-                    <ul className="border-t-[1px] border-black max-h-64 overflow-y-scroll">
+                    <ul className="border-t-[1px] border-black max-h-64 overflow-y-scroll py-2">
                       {loadingNotifications ? (
                         Array(3)
                           .fill(0)
@@ -195,14 +195,25 @@ export default function Header() {
                         Array.isArray(notifications) && notifications.map((notif: any, idx: number) => (
                           <li
                             key={idx}
-                            className="flex flex-row gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className="flex flex-row gap-8 justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                           >
-                            {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-6 w-7 text-white rounded-full" /> : <></>}{notif.message}
+                            <span className={` ${!notif?.isRead ? "font-bold" : ""} flex flex-row items-start gap-2`}>
+
+                              {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-7 w-7 text-white rounded-full" /> : <></>}{notif.message}
+                            </span>
+                            <div className="flex flex-row items-start gap-2 text-gray-400">
+                              <EnvelopeSimple className="hover:text-gray-600" size={24} />
+                              <XCircle className="hover:text-gray-600" size={24} />
+                            </div>
                           </li>
 
                         ))
                       )}
                     </ul>
+                    <div className="flex flex-row items-center justify-end h-10 gap-4 px-4">
+                      <button className="text-gray-500 hover:text-gray-800">Read All</button>
+                      <button className="text-gray-500 hover:text-gray-800">Clear All</button>
+                    </div>
                   </div>
                 )}
 
