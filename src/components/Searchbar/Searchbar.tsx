@@ -2,97 +2,161 @@
 import React from "react";
 import { useState } from "react";
 import Image from "next/image";
+import Select from "react-select";
+import { Colleges } from "@/data/sample_colleges";
+
+interface distType {
+  id: number;
+  name: string;
+  altname: string;
+  searchval: string;
+  srcimage: string;
+}
+
+const districtMap: distType[] = [
+  {
+    id: 1,
+    name: "Alipore",
+    altname: "alipore",
+    searchval: "alipore",
+    srcimage: "/assets/login_illustration.webp",
+  },
+  {
+    id: 2,
+    name: "Kolkata",
+    altname: "kolkata",
+    searchval: "kolkata",
+    srcimage: "/assets/login_illustration.webp",
+  },
+  {
+    id: 3,
+    name: "Alipore",
+    altname: "alipore",
+    searchval: "alipore",
+    srcimage: "/assets/login_illustration.webp",
+  },
+  {
+    id: 4,
+    name: "Kolkata",
+    altname: "kolkata",
+    searchval: "kolkata",
+    srcimage: "/assets/login_illustration.webp",
+  },
+  {
+    id: 1,
+    name: "Alipore",
+    altname: "alipore",
+    searchval: "alipore",
+    srcimage: "/assets/login_illustration.webp",
+  },
+  {
+    id: 2,
+    name: "Kolkata",
+    altname: "kolkata",
+    searchval: "kolkata",
+    srcimage: "/assets/login_illustration.webp",
+  },
+  {
+    id: 3,
+    name: "Alipore",
+    altname: "alipore",
+    searchval: "alipore",
+    srcimage: "/assets/login_illustration.webp",
+  },
+  {
+    id: 4,
+    name: "Kolkata",
+    altname: "kolkata",
+    searchval: "kolkata",
+    srcimage: "/assets/login_illustration.webp",
+  },
+];
+
+const Districts = () => {
+  return (
+    <div className="mx-auto flex space-x-4 overflow-x-auto p-4 w-full max-w-screen-md scrollbar-hide">
+      {districtMap?.map((district: distType, index: number) => (
+        <div
+          className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0"
+          key={index}
+        >
+          <Image
+            src={district?.srcimage}
+            height={600}
+            width={600}
+            alt={district?.altname}
+          ></Image>
+          <p className="mt-2">{district?.name}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const ExpandedComp = () => {
+  return (
+    <ul
+      id="Kolkata_Colleges"
+      className=" h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+      aria-labelledby="dropdownSearchButton"
+    >
+      {Colleges.map((item) => (
+        <li key={item.id}>
+          <div className="flex items-center py-2 pl-2 rounded hover:bg-gray-50 cursor-pointer">
+            <img
+              className="w-10 h-10 mr-2 rounded-md inline-block"
+              src={item.image_url}
+              alt={item.name + " logo"}
+            />
+            <div className="ml-2">
+              <span className="text-black">{item.name}</span> <br />
+              {/* <span className='ml-2 text-xs'>{item.location.split("|")[0]}</span> */}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const Searchbar = () => {
-  const [placeholder, setPlaceholder] = useState("Search...");
+  const [selectedOption, setSelectedOption] = useState({
+    label: "College",
+    value: "college",
+  });
 
   return (
-    <>
-      <div className="mx-auto flex p-2 lg:w-3/5  bg-white ">
-        {/* <div className=" flex items-center justify-center mx-2 p-2  w-1/5 border border-gray-300 rounded-md "></div> */}
-        <div className="flex  items-center border w-full  rounded-lg overflow-hidden">
-          <select
-            name=""
-            id=""
-            className="px-2 border-none bg-white"
-            onChange={(e) => setPlaceholder(e.target.value)}>
-            <option value="">Search by</option>
-            <option value="Search Places">Location</option>
-            <option value="Search Colleges name">College</option>
-          </select>
+    <div>
+      <Districts />
+      <div className="mx-auto flex flex-col p-2 lg:w-3/5 bg-white rounded-md">
+        <div className="flex items-center border w-full  rounded-lg">
+          <div className="">
+            <Select
+              value={selectedOption}
+              onChange={setSelectedOption}
+              isSearchable={false}
+              className="w-32 border-white"
+              options={[
+                { label: "Location", value: "location" },
+                { label: "College", value: "college" },
+              ]}
+            />
+          </div>
           <input
             type="text"
-            placeholder={placeholder}
+            placeholder={
+              selectedOption?.value === "college"
+                ? "Search By College Name"
+                : "Search By Location"
+            }
             className="w-full px-4 py-2 focus:outline-none"
           />
-          <button className="bg-black text-white px-6 py-2 hover:bg-gray-200 hover:text-black">
-            Search
-          </button>
+        </div>
+        <div className="py-4">
+          <ExpandedComp />
         </div>
       </div>
-      <div className="mx-auto flex space-x-4 overflow-x-auto p-4 w-full max-w-screen-md scrollbar-hide">
-        <div className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0">
-          <Image
-            src="/assets/login_illustration.webp"
-            height={600}
-            width={600}
-            alt="illustration"></Image>
-          <p className="mt-2">Alipore</p>
-        </div>
-        <div className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0">
-          <Image
-            src="/assets/cityImg.png"
-            height={600}
-            width={600}
-            alt="illustration"></Image>
-          <p className="mt-2">Kolkata</p>
-        </div>
-        <div className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0">
-          <Image
-            src={"/assets/cityImg.png"}
-            height={600}
-            width={600}
-            alt="illustration"></Image>
-          <p className="mt-2">Kolkata</p>
-        </div>
-        <div className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0">
-          <Image
-            src="/assets/login_illustration.webp"
-            height={600}
-            width={600}
-            alt="illustration"></Image>
-          <p className="mt-2">Kolkata</p>
-        </div>
-        <div className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0">
-          <Image
-            src="/assets/login_illustration.webp"
-            height={600}
-            width={600}
-            alt="illustration"></Image>
-          <p className="mt-2">Kolkata</p>
-        </div>
-        <div className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0">
-          <Image
-            src="/assets/login_illustration.webp"
-            height={600}
-            width={600}
-            alt="illustration"></Image>
-          <p className="mt-2">Kolkata</p>
-        </div>
-        <div className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0">
-          <Image
-            src="/assets/login_illustration.webp"
-            height={600}
-            width={600}
-            alt="illustration"></Image>
-          <p className="mt-2">Kolkata</p>
-        </div>
-
-        <div className="flex items-center justify-center w-20 h-20 bg-indigo-500 text-white text-sm font-medium rounded-full shrink-0 break-words text-center">
-          South 24 Parganas
-        </div>
-      </div>
-      ;
-    </>
+    </div>
   );
 };
 
