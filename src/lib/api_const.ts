@@ -11,6 +11,10 @@ export const API = {
         FORGET_PASSWORD : "/forgetPassword",
         CHANGE_PASSWORD : "/changePassword",
         DELETE_ACCOUNT : "/deleteAccount"
+    },
+    COLLEGE: {
+        LIST : "/getAllColleges"
     }
+
     
 }
