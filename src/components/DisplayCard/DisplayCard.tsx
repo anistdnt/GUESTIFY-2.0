@@ -9,7 +9,7 @@ import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
 
 type Props = {
-  item: PGData;
+  item?: PGData;
   number_of_stars: number;
 };
 
