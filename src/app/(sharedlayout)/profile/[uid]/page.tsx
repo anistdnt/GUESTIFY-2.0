@@ -1,18 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { FaTimes } from "react-icons/fa";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useParams } from "next/navigation";
-// import { CrudService } from "@/lib/crud_services";
-// import { ProfileType } from "@/types/profile_type";
-import toast from "react-hot-toast";
-// import { AxiosError } from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { setUserData } from "@/redux/slices/userSlice";
-import { api_caller, ApiReturn } from "@/lib/api_caller";
-import { API } from "@/lib/api_const";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
 export default function Profile() {
@@ -24,21 +17,6 @@ export default function Profile() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const pathname = usePathname();
-
-  const dispatch = useDispatch();
-
-  const fetcheUserProfile = async () => {
-    const res: ApiReturn<any> = await api_caller<any>(
-      "GET",
-      `${API.USER.INFO}/${uid}`
-    );
-    if (res.success) {
-      dispatch(setUserData(res?.data[0]));
-      // console.log(res?.data)
-    } else {
-      toast.error(`${res.message} : ${res.error}`);
-    }
-  };
 
   const linkClass = (path: string) =>
     `px-3 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 
@@ -64,10 +42,6 @@ export default function Profile() {
 
     return formattedDate;
   };
-
-  useEffect(() => {
-    fetcheUserProfile();
-  }, []);
 
   if (!profile_info || Object.keys(profile_info).length === 0) {
     return <ProfileSkeleton />;

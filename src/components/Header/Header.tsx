@@ -7,11 +7,13 @@ import { useEffect, useState } from "react";
 import { deleteCookie, hasCookie } from "cookies-next/client";
 import toast from "react-hot-toast";
 import { decodeToken } from "@/lib/decodeToken";
-import { useDispatch } from "react-redux";
-import { setToken } from "@/redux/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setToken, setUserData } from "@/redux/slices/userSlice";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { setLoading } from "@/redux/slices/loaderSlice";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { RootState } from "@/redux/store";
 
 const navigation: {
   name: string;
@@ -40,6 +42,9 @@ export interface GetNotification_Type {
 // }
 
 export default function Header() {
+  const reduxUserData = useSelector(
+    (state: RootState) => state.user_slice.userData
+  );
 
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
@@ -72,6 +77,24 @@ export default function Header() {
     dispatch(setLoading({ loading: false }));
   };
 
+  const fetcheUserProfile = async (uid:any) => {
+    const res: ApiReturn<any> = await api_caller<any>(
+      "GET",
+      `${API.USER.INFO}/${uid}`
+    );
+    if (res.success) {
+      dispatch(setUserData(res?.data[0]));
+      // console.log(res?.data)
+    } else {
+      toast.error(`${res.message} : ${res.error}`);
+    }
+  };
+
+  // useEffect(() => {
+  //   if (hasCookie("authToken")) {
+  //     setisLoggedIn(true);
+  //   }
+  // }, [pathname]);
   // notification api handler
   async function handleNotification(e: React.MouseEvent<HTMLButtonElement>) {
     setshowNotification((prev) => !prev);
@@ -98,27 +121,41 @@ export default function Header() {
 
   useEffect(() => {
     if (hasCookie("authToken")) {
+      if (Object.keys(reduxUserData).length!==0) {
+        // console.log(reduxUserData);
+        setuserInfo({
+          user_id: reduxUserData?._id ?? "",
+          first_name: reduxUserData?.first_name ?? "",
+          last_name: reduxUserData?.last_name ?? "",
+          full_name: reduxUserData?.first_name + " " + reduxUserData?.last_name,
+          email: reduxUserData?.email ?? "",
+          image_url: reduxUserData?.image_url ?? null,
+        });
+      } else {
+        const user_info_fromToken = decodeToken("authToken");
+
+        dispatch(setToken("authToken"));
+
+        fetcheUserProfile(user_info_fromToken.user_id);
+
+        // setuserInfo({
+        //   user_id: user_info_fromToken.user_id,
+        //   first_name: user_info_fromToken.first_name,
+        //   last_name: user_info_fromToken.last_name,
+        //   full_name:
+        //     user_info_fromToken.first_name +
+        //     " " +
+        //     user_info_fromToken.last_name,
+        //   email: user_info_fromToken.email,
+        //   image_url: user_info_fromToken.image_url,
+        // });
+      }
       setisLoggedIn(true);
     }
-  }, [pathname]);
-
-  useEffect(() => {
-    if (hasCookie("authToken")) {
-      const user_info_fromToken = decodeToken("authToken");
-
-      dispatch(setToken("authToken"));
-
-
-      setuserInfo({
-        user_id: user_info_fromToken.user_id,
-        first_name: user_info_fromToken.first_name,
-        last_name: user_info_fromToken.last_name,
-        full_name: user_info_fromToken.first_name + " " + user_info_fromToken.last_name,
-        email: user_info_fromToken.email,
-        image_url: user_info_fromToken.image_url,
-      });
+    else{
+      setisLoggedIn(false);
     }
-  }, [isLoggedIn, pathname]);
+  }, [isLoggedIn, pathname, reduxUserData]);
 
   useEffect(() => {
     console.log(userInfo?.image_url)
@@ -168,7 +205,7 @@ export default function Header() {
               {/* Profile dropdown */}
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
-                <div className="relative">
+                <div className="relative mt-2">
                   <button onClick={handleNotification}>
                     <Bell size={24} weight="bold" className="cursor-pointer" />
                   </button>
@@ -221,7 +258,8 @@ export default function Header() {
                 <div className="border-2" style={{ height: "3em" }}></div>
 
                 {isLoggedIn ? (
-                  <div
+                  <div>
+                    {userInfo===null ? <Skeleton/> : <div
                     className="flex flex-row justify-center items-center gap-3 cursor-pointer"
                     onClick={() => {
                       setshowProfileDropdown((prev) => !prev);
@@ -247,6 +285,7 @@ export default function Header() {
                         objectFit="cover"
                       />
                     </button>
+                  </div>}
                   </div>
                 ) : (
                   <div className="hidden sm:block">
@@ -267,7 +306,7 @@ export default function Header() {
                     </div>
                     <Link
                       href={`/profile/${userInfo?.user_id}`}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
                         setshowProfileDropdown((prev) => !prev);
                       }}
@@ -275,21 +314,23 @@ export default function Header() {
                       Your Profile
                     </Link>
                     <Link
-                      href="/settings"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => {
-                        setshowProfileDropdown((prev) => !prev);
-                      }}
-                    >
-                      Settings
-                    </Link>
-                    <Link
                       href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                       onClick={logout_user}
                     >
                       Sign out
                     </Link>
+                    <div
+                      className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setshowProfileDropdown((prev) => !prev);
+                        dispatch(
+                          setModalVisibility({ open: true, type: "delete" })
+                        );
+                      }}
+                    >
+                      Delete Profile
+                    </div>
                   </div>
                 )}
               </div>
@@ -327,5 +368,15 @@ export default function Header() {
         )}
       </nav>
     </header>
+  );
+}
+
+
+const Skeleton = ()=>{
+  return (
+    <div className="flex flex-row gap-3 items-center">
+      <span className="hidden sm:block w-24 h-4 bg-gray-300 rounded animate-pulse"></span>
+      <div className="h-10 w-10 rounded-full bg-gray-300 animate-pulse"></div>
+    </div>
   );
 }
