@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUp, Bell, List } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUp, Bell, EnvelopeSimple, List, XCircle } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -19,10 +19,10 @@ const navigation: {
   name: string;
   href: string;
 }[] = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Contact Us", href: "/contact" },
-];
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Contact Us", href: "/contact" },
+  ];
 
 interface UserInfo {
   user_id: string;
@@ -32,6 +32,14 @@ interface UserInfo {
   email: string;
   image_url: string | null;
 }
+
+export interface GetNotification_Type {
+  notification: string
+}
+
+// interface HeaderProps {
+//   notification_response: ApiReturn<GetNotification_Type>;
+// }
 
 export default function Header() {
   const reduxUserData = useSelector(
@@ -44,6 +52,10 @@ export default function Header() {
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
   const [showNotification, setshowNotification] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
+  const [notifications, setNotifications] = useState<any[]>()
+  const [loadingNotifications, setLoadingNotifications] = useState<boolean>(false);
+
+  // const [isloading,setisloading] = useState<boolean>(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -83,6 +95,29 @@ export default function Header() {
   //     setisLoggedIn(true);
   //   }
   // }, [pathname]);
+  // notification api handler
+  async function handleNotification(e: React.MouseEvent<HTMLButtonElement>) {
+    setshowNotification((prev) => !prev);
+    setshowProfileDropdown(false);
+
+    if (!showNotification) {
+      setLoadingNotifications(true);
+
+      try {
+        const resData: ApiReturn<any> = await api_caller<any>(
+          "GET",
+          API.NOTIFICATION.ALL_NOTIFICATIONS
+        );
+        console.log(resData);
+        setNotifications(resData?.data);
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      } finally {
+        setLoadingNotifications(false);
+      }
+    }
+  }
+
 
   useEffect(() => {
     if (hasCookie("authToken")) {
@@ -122,6 +157,10 @@ export default function Header() {
     }
   }, [isLoggedIn, pathname, reduxUserData]);
 
+  useEffect(() => {
+    console.log(userInfo?.image_url)
+  }, [userInfo])
+
   return (
     <header className="sticky z-40 top-0">
       <nav className="bg-white">
@@ -154,9 +193,8 @@ export default function Header() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`text-sm ${
-                      item.href === pathname ? "font-semibold" : ""
-                    }`}
+                    className={`text-sm ${item.href === pathname ? "font-semibold" : ""
+                      }`}
                   >
                     {item.name}
                   </Link>
@@ -167,33 +205,55 @@ export default function Header() {
               {/* Profile dropdown */}
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
-
-                <Bell
-                  size={24}
-                  weight="bold"
-                  onClick={() => {
-                    setshowNotification((prev) => !prev);
-                    setshowProfileDropdown(false);
-                  }}
-                  className="cursor-pointer"
-                />
+                <div className="relative mt-2">
+                  <button onClick={handleNotification}>
+                    <Bell size={24} weight="bold" className="cursor-pointer" />
+                  </button>
+                  {Array.isArray(notifications) && notifications.length > 0 && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>}
+                </div>
 
                 {/* Notification Dropdown  */}
                 {showNotification && (
-                  <div className="absolute left-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                    <ul>
-                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Hello
-                      </li>
-                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Hello
-                      </li>
-                      <li className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Hello
-                      </li>
+                  <div className="absolute right-1 top-14 z-10 mt-2 w-80 max-h-80 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                    <span className="px-4"> Notifications</span>
+                    <ul className="border-t-[1px] border-black max-h-64 overflow-y-scroll py-2">
+                      {loadingNotifications ? (
+                        Array(3)
+                          .fill(0)
+                          .map((_, idx) => (
+                            <li
+                              key={idx}
+                              className="px-4 py-2 animate-pulse text-sm text-gray-700"
+                            >
+                              <div className="h-4 bg-gray-300 rounded w-full"></div>
+                            </li>
+                          ))
+                      ) : (
+                        Array.isArray(notifications) && notifications.map((notif: any, idx: number) => (
+                          <li
+                            key={idx}
+                            className="flex flex-row gap-8 justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            <span className={` ${!notif?.isRead ? "font-bold" : ""} flex flex-row items-start gap-2`}>
+
+                              {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-7 w-7 text-white rounded-full" /> : <></>}{notif.message}
+                            </span>
+                            <div className="flex flex-row items-start gap-2 text-gray-400">
+                              <EnvelopeSimple className="hover:text-gray-600" size={24} />
+                              <XCircle className="hover:text-gray-600" size={24} />
+                            </div>
+                          </li>
+
+                        ))
+                      )}
                     </ul>
+                    <div className="flex flex-row items-center justify-end h-10 gap-4 px-4">
+                      <button className="text-gray-500 hover:text-gray-800">Read All</button>
+                      <button className="text-gray-500 hover:text-gray-800">Clear All</button>
+                    </div>
                   </div>
                 )}
+
 
                 <div className="border-2" style={{ height: "3em" }}></div>
 
@@ -280,11 +340,10 @@ export default function Header() {
 
         {showHamburger && (
           <div
-            className={`sm:hidden ${
-              showHamburger
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
-            } transition-opacity duration-300`}
+            className={`sm:hidden ${showHamburger
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+              } transition-opacity duration-300`}
           >
             <div className="flex flex-col gap-3 space-y-1 px-2 pb-3 pt-2">
               {isLoggedIn ? (

@@ -13,6 +13,7 @@ import { API } from "@/lib/api_const";
 import { useDispatch } from "react-redux";
 import { setLoading } from "@/redux/slices/loaderSlice";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { log } from "console";
 
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
@@ -53,6 +54,7 @@ const Login = () => {
       formData
     );
     if (res.success) {
+      
       setCookie("authToken", res.data?.token, {
         maxAge: 2 * 60 * 60, //2 hours
       });
