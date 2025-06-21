@@ -1,6 +1,6 @@
 // Importing Components
 
-import DisplayCard from "@/components/DisplayCard/DisplayCard";
+import CardSection from "@/components/DisplayCard/CardSection";
 import Searchbar from "@/components/Searchbar/Searchbar";
 
 export default function Home() {
@@ -29,10 +29,7 @@ export default function Home() {
         <Searchbar />
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
-        <DisplayCard number_of_stars={5} />
-        <DisplayCard number_of_stars={5} />
-      </div>
+      <CardSection/>
     </>
   );
 }

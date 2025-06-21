@@ -14,6 +14,9 @@ export const API = {
     },
     COLLEGE: {
         LIST : "/getAllColleges"
+    },
+    PG: {
+        ALL : "/getAllpg"
     }
 
     
