@@ -1,20 +1,15 @@
 "use client";
 import DisplayCard from "@/components/DisplayCard/DisplayCard";
-import { RootState } from "@/redux/store";
 import { Plus } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
 
 const Page = () => {
   const router = useRouter();
 
-  const profile_info = useSelector(
-    (state: RootState) => state.user_slice.userData
-  );
-
   function handleRoute() {
-    router.push(`/add-pg/${profile_info?._id}`);
+    router.push("/pg/new");
   }
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 justify-items-center">
       <DisplayCard number_of_stars={4} />
