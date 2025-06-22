@@ -172,7 +172,9 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
             <div className="flex gap-4">
               <button
                 className="bg-buttons text-white px-4 py-2 rounded"
-                onClick={() => router.push("/pginfo")}
+                onClick={() => {
+                  router.push(`/pg/${pginfo?._id}`)
+                }}
               >
                 View full details
               </button>
