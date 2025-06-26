@@ -60,7 +60,7 @@ const handleApiRequest = async <T>(
 
 // the api caller  
 export const api_caller = async <T, R = unknown>(
-    method: "POST" | "GET" | "PUT" | "DELETE",
+    method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH",
     url: string,
     data?: R
 ): Promise<ApiReturn<T>> => {

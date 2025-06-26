@@ -14,6 +14,8 @@ import { API } from "@/lib/api_const";
 import { setLoading } from "@/redux/slices/loaderSlice";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
+import { space } from "postcss/lib/list";
+import Loadercomp from "../Loader/Loadercomp";
 
 const navigation: {
   name: string;
@@ -54,6 +56,9 @@ export default function Header() {
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
   const [notifications, setNotifications] = useState<any[]>()
   const [loadingNotifications, setLoadingNotifications] = useState<boolean>(false);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [bulkActionLoading, setBulkActionLoading] = useState<"read" | "delete" | null>(null);
+
 
   // const [isloading,setisloading] = useState<boolean>(false);
 
@@ -77,7 +82,7 @@ export default function Header() {
     dispatch(setLoading({ loading: false }));
   };
 
-  const fetcheUserProfile = async (uid:any) => {
+  const fetcheUserProfile = async (uid: any) => {
     const res: ApiReturn<any> = await api_caller<any>(
       "GET",
       `${API.USER.INFO}/${uid}`
@@ -96,32 +101,111 @@ export default function Header() {
   //   }
   // }, [pathname]);
   // notification api handler
+
+
   async function handleNotification(e: React.MouseEvent<HTMLButtonElement>) {
     setshowNotification((prev) => !prev);
     setshowProfileDropdown(false);
 
     if (!showNotification) {
-      setLoadingNotifications(true);
-
-      try {
-        const resData: ApiReturn<any> = await api_caller<any>(
-          "GET",
-          API.NOTIFICATION.ALL_NOTIFICATIONS
-        );
-        console.log(resData);
-        setNotifications(resData?.data);
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
-      } finally {
-        setLoadingNotifications(false);
-      }
+      await fetchAllNotifications();
     }
   }
+
+  const fetchAllNotifications = async () => {
+    setLoadingNotifications(true);
+    try {
+      const resData: ApiReturn<any> = await api_caller<any>(
+        "GET",
+        API.NOTIFICATION.ALL_NOTIFICATIONS
+      );
+      console.log(resData);
+      setNotifications(resData?.data);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+
+  const markNotificationAsRead = async (id: string) => {
+    setActionLoadingId(id);
+    try {
+      const resData: ApiReturn<any> = await api_caller<any>("PATCH", `${API.NOTIFICATION.UPDATE_NOTIFICATION}/${id}`);
+      if (resData.success) {
+        toast.success(resData.message);
+        await fetchAllNotifications();
+      } else {
+        toast.error(resData.message);
+      }
+    } catch (error) {
+      console.error("Error updating notification:", error);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+
+  const markAllNotificationsAsRead = async () => {
+    setBulkActionLoading("read");
+    try {
+      const resData: ApiReturn<any> = await api_caller<any>("PUT", API.NOTIFICATION.UPDATE_NOTIFICATIONs);
+      if (resData.success) {
+        toast.success(resData.message);
+        await fetchAllNotifications();
+      } else {
+        toast.error(resData.message);
+      }
+    } catch (error) {
+      console.error("Error updating all notifications:", error);
+    } finally {
+      setBulkActionLoading(null);
+    }
+  };
+
+
+  const deleteNotification = async (id: string) => {
+    setActionLoadingId(id);
+    try {
+      const resData: ApiReturn<any> = await api_caller<any>("DELETE", `${API.NOTIFICATION.DELETE_NOTIFICATION}/${id}`);
+      if (resData.success) {
+        toast.success(resData.message);
+        await fetchAllNotifications();
+      } else {
+        toast.error(resData.message);
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+
+  const deleteAllNotifications = async () => {
+    setBulkActionLoading("delete");
+    try {
+      const resData: ApiReturn<any> = await api_caller<any>("DELETE", API.NOTIFICATION.DELETE_NOTIFICATIONS);
+      if (resData.success) {
+        toast.success(resData.message);
+        await fetchAllNotifications();
+      } else {
+        toast.error(resData.message);
+      }
+    } catch (error) {
+      console.error("Error deleting all notifications:", error);
+    } finally {
+      setBulkActionLoading(null);
+    }
+  };
+
+
 
 
   useEffect(() => {
     if (hasCookie("authToken")) {
-      if (Object.keys(reduxUserData).length!==0) {
+      if (Object.keys(reduxUserData).length !== 0) {
         // console.log(reduxUserData);
         setuserInfo({
           user_id: reduxUserData?._id ?? "",
@@ -152,7 +236,7 @@ export default function Header() {
       }
       setisLoggedIn(true);
     }
-    else{
+    else {
       setisLoggedIn(false);
     }
   }, [isLoggedIn, pathname, reduxUserData]);
@@ -216,40 +300,86 @@ export default function Header() {
                 {showNotification && (
                   <div className="absolute right-1 top-14 z-10 mt-2 w-80 max-h-80 origin-top-right rounded-md bg-white py-1 shadow-lg">
                     <span className="px-4"> Notifications</span>
-                    <ul className="border-t-[1px] border-black max-h-64 overflow-y-scroll py-2">
+                    <ul className="border-t-[1px] border-black py-2  max-h-64 overflow-y-scroll">
                       {loadingNotifications ? (
                         Array(3)
                           .fill(0)
                           .map((_, idx) => (
                             <li
                               key={idx}
-                              className="px-4 py-2 animate-pulse text-sm text-gray-700"
+                              className="flex items-center gap-4 px-4 py-3 animate-pulse text-sm text-gray-700"
                             >
-                              <div className="h-4 bg-gray-300 rounded w-full"></div>
+                              <div className="h-6 w-6 bg-gray-300 rounded-full" />
+                              <div className="h-4 bg-gray-300 rounded w-3/4" />
                             </li>
                           ))
-                      ) : (
-                        Array.isArray(notifications) && notifications.map((notif: any, idx: number) => (
+                      ) : Array.isArray(notifications) && notifications.length > 0 ? (
+                        notifications.map((notif: any, idx: number) => (
                           <li
                             key={idx}
                             className="flex flex-row gap-8 justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                           >
-                            <span className={` ${!notif?.isRead ? "font-bold" : ""} flex flex-row items-start gap-2`}>
-
-                              {notif?.notification_type === "transactional" ? <Bell className="bg-blue-400 p-1 h-7 w-7 text-white rounded-full" /> : <></>}{notif.message}
+                            <span className={`flex flex-row items-start gap-2 ${!notif?.isRead ? "font-bold" : ""}`}>
+                              {notif?.notification_type === "transactional" && (
+                                <Bell className="bg-blue-400 p-1 h-7 w-7 text-white rounded-full" />
+                              )}
+                              {notif.message}
                             </span>
                             <div className="flex flex-row items-start gap-2 text-gray-400">
-                              <EnvelopeSimple className="hover:text-gray-600" size={24} />
-                              <XCircle className="hover:text-gray-600" size={24} />
+                              <EnvelopeSimple
+                                size={24}
+                                className={`cursor-pointer transition-colors duration-200 ${actionLoadingId === notif._id ? "opacity-50 pointer-events-none" : "hover:text-gray-600"}`}
+                                onClick={() => markNotificationAsRead(notif._id)}
+                              />
+                              <XCircle
+                                size={24}
+                                className={`cursor-pointer transition-colors duration-200 ${actionLoadingId === notif._id ? "opacity-50 pointer-events-none" : "hover:text-gray-600"}`}
+                                onClick={() => deleteNotification(notif._id)}
+                              />
+
+                              {actionLoadingId === notif._id && (
+                                <div className="flex items-center justify-center ml-1">
+                                  <Loadercomp size={16} />
+                                </div>
+                              )}
+
+
                             </div>
                           </li>
-
                         ))
+                      ) : (
+                        <li className="text-sm text-gray-600 px-4 py-3 h-24 flex items-center justify-center w-full">
+                          No Notifications to display
+                        </li>
                       )}
                     </ul>
+
                     <div className="flex flex-row items-center justify-end h-10 gap-4 px-4">
-                      <button className="text-gray-500 hover:text-gray-800">Read All</button>
-                      <button className="text-gray-500 hover:text-gray-800">Clear All</button>
+                      <button
+                        className="text-gray-500 hover:text-gray-800 flex items-center gap-1"
+                        onClick={markAllNotificationsAsRead}
+                        disabled={bulkActionLoading === "read"}
+                      >
+                        {bulkActionLoading === "read" ? (
+                          <Loadercomp size={14} />
+                        ) : (
+                          "Read All"
+                        )}
+                      </button>
+
+                      <button
+                        className="text-gray-500 hover:text-gray-800 flex items-center gap-1"
+                        onClick={deleteAllNotifications}
+                        disabled={bulkActionLoading === "delete"}
+                      >
+                        {bulkActionLoading === "delete" ? (
+                          <Loadercomp size={14} />
+                        ) : (
+                          "Clear All"
+                        )}
+                      </button>
+
+
                     </div>
                   </div>
                 )}
@@ -259,33 +389,33 @@ export default function Header() {
 
                 {isLoggedIn ? (
                   <div>
-                    {userInfo===null ? <Skeleton/> : <div
-                    className="flex flex-row justify-center items-center gap-3 cursor-pointer"
-                    onClick={() => {
-                      setshowProfileDropdown((prev) => !prev);
-                      setshowNotification(false);
-                    }}
-                  >
-                    <span className="text-gray-700 text-sm hidden sm:block font-semibold">
-                      {userInfo?.full_name}
-                    </span>
-                    <button
-                      className="relative flex rounded-full text-sm border border-gray-500 h-10 w-10"
-                      aria-label="Open user menu"
+                    {userInfo === null ? <Skeleton /> : <div
+                      className="flex flex-row justify-center items-center gap-3 cursor-pointer"
+                      onClick={() => {
+                        setshowProfileDropdown((prev) => !prev);
+                        setshowNotification(false);
+                      }}
                     >
-                      <Image
-                        src={
-                          userInfo?.image_url
-                            ? userInfo?.image_url
-                            : "/assets/profile.png"
-                        }
-                        alt="Profile Avatar"
-                        className="rounded-full"
-                        fill
-                        objectFit="cover"
-                      />
-                    </button>
-                  </div>}
+                      <span className="text-gray-700 text-sm hidden sm:block font-semibold">
+                        {userInfo?.full_name}
+                      </span>
+                      <button
+                        className="relative flex rounded-full text-sm border border-gray-500 h-10 w-10"
+                        aria-label="Open user menu"
+                      >
+                        <Image
+                          src={
+                            userInfo?.image_url
+                              ? userInfo?.image_url
+                              : "/assets/profile.png"
+                          }
+                          alt="Profile Avatar"
+                          className="rounded-full"
+                          fill
+                          objectFit="cover"
+                        />
+                      </button>
+                    </div>}
                   </div>
                 ) : (
                   <div className="hidden sm:block">
@@ -372,7 +502,7 @@ export default function Header() {
 }
 
 
-const Skeleton = ()=>{
+const Skeleton = () => {
   return (
     <div className="flex flex-row gap-3 items-center">
       <span className="hidden sm:block w-24 h-4 bg-gray-300 rounded animate-pulse"></span>
