@@ -299,6 +299,11 @@ const PGType = [
           <p className="text-sm text-yellow-600">
             Note : Image must be in ( jpg / jpeg / png ) format
           </p>
+          <ErrorMessage
+            name="pg_image_url"
+            component="div"
+            className="text-red-500 text-sm"
+          />
         </div>
       </div>
     </>

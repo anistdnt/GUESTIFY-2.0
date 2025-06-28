@@ -46,7 +46,7 @@ export const PGValidationSchema = {
     rules: Yup.string()
       .required("Please enter the PG rules"),
     pg_image_url: Yup.mixed()
-      .nullable(),
+      .nullable().required("PG Image is required"),
     rooms: Yup.array().of(
       Yup.object().shape({
         room_type: Yup.string()
@@ -60,7 +60,7 @@ export const PGValidationSchema = {
         attached_bathroom: Yup.string()
           .required("Please specify if the room has an attached bathroom"),
         room_image_url: Yup.mixed()
-          .nullable()
+          .nullable().required("Room Image is required"),
       })
     ),
   }),
