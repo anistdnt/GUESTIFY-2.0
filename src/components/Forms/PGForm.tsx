@@ -13,26 +13,69 @@ export default function PGForm() {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setPgImage(imageUrl);
-      setFieldValue("pg_image", file);
+      setFieldValue("pg_image_url", file);
     }
   };
 
   const yesNoOptions = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
+    { label: "Yes", value: "yes" },
+    { label: "No", value: "no" },
   ];
 
-  const countryOptions = [
-    { label: "India", value: "India" },
-    { label: "USA", value: "USA" },
-  ];
+  const districtOptions = [
+  // West Bengal districts
+  { label: "Kolkata", value: "kolkata" },
+  { label: "Howrah", value: "howrah" },
+  { label: "Darjeeling", value: "darjeeling" },
+  { label: "Siliguri", value: "siliguri" },
+  { label: "Hooghly", value: "hooghly" },
 
-  const depositOptions = [
-    { label: "Monthly", value: "monthly" },
-    { label: "Quarterly", value: "quarterly" },
-    { label: "Half-Yearly", value: "half-yearly" },
-    { label: "Yearly", value: "yearly" },
-  ];
+  // Assam districts
+  { label: "Guwahati", value: "guwahati" },
+  { label: "Dibrugarh", value: "dibrugarh" },
+  { label: "Silchar", value: "silchar" },
+
+  // Bihar districts
+  { label: "Patna", value: "patna" },
+  { label: "Gaya", value: "gaya" },
+  { label: "Muzaffarpur", value: "muzaffarpur" },
+];
+
+
+  const stateOptions = [
+  { label: "West Bengal", value: "West Bengal" },
+  { label: "Assam", value: "Assam" },
+  { label: "Bihar", value: "Bihar" },
+  { label: "Odisha", value: "Odisha" },
+  { label: "Jharkhand", value: "Jharkhand" },
+  { label: "Uttar Pradesh", value: "Uttar Pradesh" },
+  { label: "Maharashtra", value: "Maharashtra" },
+  { label: "Karnataka", value: "Karnataka" },
+  { label: "Tamil Nadu", value: "Tamil Nadu" },
+  { label: "Kerala", value: "Kerala" },
+  { label: "Telangana", value: "Telangana" },
+  { label: "Andhra Pradesh", value: "Andhra Pradesh" },
+  { label: "Madhya Pradesh", value: "Madhya Pradesh" },
+  { label: "Rajasthan", value: "Rajasthan" },
+  { label: "Punjab", value: "Punjab" },
+  { label: "Haryana", value: "Haryana" },
+  { label: "Delhi", value: "Delhi" },
+];
+
+const PGType = [
+  {
+    label: "Boys",
+    value: "boys"
+  },
+  {
+    label: "Girls",
+    value: "girls"
+  },
+  {
+    label: "Both",
+    value: "both"
+  }
+]
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -71,22 +114,6 @@ export default function PGForm() {
 
         <div>
           <label className="block mb-1 font-medium">
-            Street Name <span className="text-red-600 font-semibold">*</span>
-          </label>
-          <Field
-            name="street_name"
-            placeholder="eg : Bipin Bihari Street"
-            className="p-2 border rounded w-full"
-          />
-          <ErrorMessage
-            name="street_name"
-            component="span"
-            className="text-red-500 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">
             House Number <span className="text-red-600 font-semibold">*</span>
           </label>
           <Field
@@ -103,12 +130,46 @@ export default function PGForm() {
 
         <div>
           <label className="block mb-1 font-medium">
-            State <span className="text-red-600 font-semibold">*</span>
+            Street Name <span className="text-red-600 font-semibold">*</span>
           </label>
           <Field
-            name="state"
-            placeholder="eg : West Benagl"
+            name="street_name"
+            placeholder="eg : Bipin Bihari Street"
             className="p-2 border rounded w-full"
+          />
+          <ErrorMessage
+            name="street_name"
+            component="span"
+            className="text-red-500 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">
+            District <span className="text-red-600 font-semibold">*</span>
+          </label>
+          <Select
+            options={districtOptions}
+            value={districtOptions?.find((opt) => opt.value === values?.district)}
+            onChange={(option) => setFieldValue("district", option?.value)}
+            placeholder="Select District"
+          />
+          <ErrorMessage
+            name="district"
+            component="span"
+            className="text-red-500 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 font-medium">
+            State <span className="text-red-600 font-semibold">*</span>
+          </label>
+          <Select
+            options={stateOptions}
+            value={stateOptions?.find((opt) => opt.value === values?.state)}
+            onChange={(option) => setFieldValue("state", option?.value)}
+            placeholder="Select State"
           />
           <ErrorMessage
             name="state"
@@ -119,15 +180,15 @@ export default function PGForm() {
 
         <div>
           <label className="block mb-1 font-medium">
-            Rent (in ₹) <span className="text-red-600 font-semibold">*</span>
+            Pincode <span className="text-red-600 font-semibold">*</span>
           </label>
           <Field
-            name="rent"
+            name="pincode"
             placeholder="eg : 7000"
             className="p-2 border rounded w-full"
           />
           <ErrorMessage
-            name="rent"
+            name="pincode"
             component="span"
             className="text-red-500 text-sm"
           />
@@ -135,37 +196,16 @@ export default function PGForm() {
 
         <div>
           <label className="block mb-1 font-medium">
-            Deposit Duration <span className="text-red-600 font-semibold">*</span>
+            Type of PG <span className="text-red-600 font-semibold">*</span>
           </label>
           <Select
-            options={depositOptions}
-            value={depositOptions.find(
-              (opt) => opt.value === values.deposit_duration
-            )}
-            onChange={(option) =>
-              setFieldValue("deposit_duration", option?.value)
-            }
-            placeholder="Select Duration"
+            options={PGType}
+            value={PGType.find((opt) => opt.value === values.pg_type)}
+            onChange={(option) => setFieldValue("pg_type", option?.value)}
+            placeholder="Select Type of PG"
           />
           <ErrorMessage
-            name="deposit_duration"
-            component="span"
-            className="text-red-500 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">
-            Country <span className="text-red-600 font-semibold">*</span>
-          </label>
-          <Select
-            options={countryOptions}
-            value={countryOptions.find((opt) => opt.value === values.country)}
-            onChange={(option) => setFieldValue("country", option?.value)}
-            placeholder="Select Country"
-          />
-          <ErrorMessage
-            name="country"
+            name="pg_type"
             component="span"
             className="text-red-500 text-sm"
           />
@@ -177,29 +217,12 @@ export default function PGForm() {
           </label>
           <Select
             options={yesNoOptions}
-            value={yesNoOptions.find((opt) => opt.value === values.wifi)}
-            onChange={(option) => setFieldValue("wifi", option?.value)}
+            value={yesNoOptions.find((opt) => opt.value === values.wifi_available)}
+            onChange={(option) => setFieldValue("wifi_available", option?.value)}
             placeholder="Whether Wifi Available"
           />
           <ErrorMessage
-            name="wifi"
-            component="span"
-            className="text-red-500 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">
-            AC Availability <span className="text-red-600 font-semibold">*</span>
-          </label>
-          <Select
-            options={yesNoOptions}
-            value={yesNoOptions.find((opt) => opt.value === values.ac)}
-            onChange={(option) => setFieldValue("ac", option?.value)}
-            placeholder="Whether AC Available"
-          />
-          <ErrorMessage
-            name="ac"
+            name="wifi_available"
             component="span"
             className="text-red-500 text-sm"
           />
@@ -211,16 +234,18 @@ export default function PGForm() {
           </label>
           <Select
             options={yesNoOptions}
-            value={yesNoOptions.find((opt) => opt.value === values.food)}
-            onChange={(option) => setFieldValue("food", option?.value)}
+            value={yesNoOptions.find((opt) => opt.value === values.food_available)}
+            onChange={(option) => setFieldValue("food_available", option?.value)}
             placeholder="Whether Food Available"
           />
           <ErrorMessage
-            name="food"
+            name="food_available"
             component="span"
             className="text-red-500 text-sm"
           />
         </div>
+
+        <br />
 
         <div className="mb-4">
           <label className="block mb-1 font-medium">
@@ -274,6 +299,11 @@ export default function PGForm() {
           <p className="text-sm text-yellow-600">
             Note : Image must be in ( jpg / jpeg / png ) format
           </p>
+          <ErrorMessage
+            name="pg_image_url"
+            component="div"
+            className="text-red-500 text-sm"
+          />
         </div>
       </div>
     </>

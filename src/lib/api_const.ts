@@ -20,7 +20,8 @@ export const API = {
         LIST : "/getAllColleges"
     },
     PG: {
-        ALL : "/getAllpg"
+        ALL : "/getAllpg",
+        ADD : "/addpg"
     }
 
     

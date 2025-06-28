@@ -61,7 +61,7 @@ export default function CardSection() {
     return <CardSkeleton no_of_card={2}/>;
   } else {
     return (
-      <div>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
         {/* <DisplayCard number_of_stars={5} /> */}
         {cards?.length === 0 ? (
           <div className="w-full py-10">
@@ -71,7 +71,6 @@ export default function CardSection() {
           cards?.map((item: any, index: number) => (
             <div
               key={index}
-              className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center"
             >
               <DisplayCard item={item} number_of_stars={5} />
             </div>
