@@ -34,7 +34,7 @@ export default function CardSection() {
 
       const urlquery = queryArray?.join("&");
 
-      const fetchColleges = async (searchQuery: string) => {
+      const fetchPgs = async (searchQuery: string) => {
         setloading(true);
         const res: ApiReturn<any> = await api_caller<any>(
           "GET",
@@ -49,7 +49,7 @@ export default function CardSection() {
         setloading(false);
       };
 
-      fetchColleges(urlquery);
+      fetchPgs(urlquery);
     }
   }, [query]);
 

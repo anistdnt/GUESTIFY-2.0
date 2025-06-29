@@ -7,10 +7,12 @@ import ResetPasswordModal from "./ResetPasswordModal";
 import OwnerInfoModal from "./OwnerInfoModal";
 import { hideModal } from "@/redux/slices/modalSlice";
 import ConfirmationModal from "./ConfirmationModal";
+import DeleteModal from "./DeleteModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
   const open = useSelector((state: RootState) => state.modal_slice.open);
+  const modalData = useSelector((state: RootState) => state.modal_slice.modalData) || {};
 
   //   const [showModal,setshowModal] = useState<boolean>(false);
   const dispatch = useDispatch();
@@ -31,6 +33,9 @@ export default function DefaultModal() {
           )}
           {type === "delete" && (
             <ConfirmationModal setshowModal={setshowModal}/>
+          )}
+          {type === "deletePG" && (
+            <DeleteModal setshowModal={setshowModal} modalData={modalData}/>
           )}
         </div>
       )}
