@@ -14,7 +14,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        buttons: "#c29a00",
+        buttons: "#d0a400",
         buttonsSecondary: "#e4b500",
         priceCol: "#c29a00",
         buttonsHover: "#c29a00",
@@ -29,11 +29,21 @@ export default {
       },
       animation: {
         slideFadeIn: "slideFadeIn 0.5s ease-out forwards",
+        slideInRight: 'slideInRight 0.3s ease-out forwards',
+        slideOutRight: 'slideOutRight 0.3s ease-in forwards',
       },
       keyframes: {
         slideFadeIn: {
           "0%": { opacity: "0", transform: "translateY(20px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        slideInRight: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+        slideOutRight: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
     },

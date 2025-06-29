@@ -8,7 +8,7 @@ interface BaseApiResponse<T> {
 }
 
 export interface ApiReturn<T> {
-    success: boolean;
+    success?: boolean;
     data?: T;
     results?:T;
     message?: string;

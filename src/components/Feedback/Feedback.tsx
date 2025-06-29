@@ -1,5 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useDropzone } from "react-dropzone";
 import type { StaticImageData } from "next/image";
 import room1 from "../../../public/assets/rooms/room1.jpg";
 import room2 from "../../../public/assets/rooms/room2.jpg";
@@ -15,7 +18,7 @@ interface FeedbackItem {
   imageUrl?: string | StaticImageData;
 }
 
-const Feedback: React.FC = () => {
+const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
   // Default feedback items
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([
     {
@@ -59,12 +62,6 @@ const Feedback: React.FC = () => {
     },
   ]);
 
-  // State for new feedback
-  const [newName, setNewName] = useState("");
-  const [newComment, setNewComment] = useState("");
-  const [newRating, setNewRating] = useState(0);
-  const [newImageBase64, setNewImageBase64] = useState<string>("");
-
   // Carousel state
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -74,39 +71,46 @@ const Feedback: React.FC = () => {
   const pairsCount = Math.ceil(totalItems / itemsPerView);
   const maxIndex = pairsCount > 0 ? pairsCount - 1 : 0;
 
-  // Convert uploaded file to base64
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setNewImageBase64(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Submit new feedback
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!newName || !newComment || newRating === 0) {
-      alert("Please enter your name, a comment, and a rating.");
-      return;
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      comment: "",
+      rating: 0,
+      imageUrl: ""
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required("Name is required"),
+      comment: Yup.string().required("Feedback is required"),
+      rating: Yup.number().min(1, "Please give a rating")
+    }),
+    onSubmit: (values, { resetForm }) => {
+      const newFeedback: FeedbackItem = {
+        name: values.name,
+        comment: values.comment,
+        rating: values.rating,
+        imageUrl: values.imageUrl || undefined
+      };
+      setFeedbackList((prev) => [...prev, newFeedback]);
+      resetForm();
     }
 
-    const newFeedback: FeedbackItem = {
-      name: newName,
-      comment: newComment,
-      rating: newRating,
-      imageUrl: newImageBase64 || undefined,
-    };
+  });
 
-    setFeedbackList((prev) => [...prev, newFeedback]);
-    setNewName("");
-    setNewComment("");
-    setNewRating(0);
-    setNewImageBase64("");
-  };
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      "image/*": []
+    },
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        formik.setFieldValue("imageUrl", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
   // Infinite Carousel Navigation
   const handlePrev = () => {
@@ -168,9 +172,8 @@ const Feedback: React.FC = () => {
                     {Array.from({ length: 5 }, (_, i) => (
                       <span
                         key={i}
-                        className={`${
-                          i < feedback.rating ? "text-gold" : "text-gray-300"
-                        } text-xl mr-[2px]`}
+                        className={`${i < feedback.rating ? "text-buttons" : "text-gray-300"
+                          } text-xl mr-[2px]`}
                       >
                         ★
                       </span>
@@ -201,83 +204,118 @@ const Feedback: React.FC = () => {
       </div>
 
       {/* 2) Form Section */}
-      <div className="bg-white p-8 rounded-md shadow w-[700px] mx-auto">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
-        >
+      <div ref={ref} className="bg-white p-8 rounded-md shadow w-full max-w-[800px] mx-auto scroll-mt-20">
+        <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-bold mb-1">
-              Your Name
-            </label>
+            <label className="block text-sm font-bold mb-1">Your Name</label>
             <input
               type="text"
-              placeholder="Enter your name"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 outline-none text-base w-full"
+              name="name"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.name}
+              className={`border-2 rounded px-3 py-2 outline-none text-base w-full 
+    ${formik.touched.name && formik.errors.name ? "border-red-500 focus:ring-1 focus:ring-red-400" : "border-gray-300"}`}
             />
+
+            {formik.touched.name && formik.errors.name && (
+              <p className="text-red-500 text-sm mt-1">{formik.errors.name}</p>
+            )}
           </div>
 
           {/* Comment */}
           <div>
-            <label className="block text-sm font-bold mb-1">
-              Write Your Feedback
-            </label>
+            <label className="block text-sm font-bold mb-1">Write Your Feedback</label>
             <textarea
-              placeholder="Write your feedback here..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              name="comment"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.comment}
               rows={4}
-              className="border border-gray-300 rounded px-3 py-2 outline-none text-base w-full resize-none"
+              className={`border-2 rounded px-3 py-2 outline-none text-base w-full resize-none 
+    ${formik.touched.comment && formik.errors.comment ? "border-red-500 focus:ring-1 focus:ring-red-400" : "border-gray-300"}`}
             />
+
+            {formik.touched.comment && formik.errors.comment && (
+              <p className="text-red-500 text-sm mt-1">{formik.errors.comment}</p>
+            )}
           </div>
 
-          {/* Image Upload */}
+          {/* Dropzone */}
           <div>
-            <label className="block text-sm font-bold mb-1">
-              Upload Image (Optional)
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="text-sm"
-            />
+            <label className="block text-sm font-bold mb-1">Upload Image (Optional)</label>
+
+            <div
+              {...getRootProps()}
+              className={`relative inline-block cursor-pointer group border-2 border-dashed rounded-md p-1 
+      ${formik.values.imageUrl ? "border-transparent" : "border-gray-400 hover:border-gray-600"}`}
+            >
+              <input {...getInputProps()} />
+
+              {formik.values.imageUrl ? (
+                <div className="relative inline-block">
+                  <img
+                    src={formik.values.imageUrl}
+                    alt="Uploaded preview"
+                    className="max-w-[300px] max-h-[300px] object-contain rounded-md"
+                  />
+
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <button
+                      type="button"
+                      className="bg-black bg-opacity-50 text-white font-semibold px-4 py-2 rounded shadow"
+                    >
+                      Change Image
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-[200px] h-[200px] flex items-center justify-center">
+                  <p className="text-center text-sm text-gray-500">Drag & drop or click to upload</p>
+                </div>
+              )}
+            </div>
           </div>
+
+
+
 
           {/* Rating */}
           <div>
-            <label className="block text-sm font-bold mb-1">
-              Rate:
-            </label>
+            <label className="block text-sm font-bold mb-1">Rate:</label>
             <div className="flex gap-2">
               {Array.from({ length: 5 }, (_, i) => (
                 <span
                   key={i}
-                  onClick={() => setNewRating(i + 1)}
-                  className={`cursor-pointer text-2xl ${
-                    i < newRating ? "text-gold" : "text-gray-300"
-                  }`}
+                  onClick={() => formik.setFieldValue("rating", i + 1)}
+                  className={`cursor-pointer hover:scale-110 transition-transform duration-150 text-3xl ${i < formik.values.rating ? "text-buttons" : "text-gray-300"
+                    }`}
                 >
                   ★
                 </span>
               ))}
             </div>
+            {formik.touched.rating && formik.errors.rating && (
+              <p className="text-red-500 text-sm mt-1">{formik.errors.rating}</p>
+            )}
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
-            className="bg-gradient-to-r from-[#FF6A9C] to-[#FF3D7F] text-white py-3 px-6 rounded-full cursor-pointer font-bold text-base uppercase tracking-wide transition-opacity duration-300 mt-4 hover:opacity-80"
+            className="bg-gradient-to-r from-buttonsSecondary to-buttons text-white py-3 px-6 rounded-full cursor-pointer font-bold text-base uppercase tracking-wide transition-opacity duration-300 mt-4 hover:opacity-80"
           >
             Submit Feedback
           </button>
         </form>
       </div>
+
     </div>
   );
-};
+});
+
+Feedback.displayName = "Feedback";
 
 export default Feedback;

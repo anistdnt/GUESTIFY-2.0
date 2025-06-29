@@ -34,3 +34,25 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Swiper navigation arrow overrides */
+.custom-swiper .swiper-button-prev,
+.custom-swiper .swiper-button-next {
+  color: black;
+  width: 24px;
+  height: 24px;
+}
+
+.custom-swiper .swiper-button-prev::after,
+.custom-swiper .swiper-button-next::after {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.custom-swiper .swiper-pagination-bullet {
+  background-color: #d0a400 !important;
+}
+
+.custom-swiper .swiper-pagination-bullet-active {
+  background-color: #d0a400 !important;
+}
