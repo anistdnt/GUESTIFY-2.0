@@ -14,7 +14,8 @@ export const API = {
         UPDATE : "/updateProfile",
         FORGET_PASSWORD : "/forgetPassword",
         CHANGE_PASSWORD : "/changePassword",
-        DELETE_ACCOUNT : "/deleteAccount"
+        DELETE_ACCOUNT : "/deleteAccount",
+        GET_PGs : "/getPg/user",
     },
     COLLEGE: {
         LIST : "/getAllColleges"

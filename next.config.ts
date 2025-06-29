@@ -13,9 +13,13 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'guestify-2-0-backend.onrender.com',
-        pathname: '/user-assets/**',
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "http",
+        hostname: "guestify-2-0-backend.onrender.com",
+        pathname: "/user-assets/**",
       },
     ],
   },
