@@ -1,5 +1,6 @@
 "use client";
-import DisplayCard from "@/components/DisplayCard/DisplayCard";
+
+import ProfilePGCard from "@/components/DisplayCard/ProfilePGCard";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
@@ -51,7 +52,8 @@ const Page = () => {
             <div
               key={index}
             >
-              <DisplayCard item={item} number_of_stars={5} />
+              <ProfilePGCard item={item} number_of_stars={5}/>
+              {/* <DisplayCard item={item} number_of_stars={5} /> */}
             </div>
           ))
         )}

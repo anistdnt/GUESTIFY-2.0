@@ -22,7 +22,8 @@ export const API = {
     },
     PG: {
         ALL : "/getAllpg",
-        ADD : "/addpg"
+        ADD : "/addpg",
+        DELETE : "/deletePG"
     }
 
     
