@@ -31,7 +31,7 @@ export default function RootLayout({
           <DefaultModal/>
           <GlobalLoaderWrapper/>
           <Header/>
-          <main className="">
+          <main className="px-4">
             <Toaster />
             {children}
           </main>
