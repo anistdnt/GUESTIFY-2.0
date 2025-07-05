@@ -2,8 +2,6 @@
 import Image from "next/image";
 import Rating from "../Rating/Rating";
 import { CurrencyInr, MapPin } from "@phosphor-icons/react/dist/ssr";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
 import { useDispatch } from "react-redux";
@@ -71,7 +69,6 @@ type Props = {
 //         }
 
 export default function ProfilePGCard({ item, number_of_stars }: Props) {
-  const router = useRouter();
 
   const dispatch = useDispatch();
 
@@ -188,7 +185,7 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
               <button
                 className="bg-slate-500 text-white px-4 py-2 rounded"
                 onClick={() => {
-                  router.push(`/pg/${pginfo?._id}`);
+                  dispatch(setModalVisibility({ open: true, type: "editPGDetails" , modalData : { text : pginfo?.pg_name as string, rowid : pginfo?._id as string}}));
                 }}
               >
                 Edit PG

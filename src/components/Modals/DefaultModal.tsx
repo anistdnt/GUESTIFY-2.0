@@ -8,6 +8,7 @@ import OwnerInfoModal from "./OwnerInfoModal";
 import { hideModal } from "@/redux/slices/modalSlice";
 import ConfirmationModal from "./ConfirmationModal";
 import DeleteModal from "./DeleteModal";
+import PGEditModal from "./PGEditModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -36,6 +37,9 @@ export default function DefaultModal() {
           )}
           {type === "deletePG" && (
             <DeleteModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "editPGDetails" && (
+            <PGEditModal setshowModal={setshowModal} modalData={modalData}/>
           )}
         </div>
       )}
