@@ -13,9 +13,18 @@ type ModalType = {
   modalData?: any;
 };
 
+
+const deleteEndpointMap = {
+  "pg" : API.PG.DELETE,
+  "room" : API.PG.DELETE
+}
+
+
 function DeleteModal({ setshowModal, modalData }: ModalType) {
   const dispatch = useDispatch();
   const router = useRouter();
+  const targetId = modalData?.rowid;
+  const targetEndpoint = deleteEndpointMap[modalData?.target];
 
   const handleDelete = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,13 +32,13 @@ function DeleteModal({ setshowModal, modalData }: ModalType) {
     dispatch(setLoading({ loading: true }));
     const res: ApiReturn<any> = await api_caller<any>(
       "DELETE",
-      `${API.PG.DELETE}/${modalData?.rowid}`
+      `${targetEndpoint}/${targetId}`
     );
     if (res.success) {
       dispatch(hideModal(false));
       dispatch(setLoading({ loading: false }));
     //   router.push("/");
-      toast.success(res.message || "PG Deleted Successfully");
+      toast.success(res.message || "Deleted Successfully");
     } else {
       dispatch(setLoading({ loading: false }));
       toast.error(`${res.message} : ${res.error}`);
@@ -46,7 +55,7 @@ function DeleteModal({ setshowModal, modalData }: ModalType) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-row justify-between items-center">
-          <h3 className="text-xl">Delete Paying Guest</h3>
+          <h3 className="text-xl">{modalData?.caption ?? 'Delete Modal'}</h3>
           <button
             onClick={() => {
               setshowModal(false);
@@ -57,20 +66,22 @@ function DeleteModal({ setshowModal, modalData }: ModalType) {
         </div>
         <hr />
         <p className="text-yellow-600 text-sm">
-          Are you sure you want to delete the Paying Guest House <b>{modalData?.text}</b>?
+          Are you sure you want to Delete <b>{modalData?.placeholder}</b>?
         </p>
         <div className="text-yellow-600 text-sm">
             <span>This will permanently delete the following credentials from the database</span>
-            <ul>
-                <li>All Rooms</li>
-            </ul>
+            {modalData?.deletedCred?.length!==0 && <ul>
+                {modalData?.deletedCred?.map((cred:string,ind:number)=>(
+                  <li key={ind} className="font-semibold">{cred}</li>
+                ))}
+            </ul>}
         </div>
         <button
           type="button"
           className="btn bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg cursor-pointer mt-8"
           onClick={handleDelete}
         >
-          Delete Paying Guest
+          {modalData?.btnText ?? 'Delete'}
         </button>
       </div>
     </div>

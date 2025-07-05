@@ -1,12 +1,15 @@
 "use client";
 
+import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { Trash } from "@phosphor-icons/react/dist/ssr";
 import { FieldArray, Field, ErrorMessage, useFormikContext } from "formik";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import Select from "react-select";
 
 type RoomFormValues = {
+  _id?: string;
   room_type: string;
   room_rent: string;
   attached_bathroom: string;
@@ -22,12 +25,20 @@ const depositOptions = [
   { label: "Yearly", value: "yearly" },
 ];
 
-export default function RoomForm() {
+export default function RoomForm({
+  hasAddBtn = true,
+  caption
+}: {
+  hasAddBtn?: boolean;
+  caption?: string;
+}) {
   const { values, setFieldValue } = useFormikContext<{
     rooms: RoomFormValues[];
   }>();
 
   const [roomImage, setRoomImage] = useState<string[]>([]);
+
+  const dispatch = useDispatch();
 
   const handleImageChange = (
     index: number,
@@ -54,12 +65,16 @@ export default function RoomForm() {
     { label: "Double", value: "double" },
   ];
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
   return (
     <>
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-1">
           <h2 className="text-3xl font-bold text-gray-800">
-            Room Enlistment Form
+            {caption ?? 'Room Enlistment Form'}
           </h2>
         </div>
         <p className="text-gray-600">
@@ -242,8 +257,27 @@ export default function RoomForm() {
                 {/* Remove Room Button */}
                 <button
                   type="button"
-                  onClick={() => remove(index)}
-                  disabled={values?.rooms?.length < 2}
+                  onClick={() => {
+                    if (hasAddBtn) {
+                      remove(index);
+                    } else {
+                      dispatch(
+                        setModalVisibility({
+                          open: true,
+                          type: "deletePG",
+                          modalData: {
+                            target: "room",
+                            caption: "Delete Room",
+                            btnText: "Delete Room",
+                            deletedCred: ["This Room"],
+                            placeholder:"The Room",
+                            rowid: room?._id as string,
+                          },
+                        })
+                      );
+                    }
+                  }}
+                  disabled={hasAddBtn && values?.rooms?.length < 2}
                   className="absolute top-4 right-4 text-red-500 hover:text-red-700"
                 >
                   <Trash size={20} weight="bold" />
@@ -252,24 +286,26 @@ export default function RoomForm() {
             ))}
 
             {/* Add Room Button */}
-            <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() =>
-                  push({
-                    room_type: "",
-                    room_rent: "",
-                    attached_bathroom: "",
-                    ac_available: "",
-                    deposit_duration: "",
-                    room_image_url: null,
-                  })
-                }
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
-              >
-                + Add Room
-              </button>
-            </div>
+            {hasAddBtn && (
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={() =>
+                    push({
+                      room_type: "",
+                      room_rent: "",
+                      attached_bathroom: "",
+                      ac_available: "",
+                      deposit_duration: "",
+                      room_image_url: null,
+                    })
+                  }
+                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                >
+                  + Add Room
+                </button>
+              </div>
+            )}
           </>
         )}
       </FieldArray>
