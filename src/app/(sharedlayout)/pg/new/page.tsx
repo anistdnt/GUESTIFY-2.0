@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { API } from "@/lib/api_const";
 import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
+import { base64ToFile } from "@/lib/imageConvert";
 
 export default function PGFormWrapper() {
   const reduxUserData = useSelector(
@@ -27,19 +28,29 @@ export default function PGFormWrapper() {
       if (key === "rooms") return; // skip for now
 
       if (key === "pg_image_url" && value) {
-        formData.append("pg_image_url", value as File);
+        if (typeof value === "string" && value.startsWith("data:image/")) {
+          const file = base64ToFile(value, `PG-Image-${Date.now()}`);
+          formData.append("pg_image_url", file);
+        } else {
+          formData.append("pg_image_url", value as File);
+        }
       } else if (key !== "pg_image_url") {
         formData.append(key, value as string ?? "");
       }
     });
 
     // ✅ Add rooms array with their files
-    values.rooms.forEach((room:any, index:number) => {
+    values.rooms.forEach((room: any, index: number) => {
       Object.entries(room).forEach(([key, value]) => {
         if (key === "room_image_url" && value) {
-          formData.append(`rooms[${index}][${key}]`, value as File);
+          if (typeof value === "string" && value.startsWith("data:image/")) {
+            const file = base64ToFile(value, `Room-Image-${Date.now()}`);
+            formData.append(`rooms[${index}][${key}]`, file);
+          } else {
+            formData.append(`rooms[${index}][${key}]`, value as File);
+          }
         } else if (key !== "room_image_url") {
-          formData.append(`rooms[${index}][${key}]`, value as string ?? "");
+          formData.append(`rooms[${index}][${key}]`, (value as string) ?? "");
         }
       });
     });

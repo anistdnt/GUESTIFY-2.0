@@ -1,21 +1,33 @@
 "use client";
 import { Field, ErrorMessage, useFormikContext } from "formik";
-import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import Select from "react-select";
 
-export default function PGForm() {
-  const [pgImage, setPgImage] = useState<string | null>(null);
+export default function PGForm({
+  caption,
+  disabledField,
+}: {
+  caption?: string;
+  disabledField?: string[];
+}) {
   const { setFieldValue, values } = useFormikContext<any>();
 
-  const handlePGImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setPgImage(imageUrl);
-      setFieldValue("pg_image_url", file);
-    }
-  };
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      "image/*": [],
+    },
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFieldValue("pg_image_url", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    },
+  });
 
   const yesNoOptions = [
     { label: "Yes", value: "yes" },
@@ -23,59 +35,58 @@ export default function PGForm() {
   ];
 
   const districtOptions = [
-  // West Bengal districts
-  { label: "Kolkata", value: "kolkata" },
-  { label: "Howrah", value: "howrah" },
-  { label: "Darjeeling", value: "darjeeling" },
-  { label: "Siliguri", value: "siliguri" },
-  { label: "Hooghly", value: "hooghly" },
+    // West Bengal districts
+    { label: "Kolkata", value: "kolkata" },
+    { label: "Howrah", value: "howrah" },
+    { label: "Darjeeling", value: "darjeeling" },
+    { label: "Siliguri", value: "siliguri" },
+    { label: "Hooghly", value: "hooghly" },
 
-  // Assam districts
-  { label: "Guwahati", value: "guwahati" },
-  { label: "Dibrugarh", value: "dibrugarh" },
-  { label: "Silchar", value: "silchar" },
+    // Assam districts
+    { label: "Guwahati", value: "guwahati" },
+    { label: "Dibrugarh", value: "dibrugarh" },
+    { label: "Silchar", value: "silchar" },
 
-  // Bihar districts
-  { label: "Patna", value: "patna" },
-  { label: "Gaya", value: "gaya" },
-  { label: "Muzaffarpur", value: "muzaffarpur" },
-];
-
+    // Bihar districts
+    { label: "Patna", value: "patna" },
+    { label: "Gaya", value: "gaya" },
+    { label: "Muzaffarpur", value: "muzaffarpur" },
+  ];
 
   const stateOptions = [
-  { label: "West Bengal", value: "West Bengal" },
-  { label: "Assam", value: "Assam" },
-  { label: "Bihar", value: "Bihar" },
-  { label: "Odisha", value: "Odisha" },
-  { label: "Jharkhand", value: "Jharkhand" },
-  { label: "Uttar Pradesh", value: "Uttar Pradesh" },
-  { label: "Maharashtra", value: "Maharashtra" },
-  { label: "Karnataka", value: "Karnataka" },
-  { label: "Tamil Nadu", value: "Tamil Nadu" },
-  { label: "Kerala", value: "Kerala" },
-  { label: "Telangana", value: "Telangana" },
-  { label: "Andhra Pradesh", value: "Andhra Pradesh" },
-  { label: "Madhya Pradesh", value: "Madhya Pradesh" },
-  { label: "Rajasthan", value: "Rajasthan" },
-  { label: "Punjab", value: "Punjab" },
-  { label: "Haryana", value: "Haryana" },
-  { label: "Delhi", value: "Delhi" },
-];
+    { label: "West Bengal", value: "West Bengal" },
+    { label: "Assam", value: "Assam" },
+    { label: "Bihar", value: "Bihar" },
+    { label: "Odisha", value: "Odisha" },
+    { label: "Jharkhand", value: "Jharkhand" },
+    { label: "Uttar Pradesh", value: "Uttar Pradesh" },
+    { label: "Maharashtra", value: "Maharashtra" },
+    { label: "Karnataka", value: "Karnataka" },
+    { label: "Tamil Nadu", value: "Tamil Nadu" },
+    { label: "Kerala", value: "Kerala" },
+    { label: "Telangana", value: "Telangana" },
+    { label: "Andhra Pradesh", value: "Andhra Pradesh" },
+    { label: "Madhya Pradesh", value: "Madhya Pradesh" },
+    { label: "Rajasthan", value: "Rajasthan" },
+    { label: "Punjab", value: "Punjab" },
+    { label: "Haryana", value: "Haryana" },
+    { label: "Delhi", value: "Delhi" },
+  ];
 
-const PGType = [
-  {
-    label: "Boys",
-    value: "boys"
-  },
-  {
-    label: "Girls",
-    value: "girls"
-  },
-  {
-    label: "Both",
-    value: "both"
-  }
-]
+  const PGType = [
+    {
+      label: "Boys",
+      value: "boys",
+    },
+    {
+      label: "Girls",
+      value: "girls",
+    },
+    {
+      label: "Both",
+      value: "both",
+    },
+  ];
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -86,7 +97,7 @@ const PGType = [
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-1">
           <h2 className="text-3xl font-bold text-gray-800">
-            PG Registration Form
+            {caption ?? "PG Registration Form"}
           </h2>
         </div>
         <p className="text-gray-600">
@@ -104,6 +115,7 @@ const PGType = [
             name="pg_name"
             placeholder="eg : Shyam Residence"
             className="p-2 border rounded w-full"
+            disabled={disabledField && disabledField?.includes("pg_name")}
           />
           <ErrorMessage
             name="pg_name"
@@ -150,7 +162,9 @@ const PGType = [
           </label>
           <Select
             options={districtOptions}
-            value={districtOptions?.find((opt) => opt.value === values?.district)}
+            value={districtOptions?.find(
+              (opt) => opt.value === values?.district
+            )}
             onChange={(option) => setFieldValue("district", option?.value)}
             placeholder="Select District"
           />
@@ -213,12 +227,17 @@ const PGType = [
 
         <div>
           <label className="block mb-1 font-medium">
-            WiFi Availability <span className="text-red-600 font-semibold">*</span>
+            WiFi Availability{" "}
+            <span className="text-red-600 font-semibold">*</span>
           </label>
           <Select
             options={yesNoOptions}
-            value={yesNoOptions.find((opt) => opt.value === values.wifi_available)}
-            onChange={(option) => setFieldValue("wifi_available", option?.value)}
+            value={yesNoOptions.find(
+              (opt) => opt.value === values.wifi_available
+            )}
+            onChange={(option) =>
+              setFieldValue("wifi_available", option?.value)
+            }
             placeholder="Whether Wifi Available"
           />
           <ErrorMessage
@@ -230,12 +249,17 @@ const PGType = [
 
         <div>
           <label className="block mb-1 font-medium">
-            Food Availability <span className="text-red-600 font-semibold">*</span>
+            Food Availability{" "}
+            <span className="text-red-600 font-semibold">*</span>
           </label>
           <Select
             options={yesNoOptions}
-            value={yesNoOptions.find((opt) => opt.value === values.food_available)}
-            onChange={(option) => setFieldValue("food_available", option?.value)}
+            value={yesNoOptions.find(
+              (opt) => opt.value === values.food_available
+            )}
+            onChange={(option) =>
+              setFieldValue("food_available", option?.value)
+            }
             placeholder="Whether Food Available"
           />
           <ErrorMessage
@@ -255,7 +279,7 @@ const PGType = [
           <Field
             as="textarea"
             name="rules"
-            rows={8}
+            rows={10}
             placeholder="eg : Not allowed within PG after 10 P.M"
             className="p-2 border rounded w-full"
           />
@@ -267,38 +291,50 @@ const PGType = [
         </div>
 
         <div className="">
-          <label className="block mb-1 font-medium">PG Image</label>
-          <div className="w-full h-48 max-h-52 border-dashed border-2 border-gray-300 flex flex-col gap-1 items-center justify-center rounded box-content">
-            {pgImage ? (
-              <div className="relative max-h-44">
-                <Image src={pgImage} alt="PG" width={250} height={250} />
-                <label className="absolute bottom-0 right-0 bg-yellow-600 text-white px-2 py-1 text-sm cursor-pointer rounded">
-                  Change
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handlePGImageChange}
-                  />
-                </label>
+          <label className="block mb-1 font-medium">
+            PG Image
+            <span className="text-red-600 font-semibold ms-1">*</span>
+          </label>
+          <div
+            {...getRootProps()}
+            className={`relative cursor-pointer group border-2 border-dashed rounded-md p-1 w-full h-[250px] flex justify-center
+      ${
+        values["pg_image_url"]
+          ? "border-transparent"
+          : "border-gray-400 hover:border-gray-600"
+      }`}
+          >
+            <input {...getInputProps()} />
+
+            {values["pg_image_url"] ? (
+              <div className="relative inline-block">
+                <img
+                  src={values["pg_image_url"]}
+                  alt="Uploaded preview"
+                  className="max-w-[300px] max-h-[200px] object-contain rounded-md"
+                />
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="bg-black bg-opacity-50 text-white font-semibold px-4 py-2 rounded shadow"
+                  >
+                    Change Image
+                  </button>
+                </div>
               </div>
             ) : (
-              <label className="cursor-pointer">
-                <span className="text-gray-600 bg-slate-300 rounded px-3 py-1 hover:bg-slate-200">
-                  Upload Image
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handlePGImageChange}
-                />
-              </label>
+              <div className="flex items-center justify-center">
+                <p className="text-center text-sm text-gray-500">
+                  Drag & drop or click to upload
+                </p>
+              </div>
             )}
           </div>
-          <p className="text-sm text-yellow-600">
-            Note : Image must be in ( jpg / jpeg / png ) format
-          </p>
+          <span className="text-sm text-yellow-600">
+            {"("}Note : Image must be in ( jpg / jpeg / png ) format{")"}
+          </span>
           <ErrorMessage
             name="pg_image_url"
             component="div"
