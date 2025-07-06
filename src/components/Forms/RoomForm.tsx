@@ -5,6 +5,7 @@ import { Trash } from "@phosphor-icons/react/dist/ssr";
 import { FieldArray, Field, ErrorMessage, useFormikContext } from "formik";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 
@@ -18,6 +19,12 @@ type RoomFormValues = {
   room_image_url: any;
 };
 
+type RoomImageUploaderProps = {
+  index: number;
+  values: any;
+  setFieldValue: (field: string, value: any) => void;
+};
+
 const depositOptions = [
   { label: "Monthly", value: "monthly" },
   { label: "Quarterly", value: "quarterly" },
@@ -25,9 +32,76 @@ const depositOptions = [
   { label: "Yearly", value: "yearly" },
 ];
 
+// ===== Room Image Uploader component =======
+
+const RoomImageUploader = ({
+  index,
+  values,
+  setFieldValue,
+}: RoomImageUploaderProps) => {
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: { "image/*": [] },
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFieldValue(
+          `rooms[${index}].room_image_url`,
+          reader.result as string
+        );
+      };
+      reader.readAsDataURL(file);
+    },
+  });
+
+  return (
+    <div
+      {...getRootProps()}
+      className={`relative cursor-pointer group border-2 border-dashed rounded-md p-1 w-full h-[250px] flex justify-center
+      ${
+        values?.rooms[index].room_image_url
+          ? "border-transparent"
+          : "border-gray-400 hover:border-gray-600"
+      }`}
+    >
+      <input {...getInputProps()} />
+
+      {values?.rooms[index].room_image_url ? (
+        <div className="relative inline-block">
+          <img
+            src={values?.rooms[index].room_image_url}
+            alt="Uploaded preview"
+            className="max-w-[300px] max-h-[200px] object-contain rounded-md"
+          />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <button
+              type="button"
+              className="bg-black bg-opacity-50 text-white font-semibold px-4 py-2 rounded shadow"
+            >
+              Change Image
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center">
+          <p className="text-center text-sm text-gray-500">
+            Drag & drop or click to upload
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ======== Room Form Component =========
+
 export default function RoomForm({
   hasAddBtn = true,
-  caption
+  caption,
 }: {
   hasAddBtn?: boolean;
   caption?: string;
@@ -36,25 +110,7 @@ export default function RoomForm({
     rooms: RoomFormValues[];
   }>();
 
-  const [roomImage, setRoomImage] = useState<string[]>([]);
-
   const dispatch = useDispatch();
-
-  const handleImageChange = (
-    index: number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setFieldValue(`rooms[${index}].room_image_url`, file);
-      setRoomImage((prev) => {
-        const copy = [...prev];
-        copy[index] = imageUrl;
-        return copy;
-      });
-    }
-  };
 
   const yesNoOptions = [
     { label: "Yes", value: "yes" },
@@ -74,7 +130,7 @@ export default function RoomForm({
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-1">
           <h2 className="text-3xl font-bold text-gray-800">
-            {caption ?? 'Room Enlistment Form'}
+            {caption ?? "Room Enlistment Form"}
           </h2>
         </div>
         <p className="text-gray-600">
@@ -214,40 +270,12 @@ export default function RoomForm({
                 </div>
 
                 {/* Image Upload */}
-                <div className="w-full border-dashed border-2 border-gray-300 flex items-center justify-center py-6 rounded relative mb-4">
-                  {room.room_image_url ? (
-                    <div className="relative">
-                      <Image
-                        src={roomImage[index]}
-                        alt={`Room ${index + 1}`}
-                        width={250}
-                        height={250}
-                        className="rounded"
-                      />
-                      <label className="absolute bottom-0 right-0 bg-blue-500 text-white px-2 py-1 text-sm cursor-pointer rounded">
-                        Change
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => handleImageChange(index, e)}
-                        />
-                      </label>
-                    </div>
-                  ) : (
-                    <label className="cursor-pointer">
-                      <span className="text-gray-600 bg-slate-300 rounded px-3 py-1 hover:bg-slate-200">
-                        Upload Image
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleImageChange(index, e)}
-                      />
-                    </label>
-                  )}
-                </div>
+                <RoomImageUploader
+                  key={index}
+                  index={index}
+                  values={values}
+                  setFieldValue={setFieldValue}
+                />
                 <ErrorMessage
                   name={`rooms[${index}].room_image_url`}
                   component="div"
@@ -270,7 +298,7 @@ export default function RoomForm({
                             caption: "Delete Room",
                             btnText: "Delete Room",
                             deletedCred: ["This Room"],
-                            placeholder:"The Room",
+                            placeholder: "The Room",
                             rowid: room?._id as string,
                           },
                         })

@@ -15,27 +15,29 @@ export default function RoomDetailsEdit() {
     Only_RoomValidationSchema?.initials
   );
 
-  // useEffect(() => {
-  //   const fetchInformation = async () => {
-  //     const res: ApiReturn<any> = await api_caller<any>(
-  //       "GET",
-  //       `${API.PG.GET_PG_BY_ID}/${paying_guestID}`
-  //     );
-  //     if (res.success) {
-  //       setInitialFieldData(res?.data?.pginfo);
-  //     } else {
-  //       toast.error(`${res.message} : ${res.error}`);
-  //     }
-  //   };
-  //   fetchInformation();
-  // }, []);
+  useEffect(() => {
+    const fetchInformation = async () => {
+      const res: ApiReturn<any> = await api_caller<any>(
+        "GET",
+        `${API.PG.GET_PG_BY_ID}/${paying_guestID}`
+      );
+      if (res.success) {
+        setInitialFieldData({
+          rooms : res?.data?.rooms
+        });
+      } else {
+        toast.error(`${res.message} : ${res.error}`);
+      }
+    };
+    fetchInformation();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
       <Formik
         initialValues={initialFieldData}
         validationSchema={Only_RoomValidationSchema?.validation}
-        // enableReinitialize={true}
+        enableReinitialize={true}
         onSubmit={() => {}}
       >
         {({ submitForm, dirty }) => (
