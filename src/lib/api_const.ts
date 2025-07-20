@@ -25,6 +25,10 @@ export const API = {
         GET_PG_BY_ID : "/getPg",
         ADD : "/addpg",
         DELETE : "/deletePG"
+    },
+    REVIEW: {
+        GET_REVIWS_OF_PG : "/getReviews",
+        ADD_REVIEW:"/addReview"
     }
 
     

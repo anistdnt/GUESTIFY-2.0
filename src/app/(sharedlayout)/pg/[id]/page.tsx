@@ -3,6 +3,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import React from "react";
 import { notFound } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface Iprops {
   params: {
@@ -53,12 +54,33 @@ export interface Room {
   __v: number;
 }
 
+export interface Review {
+  _id?: string;
+  full_name: string;
+  feedback: string;
+  image_url: string ;
+  rating: number
+}
+
 const PGDetails = async ({ params: { id } }: Iprops) => {
   try {
     const resData: ApiReturn<PGDetailsResponse> = await api_caller<PGDetailsResponse>(
       "GET",
       `${API.PG.GET_PG_BY_ID}/${id}`
     );
+
+    let reviewData: ApiReturn<Review[]> | null = null;
+
+    if (resData.success && resData.data) {
+      reviewData = await api_caller<Review[]>(
+        "GET",
+        `${API.REVIEW.GET_REVIWS_OF_PG}/${id}`
+      );
+      if(!reviewData.success){
+        toast.error(reviewData?.message)
+      }
+    }
+
 
     if (!resData.success || !resData.data) {
       console.error("API call failed or returned no data:", resData);
@@ -68,7 +90,7 @@ const PGDetails = async ({ params: { id } }: Iprops) => {
     const { pginfo, rooms } = resData.data;
 
     return (
-      <PGInfoComponent {...{pginfo,rooms}} />
+      <PGInfoComponent {...{ pginfo, rooms, reviewData:reviewData?.data, id }} />
     );
   } catch (error) {
     console.error("Failed to fetch PG details:", error);
