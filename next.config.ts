@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
         hostname: "guestify-2-0-backend.onrender.com",
         pathname: "/user-assets/**",
       },
+      {
+        protocol: "http",
+        hostname: "guestify-2-0-backend.onrender.com",
+        pathname: "/reviews-assets/**",
+      },
+      {
+      protocol: 'https',
+      hostname: 'images.collegedunia.com',
+      pathname: '/**',
+    },
     ],
   },
 };

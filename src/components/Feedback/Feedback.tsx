@@ -4,66 +4,37 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDropzone } from "react-dropzone";
 import type { StaticImageData } from "next/image";
-import room1 from "../../../public/assets/rooms/room1.jpg";
-import room2 from "../../../public/assets/rooms/room2.jpg";
-import room3 from "../../../public/assets/rooms/room3.jpg";
-import room4 from "../../../public/assets/rooms/room4.jpg";
-import room5 from "../../../public/assets/rooms/room5.jpg";
-import room6 from "../../../public/assets/rooms/room6.jpg";
+import { Review } from "@/app/(sharedlayout)/pg/[id]/page";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { base64ToFile } from "@/lib/imageConvert";
+import { API } from "@/lib/api_const";
+import toast from "react-hot-toast";
+
 
 interface FeedbackItem {
-  name: string;
-  comment: string;
+  full_name: string;
+  email: string;
+  feedback: string;
   rating: number;
-  imageUrl?: string | StaticImageData;
+  image_url?: string | StaticImageData | File;
 }
 
-const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
-  // Default feedback items
-  const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([
-    {
-      name: "Emma Johnson",
-      comment:
-        "The room was beautiful and the service was excellent. I had a great stay!",
-      rating: 5,
-      imageUrl: room1,
-    },
-    {
-      name: "Michael Brown",
-      comment:
-        "Excellent location and really comfortable rooms. Highly recommended!",
-      rating: 4,
-      imageUrl: room2,
-    },
-    {
-      name: "Sarah Davis",
-      comment:
-        "Loved the spa and the room view was breathtaking. Will come back soon!",
-      rating: 4,
-      imageUrl: room3,
-    },
-    {
-      name: "David Lee",
-      comment: "The staff was very friendly and helpful. The breakfast was also delicious!",
-      rating: 5,
-      imageUrl: room4,
-    },
-    {
-      name: "Emily Chen",
-      comment: "The room was clean and cozy. The location was also very convenient.",
-      rating: 4,
-      imageUrl: room5,
-    },
-    {
-      name: "James Wilson",
-      comment: "The hotel had a great atmosphere and the amenities were top-notch.",
-      rating: 5,
-      imageUrl: room6,
-    },
-  ]);
+interface FeedbackProp {
+  reviewData: Review[];
+  id: string
+}
 
+type ReviewSubmitResponseType = {
+  success: boolean;
+  message: string
+}
+
+const Feedback = forwardRef<HTMLDivElement, FeedbackProp>(({ reviewData, id }, ref) => {
+
+  const feedbackList : Review[] = reviewData;
   // Carousel state
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [submitLoading , setSubmitLoading] = useState<boolean>(false)
 
   const itemsPerView = 2;
   const totalItems = feedbackList.length;
@@ -73,28 +44,52 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      comment: "",
+      full_name: "",
+      email: "",
+      feedback: "",
       rating: 0,
-      imageUrl: ""
+      image_url: ""
     },
     validationSchema: Yup.object({
-      name: Yup.string().required("Name is required"),
-      comment: Yup.string().required("Feedback is required"),
+      full_name: Yup.string().required("Name is required"),
+      email: Yup.string().email("Please enter a valid email id").required("Email is required"),
+      feedback: Yup.string().required("Feedback is required"),
       rating: Yup.number().min(1, "Please give a rating")
     }),
     onSubmit: (values, { resetForm }) => {
-      const newFeedback: FeedbackItem = {
-        name: values.name,
-        comment: values.comment,
-        rating: values.rating,
-        imageUrl: values.imageUrl || undefined
-      };
-      setFeedbackList((prev) => [...prev, newFeedback]);
+      handleSubmit(values);
       resetForm();
     }
 
   });
+
+  async function handleSubmit(values: FeedbackItem) {
+    setSubmitLoading(true)
+  const file = base64ToFile(values.image_url as string, `Review-Image-${Date.now()}`);
+
+  const formData = new FormData();
+  formData.append("full_name", values.full_name);
+  formData.append("email", values.email);
+  formData.append("feedback", values.feedback);
+  formData.append("rating", values.rating.toString());
+  formData.append("image_url", file); // image as File object
+
+  try {
+    const resp = await api_caller<FormData, any>("POST", `${API.REVIEW.ADD_REVIEW}/${id}`, formData);
+
+    if (resp?.success) {
+      toast.success(resp.message);
+    } else {
+      toast.error(resp.message);
+    }
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    toast.error("Submission failed");
+  }finally{
+    setSubmitLoading(false)
+  }
+}
+
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -106,7 +101,7 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        formik.setFieldValue("imageUrl", reader.result as string);
+        formik.setFieldValue("image_url", reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -130,43 +125,34 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
         </h2>
 
         {/* Carousel Wrapper (800px wide => 2 items at 400px each) */}
-        <div className="relative w-[800px] mx-auto overflow-hidden bg-white rounded-md shadow p-4">
+        <div className="relative w-full max-w-[800px] mx-auto overflow-hidden bg-white rounded-md shadow p-4">
           {/* Track (dynamic width, translateX) */}
           <div
             className="flex transition-transform duration-300 ease-in-out"
             style={{
-              width: `${400 * totalItems}px`,
-              transform: `translateX(-${currentIndex * 800}px)`,
+              transform: `translateX(-${currentIndex * 100}%)`,
             }}
           >
+
             {feedbackList.map((feedback, index) => (
               <div
                 key={index}
-                className="w-[400px] box-border p-6 flex flex-col gap-4 bg-white whitespace-normal break-words"
+                className="w-full lg:w-1/2 shrink-0 box-border p-6 flex flex-col gap-4 bg-white whitespace-normal break-words"
               >
+
                 {/* Image (optional) */}
-                {feedback.imageUrl && (
-                  <div className="text-center">
-                    {typeof feedback.imageUrl === "string" ? (
-                      <img
-                        src={feedback.imageUrl}
-                        alt={`${feedback.name} feedback`}
-                        className="w-[250px] h-[250px] object-cover rounded-full mx-auto"
-                      />
-                    ) : (
-                      <img
-                        src={feedback.imageUrl.src}
-                        alt={`${feedback.name} feedback`}
-                        className="w-[250px] h-[250px] object-cover rounded-full mx-auto"
-                      />
-                    )}
-                  </div>
-                )}
+                <div className="text-center">
+                  <img
+                    src={feedback.image_url || '/assets/profile.png'}
+                    alt={`${feedback.full_name} feedback`}
+                    className="w-[250px] h-[250px] object-cover rounded-full mx-auto"
+                  />
+                </div>
 
                 {/* Comment & Rating */}
                 <div className="flex flex-col gap-2">
                   <p className="italic m-0">
-                    “{feedback.comment}”
+                    “{feedback.feedback}”
                   </p>
                   <div>
                     {Array.from({ length: 5 }, (_, i) => (
@@ -180,7 +166,7 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
                     ))}
                   </div>
                   <p className="text-right m-0 font-semibold">
-                    - {feedback.name}
+                    - {feedback.full_name}
                   </p>
                 </div>
               </div>
@@ -208,37 +194,55 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
         <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-bold mb-1">Your Name</label>
+            <label className="block text-sm font-bold mb-1">Your Name <span className="text-red-500">*</span></label>
             <input
               type="text"
-              name="name"
+              name="full_name"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.name}
+              value={formik.values.full_name}
               className={`border-2 rounded px-3 py-2 outline-none text-base w-full 
-    ${formik.touched.name && formik.errors.name ? "border-red-500 focus:ring-1 focus:ring-red-400" : "border-gray-300"}`}
+    ${formik.touched.full_name && formik.errors.full_name ? "border-red-500 focus:ring-1 focus:ring-red-400" : "border-gray-300"}`}
             />
 
-            {formik.touched.name && formik.errors.name && (
-              <p className="text-red-500 text-sm mt-1">{formik.errors.name}</p>
+            {formik.touched.full_name && formik.errors.full_name && (
+              <p className="text-red-500 text-sm mt-1">{formik.errors.full_name}</p>
+            )}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-bold mb-1">Your Email <span className="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="email"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.email}
+              className={`border-2 rounded px-3 py-2 outline-none text-base w-full 
+    ${formik.touched.email && formik.errors.email ? "border-red-500 focus:ring-1 focus:ring-red-400" : "border-gray-300"}`}
+            />
+
+            {formik.touched.email && formik.errors.email && (
+              <p className="text-red-500 text-sm mt-1">{formik.errors.full_name}</p>
             )}
           </div>
 
           {/* Comment */}
           <div>
-            <label className="block text-sm font-bold mb-1">Write Your Feedback</label>
+            <label className="block text-sm font-bold mb-1">Write Your Feedback <span className="text-red-500">*</span></label>
             <textarea
-              name="comment"
+              name="feedback"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.comment}
+              value={formik.values.feedback}
               rows={4}
               className={`border-2 rounded px-3 py-2 outline-none text-base w-full resize-none 
-    ${formik.touched.comment && formik.errors.comment ? "border-red-500 focus:ring-1 focus:ring-red-400" : "border-gray-300"}`}
+    ${formik.touched.feedback && formik.errors.feedback ? "border-red-500 focus:ring-1 focus:ring-red-400" : "border-gray-300"}`}
             />
 
-            {formik.touched.comment && formik.errors.comment && (
-              <p className="text-red-500 text-sm mt-1">{formik.errors.comment}</p>
+            {formik.touched.feedback && formik.errors.feedback && (
+              <p className="text-red-500 text-sm mt-1">{formik.errors.feedback}</p>
             )}
           </div>
 
@@ -249,14 +253,14 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
             <div
               {...getRootProps()}
               className={`relative inline-block cursor-pointer group border-2 border-dashed rounded-md p-1 
-      ${formik.values.imageUrl ? "border-transparent" : "border-gray-400 hover:border-gray-600"}`}
+      ${formik.values.image_url ? "border-transparent" : "border-gray-400 hover:border-gray-600"}`}
             >
               <input {...getInputProps()} />
 
-              {formik.values.imageUrl ? (
+              {formik.values.image_url ? (
                 <div className="relative inline-block">
                   <img
-                    src={formik.values.imageUrl}
+                    src={formik.values.image_url}
                     alt="Uploaded preview"
                     className="max-w-[300px] max-h-[300px] object-contain rounded-md"
                   />
@@ -279,12 +283,9 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
             </div>
           </div>
 
-
-
-
           {/* Rating */}
           <div>
-            <label className="block text-sm font-bold mb-1">Rate:</label>
+            <label className="block text-sm font-bold mb-1">Rate: <span className="text-red-500">*</span></label>
             <div className="flex gap-2">
               {Array.from({ length: 5 }, (_, i) => (
                 <span
@@ -304,6 +305,7 @@ const Feedback = forwardRef<HTMLDivElement>((_, ref) => {
 
           {/* Submit */}
           <button
+          disabled={submitLoading}
             type="submit"
             className="bg-gradient-to-r from-buttonsSecondary to-buttons text-white py-3 px-6 rounded-full cursor-pointer font-bold text-base uppercase tracking-wide transition-opacity duration-300 mt-4 hover:opacity-80"
           >

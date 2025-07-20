@@ -1,19 +1,22 @@
 "use client"
 
 import RoomCard from '@/components/DisplayCard/RoomCard';
-import Feedback from '@/components/Feedback/Feedback';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { ForkKnife, WifiHigh, ThermometerCold, ArrowLeft, ArrowRight, X } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { PGInfo, Room } from '@/types/pg_type';
 import 'swiper/css';
+import { Review } from '@/app/(sharedlayout)/pg/[id]/page';
+const Feedback = lazy(() => import('@/components/Feedback/Feedback'))
 
 interface Iprops {
+    id: string,
     pginfo: PGInfo,
-    rooms: Room[]
+    rooms: Room[],
+    reviewData: Review[]
 }
-const PGInfoComponent = ({ pginfo, rooms }: Iprops) => {
+const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
     // const router = useRouter();
     //   const { id } = router.query;
     //   const [pgDetails, setPgDetails] = useState(null);
@@ -105,7 +108,7 @@ const PGInfoComponent = ({ pginfo, rooms }: Iprops) => {
                     onClick={() => { formRef.current?.scrollIntoView({ behavior: 'smooth' }) }}>Write a Review <ArrowRight size={16} /></button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+            <div className="grid grid-cols-1 max-sm:justify-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
                 {rooms && rooms.map((room) => (
                     <RoomCard
                         key={room._id}
@@ -114,7 +117,7 @@ const PGInfoComponent = ({ pginfo, rooms }: Iprops) => {
                         foodIncluded={true}
                         roomsAvailable={10}
                         depositDuration={room.deposit_duration}
-                        imageUrls={[room.room_image_url]}
+                        imageUrls={[room.room_image_url]} // need to change it later
                         amenities={[
                             "AC",
                             "Washroom",
@@ -131,7 +134,9 @@ const PGInfoComponent = ({ pginfo, rooms }: Iprops) => {
             </div>
 
 
-            <Feedback ref={formRef} />
+            <Suspense fallback={<FeedbackSkeleton />}>
+                <Feedback ref={formRef} {...{reviewData,id}} />
+            </Suspense>
 
             {/* review offcanvas */}
             {/* {showReviewPanel && (
@@ -195,3 +200,88 @@ const PGInfoComponent = ({ pginfo, rooms }: Iprops) => {
 };
 
 export default PGInfoComponent;
+
+
+const FeedbackSkeleton = () => {
+  return (
+    <div className="w-4/5 max-w-[1200px] mx-auto min-h-screen bg-[#fafafa] py-8 flex flex-col gap-12 animate-pulse">
+      {/* 1) Carousel Skeleton */}
+      <div>
+        <div className="h-8 bg-gray-300 rounded w-40 mx-auto mb-6" />
+
+        <div className="relative w-[800px] mx-auto overflow-hidden bg-white rounded-md shadow p-4">
+          <div className="flex" style={{ width: "800px" }}>
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-[400px] p-6 flex flex-col gap-4 bg-white"
+              >
+                <div className="w-[250px] h-[250px] bg-gray-200 rounded-full mx-auto" />
+                <div className="flex flex-col gap-2">
+                  <div className="h-4 bg-gray-300 rounded w-full" />
+                  <div className="flex gap-[2px]">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <div
+                        key={j}
+                        className="w-5 h-5 bg-gray-300 rounded"
+                      />
+                    ))}
+                  </div>
+                  <div className="h-4 bg-gray-300 rounded w-1/2 self-end" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Prev/Next buttons */}
+          <div className="absolute top-1/2 -translate-y-1/2 left-4 w-10 h-10 bg-gray-300 rounded-full" />
+          <div className="absolute top-1/2 -translate-y-1/2 right-4 w-10 h-10 bg-gray-300 rounded-full" />
+        </div>
+      </div>
+
+      {/* 2) Form Skeleton */}
+      <div className="bg-white p-8 rounded-md shadow w-full max-w-[800px] mx-auto">
+        <div className="flex flex-col gap-4">
+          {/* Name */}
+          <div className="space-y-2">
+            <div className="h-4 w-24 bg-gray-300 rounded" />
+            <div className="h-10 bg-gray-200 rounded" />
+          </div>
+
+          {/* Email */}
+          <div className="space-y-2">
+            <div className="h-4 w-24 bg-gray-300 rounded" />
+            <div className="h-10 bg-gray-200 rounded" />
+          </div>
+
+          {/* Feedback */}
+          <div className="space-y-2">
+            <div className="h-4 w-40 bg-gray-300 rounded" />
+            <div className="h-24 bg-gray-200 rounded" />
+          </div>
+
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <div className="h-4 w-60 bg-gray-300 rounded" />
+            <div className="w-[200px] h-[200px] bg-gray-200 rounded-md flex items-center justify-center"/>
+          </div>
+
+          {/* Rating */}
+          <div className="space-y-2">
+            <div className="h-4 w-20 bg-gray-300 rounded" />
+            <div className="flex gap-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="w-8 h-8 bg-gray-200 rounded" />
+              ))}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="w-40 h-10 bg-gray-300 rounded-full mt-4" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
