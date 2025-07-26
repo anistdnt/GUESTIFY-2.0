@@ -27,6 +27,11 @@ export const API = {
         DELETE : "/deletePG",
         UPDATE : "/updatePg"
     },
+    ROOM: {
+        GET_ROOM_BY_ID : "/getPg",
+        UPDATE : "/updatePg",
+        DELETE: "/deleteRoom"
+    },
     REVIEW: {
         GET_REVIWS_OF_PG : "/getReviews",
         ADD_REVIEW:"/addReview"
