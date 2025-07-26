@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDropzone } from "react-dropzone";
@@ -9,6 +9,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { base64ToFile } from "@/lib/imageConvert";
 import { API } from "@/lib/api_const";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 
 interface FeedbackItem {
@@ -31,16 +32,22 @@ type ReviewSubmitResponseType = {
 
 const Feedback = forwardRef<HTMLDivElement, FeedbackProp>(({ reviewData, id }, ref) => {
 
-  const feedbackList : Review[] = reviewData;
+  // const feedbackList : Review[] = reviewData;
+  const [feedbackList, setFeedbackList] = useState<Review[]>(reviewData)
+  const router = useRouter()
   // Carousel state
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [submitLoading , setSubmitLoading] = useState<boolean>(false)
+  const [submitLoading, setSubmitLoading] = useState<boolean>(false)
 
   const itemsPerView = 2;
   const totalItems = feedbackList.length;
 
   const pairsCount = Math.ceil(totalItems / itemsPerView);
   const maxIndex = pairsCount > 0 ? pairsCount - 1 : 0;
+
+  useEffect(()=>{
+    setFeedbackList(reviewData)
+  },[reviewData])
 
   const formik = useFormik({
     initialValues: {
@@ -65,30 +72,33 @@ const Feedback = forwardRef<HTMLDivElement, FeedbackProp>(({ reviewData, id }, r
 
   async function handleSubmit(values: FeedbackItem) {
     setSubmitLoading(true)
-  const file = base64ToFile(values.image_url as string, `Review-Image-${Date.now()}`);
 
-  const formData = new FormData();
-  formData.append("full_name", values.full_name);
-  formData.append("email", values.email);
-  formData.append("feedback", values.feedback);
-  formData.append("rating", values.rating.toString());
-  formData.append("image_url", file); // image as File object
-
-  try {
-    const resp = await api_caller<FormData, any>("POST", `${API.REVIEW.ADD_REVIEW}/${id}`, formData);
-
-    if (resp?.success) {
-      toast.success(resp.message);
-    } else {
-      toast.error(resp.message);
+    const formData = new FormData();
+    formData.append("full_name", values.full_name);
+    formData.append("email", values.email);
+    formData.append("feedback", values.feedback);
+    formData.append("rating", values.rating.toString());
+    if (values.image_url) {
+      const file = base64ToFile(values.image_url as string, `Review-Image-${Date.now()}`);
+      formData.append("image_url", file); // image as File object
     }
-  } catch (error) {
-    console.error("Error submitting review:", error);
-    toast.error("Submission failed");
-  }finally{
-    setSubmitLoading(false)
+
+    try {
+      const resp = await api_caller<FormData, any>("POST", `${API.REVIEW.ADD_REVIEW}/${id}`, formData);
+
+      if (resp?.success) {
+        toast.success(resp.message);
+        router.refresh(); // for getting the review list
+      } else {
+        toast.error(resp.message);
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error("Submission failed");
+    } finally {
+      setSubmitLoading(false)
+    }
   }
-}
 
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -127,65 +137,82 @@ const Feedback = forwardRef<HTMLDivElement, FeedbackProp>(({ reviewData, id }, r
         {/* Carousel Wrapper (800px wide => 2 items at 400px each) */}
         <div className="relative w-full max-w-[800px] mx-auto overflow-hidden bg-white rounded-md shadow p-4">
           {/* Track (dynamic width, translateX) */}
-          <div
-            className="flex transition-transform duration-300 ease-in-out"
-            style={{
-              transform: `translateX(-${currentIndex * 100}%)`,
-            }}
-          >
-
-            {feedbackList.map((feedback, index) => (
+          {feedbackList.length > 0 ?
+            (<>
               <div
-                key={index}
-                className="w-full lg:w-1/2 shrink-0 box-border p-6 flex flex-col gap-4 bg-white whitespace-normal break-words"
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{
+                  transform: `translateX(-${currentIndex * 100}%)`,
+                }}
               >
 
-                {/* Image (optional) */}
-                <div className="text-center">
-                  <img
-                    src={feedback.image_url || '/assets/profile.png'}
-                    alt={`${feedback.full_name} feedback`}
-                    className="w-[250px] h-[250px] object-cover rounded-full mx-auto"
-                  />
-                </div>
+                {feedbackList.map((feedback, index) => (
+                  <div
+                    key={index}
+                    className="w-full lg:w-1/2 shrink-0 box-border p-6 flex flex-col gap-4 bg-white whitespace-normal break-words"
+                  >
 
-                {/* Comment & Rating */}
-                <div className="flex flex-col gap-2">
-                  <p className="italic m-0">
-                    “{feedback.feedback}”
-                  </p>
-                  <div>
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <span
-                        key={i}
-                        className={`${i < feedback.rating ? "text-buttons" : "text-gray-300"
-                          } text-xl mr-[2px]`}
-                      >
-                        ★
-                      </span>
-                    ))}
+                    {/* Image (optional) */}
+                    <div className="text-center">
+                      <img
+                        src={feedback.image_url || '/assets/profile.png'}
+                        alt={`${feedback.full_name} feedback`}
+                        className="w-[250px] h-[250px] object-cover rounded-full mx-auto"
+                      />
+                    </div>
+
+                    {/* Comment & Rating */}
+                    <div className="flex flex-col gap-2">
+                      <p className="italic m-0">
+                        “{feedback.feedback}”
+                      </p>
+                      <div>
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span
+                            key={i}
+                            className={`${i < feedback.rating ? "text-buttons" : "text-gray-300"
+                              } text-xl mr-[2px]`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-right m-0 font-semibold">
+                        - {feedback.full_name}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-right m-0 font-semibold">
-                    - {feedback.full_name}
-                  </p>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Prev / Next Buttons */}
-          <button
-            onClick={handlePrev}
-            className="absolute top-1/2 -translate-y-1/2 left-4 bg-white border border-gray-300 rounded-full w-10 h-10 cursor-pointer font-bold shadow text-center leading-[2.5rem] text-xl select-none"
-          >
-            ←
-          </button>
-          <button
-            onClick={handleNext}
-            className="absolute top-1/2 -translate-y-1/2 right-4 bg-white border border-gray-300 rounded-full w-10 h-10 cursor-pointer font-bold shadow text-center leading-[2.5rem] text-xl select-none"
-          >
-            →
-          </button>
+              <button
+                onClick={handlePrev}
+                className="absolute top-1/2 -translate-y-1/2 left-4 bg-white border border-gray-300 rounded-full w-10 h-10 cursor-pointer font-bold shadow text-center leading-[2.5rem] text-xl select-none"
+              >
+                ←
+              </button>
+              <button
+                onClick={handleNext}
+                className="absolute top-1/2 -translate-y-1/2 right-4 bg-white border border-gray-300 rounded-full w-10 h-10 cursor-pointer font-bold shadow text-center leading-[2.5rem] text-xl select-none"
+              >
+                →
+              </button>
+            </>) :
+            (
+              <div className="text-center flex flex-col items-center justify-center gap-4 py-10">
+                <img
+                  src="/assets/no-feedback.png"
+                  alt="No feedback"
+                  className="w-[200px] h-[200px] object-contain mx-auto opacity-70"
+                />
+                <h3 className="text-xl font-semibold text-gray-600">
+                  No feedback available
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Be the first to leave your thoughts. We value your feedback!
+                </p>
+              </div>
+            )}
         </div>
       </div>
 
@@ -305,7 +332,7 @@ const Feedback = forwardRef<HTMLDivElement, FeedbackProp>(({ reviewData, id }, r
 
           {/* Submit */}
           <button
-          disabled={submitLoading}
+            disabled={submitLoading}
             type="submit"
             className="bg-gradient-to-r from-buttonsSecondary to-buttons text-white py-3 px-6 rounded-full cursor-pointer font-bold text-base uppercase tracking-wide transition-opacity duration-300 mt-4 hover:opacity-80"
           >

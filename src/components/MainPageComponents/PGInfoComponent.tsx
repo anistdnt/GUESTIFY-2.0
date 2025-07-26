@@ -4,7 +4,7 @@ import RoomCard from '@/components/DisplayCard/RoomCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { ForkKnife, WifiHigh, ThermometerCold, ArrowLeft, ArrowRight, X } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
-import { lazy, Suspense, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { PGInfo, Room } from '@/types/pg_type';
 import 'swiper/css';
 import { Review } from '@/app/(sharedlayout)/pg/[id]/page';
@@ -46,6 +46,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
     //     }, 300);
     // };
 
+    useEffect(()=>{console.log(reviewData)},[reviewData])
     const router = useRouter()
     return (
         <div className=" mx-auto">
