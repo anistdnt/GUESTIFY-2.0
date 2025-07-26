@@ -6,6 +6,7 @@ import { FieldArray, Field, ErrorMessage, useFormikContext } from "formik";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 
@@ -289,7 +290,11 @@ export default function RoomForm({
                     if (hasAddBtn) {
                       remove(index);
                     } else {
-                      dispatch(
+                      if(values?.rooms?.length < 2){
+                        toast.error("Unable to Delete : You have to enlist at least 1 room")
+                      }
+                      else{
+                        dispatch(
                         setModalVisibility({
                           open: true,
                           type: "deletePG",
@@ -303,6 +308,7 @@ export default function RoomForm({
                           },
                         })
                       );
+                      }
                     }
                   }}
                   disabled={hasAddBtn && values?.rooms?.length < 2}

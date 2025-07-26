@@ -16,7 +16,7 @@ type ModalType = {
 
 const deleteEndpointMap = {
   "pg" : API.PG.DELETE,
-  "room" : API.PG.DELETE
+  "room" : API.ROOM.DELETE
 }
 
 
