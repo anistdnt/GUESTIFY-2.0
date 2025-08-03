@@ -169,7 +169,7 @@ const Searchbar = () => {
   const handleChangePath = useCallback(
     (coordinates: string,college_name:string) => {
       // console.log("Co-Ordinates",coordinates);
-      const url = new URLSearchParams(window.location.search);
+      const url = new URLSearchParams(window?.location.search);
 
       //Adding query params
       url.set("coordinates", coordinates);

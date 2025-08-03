@@ -3,8 +3,8 @@ import { ArrowUp, Bell, EnvelopeSimple, List, XCircle } from "@phosphor-icons/re
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { deleteCookie, hasCookie } from "cookies-next/client";
+import { useEffect, useState, useRef } from "react";
+import { deleteCookie, hasCookie, getCookie } from "cookies-next/client";
 import toast from "react-hot-toast";
 import { decodeToken } from "@/lib/decodeToken";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,6 +44,7 @@ export interface GetNotification_Type {
 // }
 
 export default function Header() {
+  // Get user data from Redux store
   const reduxUserData = useSelector(
     (state: RootState) => state.user_slice.userData
   );
@@ -58,6 +59,7 @@ export default function Header() {
   const [loadingNotifications, setLoadingNotifications] = useState<boolean>(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [bulkActionLoading, setBulkActionLoading] = useState<"read" | "delete" | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
 
   // const [isloading,setisloading] = useState<boolean>(false);
@@ -71,11 +73,18 @@ export default function Header() {
     dispatch(setLoading({ loading: true }));
     const res: ApiReturn<any> = await api_caller<any>("GET", API.USER.LOGOUT);
     if (res.success) {
+      // Close SSE connection when logging out
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+
       deleteCookie("authToken");
       setisLoggedIn(false);
       setshowProfileDropdown(false);
+      setNotifications([]); // Clear notifications
       router.push("/");
-      toast.success(res.message || "Loggged out successfully");
+      toast.success(res.message || "Logged out successfully");
     } else {
       toast.error(`${res.message} : ${res.error}`);
     }
@@ -107,9 +116,10 @@ export default function Header() {
     setshowNotification((prev) => !prev);
     setshowProfileDropdown(false);
 
-    if (!showNotification) {
-      await fetchAllNotifications();
-    }
+    // Only fetch notifications if we're opening the dropdown and there are no notifications yet
+    // if (!showNotification && (!notifications || notifications.length === 0)) {
+    //   await fetchAllNotifications();
+    // }
   }
 
   const fetchAllNotifications = async () => {
@@ -135,7 +145,7 @@ export default function Header() {
       const resData: ApiReturn<any> = await api_caller<any>("PATCH", `${API.NOTIFICATION.UPDATE_NOTIFICATION}/${id}`);
       if (resData.success) {
         toast.success(resData.message);
-        await fetchAllNotifications();
+        // await fetchAllNotifications();
       } else {
         toast.error(resData.message);
       }
@@ -153,7 +163,7 @@ export default function Header() {
       const resData: ApiReturn<any> = await api_caller<any>("PUT", API.NOTIFICATION.UPDATE_NOTIFICATIONs);
       if (resData.success) {
         toast.success(resData.message);
-        await fetchAllNotifications();
+        // await fetchAllNotifications();
       } else {
         toast.error(resData.message);
       }
@@ -171,7 +181,7 @@ export default function Header() {
       const resData: ApiReturn<any> = await api_caller<any>("DELETE", `${API.NOTIFICATION.DELETE_NOTIFICATION}/${id}`);
       if (resData.success) {
         toast.success(resData.message);
-        await fetchAllNotifications();
+        // await fetchAllNotifications();
       } else {
         toast.error(resData.message);
       }
@@ -189,7 +199,7 @@ export default function Header() {
       const resData: ApiReturn<any> = await api_caller<any>("DELETE", API.NOTIFICATION.DELETE_NOTIFICATIONS);
       if (resData.success) {
         toast.success(resData.message);
-        await fetchAllNotifications();
+        // await fetchAllNotifications();
       } else {
         toast.error(resData.message);
       }
@@ -201,6 +211,104 @@ export default function Header() {
   };
 
 
+
+
+  // Setup SSE connection for real-time notifications
+  const setupSSEConnection = () => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    if (!hasCookie("authToken")) return;
+
+    const auth_token = getCookie("authToken");
+    const device_token = getCookie("device_token");
+    const baseUrl = (process.env.NEXT_PUBLIC_SERVER_URL || "").replace(/\/+$/, "");
+    const apiPath = API.NOTIFICATION.ALL_NOTIFICATIONS.replace(/^\/+/, "");
+    const sseUrl = `${baseUrl}/${apiPath}`;
+
+    const eventSource = new EventSource(`${sseUrl}?auth_token=${auth_token}&device_token=${device_token}`);
+    eventSourceRef.current = eventSource;
+
+    eventSource.onopen = () => {
+      console.log("SSE connection established");
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log(data, "event update data")
+
+        if (data.initialNotifications) {
+          // Initial load of notifications
+          setNotifications(data.initialNotifications);
+        } else if (data.error) {
+          toast.error(data.error);
+        } else if (data.updateType) {
+          switch (data.updateType) {
+            case "all_deleted":
+              // Remove all notifications whose _id is in batchIds from state
+              setNotifications(prev => prev.filter(n => !data.batchIds.includes(n._id)));
+              toast.success("All notifications deleted");
+              break;
+
+            case "all_read":
+              // Mark notifications in batchIds as read
+              setNotifications(prev => prev.map(n =>
+                data.batchIds.includes(n._id) ? { ...n, isRead: true } : n
+              ));
+              toast.success("All notifications marked as read");
+              break;
+
+            case "deleted":
+              // Remove single notification
+              setNotifications(prev => prev.filter(n => n._id !== data.notification._id));
+              toast.success("Notification deleted");
+              break;
+
+            case "updated":
+            case "new":
+              // Add or update a single notification
+              const notif = data.notification ?? data.newNotification;
+              setNotifications(prev => {
+                if (!prev) return [notif];
+                const exists = prev.find(n => n._id === notif._id);
+                if (exists) {
+                  return prev.map(n => n._id === notif._id ? notif : n);
+                }
+                return [notif, ...prev];
+              });
+              toast.success("Notification updated");
+              break;
+
+            default:
+              // Unknown updateType, optionally ignore or log
+              console.warn("Unknown SSE updateType:", data.updateType);
+              break;
+          }
+        } else if (data.notification || data.newNotification) {
+          // Fallback case if no updateType but notification present
+          const newNotif = data.notification ?? data.newNotification;
+          setNotifications(prev => {
+            if (!prev) return [newNotif];
+            if (prev.find(n => n._id === newNotif._id)) return prev;
+            return [newNotif, ...prev];
+          });
+          toast.success("New notification received!");
+        }
+      } catch (error) {
+        console.error("Error processing SSE message:", error);
+      }
+    };
+
+
+    eventSource.onerror = (error) => {
+      console.error("SSE connection error:", error);
+      eventSource.close();
+      eventSourceRef.current = null;
+      setisLoggedIn(false);
+    };
+  };
 
 
   useEffect(() => {
@@ -217,33 +325,34 @@ export default function Header() {
         });
       } else {
         const user_info_fromToken = decodeToken("authToken");
-
         dispatch(setToken("authToken"));
-
         fetcheUserProfile(user_info_fromToken.user_id);
-
-        // setuserInfo({
-        //   user_id: user_info_fromToken.user_id,
-        //   first_name: user_info_fromToken.first_name,
-        //   last_name: user_info_fromToken.last_name,
-        //   full_name:
-        //     user_info_fromToken.first_name +
-        //     " " +
-        //     user_info_fromToken.last_name,
-        //   email: user_info_fromToken.email,
-        //   image_url: user_info_fromToken.image_url,
-        // });
       }
       setisLoggedIn(true);
+      // Setup SSE connection when user is logged in
+      setupSSEConnection();
+      // Initial fetch of notifications
+      // fetchAllNotifications();
     }
     else {
       setisLoggedIn(false);
-    }
-  }, [isLoggedIn, pathname, reduxUserData]);
 
-  useEffect(() => {
-    console.log(userInfo?.image_url)
-  }, [userInfo])
+      // Close SSE connection when user logs out
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+      setNotifications([]);
+    }
+
+    // Cleanup function to close SSE connection when component unmounts
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
+  }, [isLoggedIn, pathname, reduxUserData]);
 
   return (
     <header className="sticky z-40 top-0">

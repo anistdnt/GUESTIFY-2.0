@@ -401,7 +401,7 @@ const Page = () => {
             onClick={() => {
               toast.success("You are redirecting to the Reset Password Page")
               setTimeout(() => {
-                window.open(`/reset-password/${getCookie("authToken")}`,'_blank')
+                window?.open(`/reset-password/${getCookie("authToken")}`,'_blank')
               }, 2000);
             }}
           >

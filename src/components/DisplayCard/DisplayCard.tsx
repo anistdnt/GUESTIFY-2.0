@@ -2,9 +2,9 @@
 import Image from "next/image";
 import Rating from "../Rating/Rating";
 import { CurrencyInr, MapPin } from "@phosphor-icons/react/dist/ssr";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import OwnerInfoModal from "../Modals/OwnerInfoModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
 
@@ -74,6 +74,12 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
   const router = useRouter();
 
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
+  // Utility to extract coordinates from query string
+    const [college_longitude, setLongitude] = useState<number | null>(null);
+    const [college_latitude, setLatitude] = useState<number | null>(null);
+  
+    const params = useSearchParams();
+    const clg_coords = params.get("coordinates");
 
   return (
     <>
@@ -173,7 +179,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               <button
                 className="bg-buttons text-white px-4 py-2 rounded"
                 onClick={() => {
-                  router.push(`/pg/${pginfo?._id}`)
+                  router.push(`/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(clg_coords)}`);
                 }}
               >
                 View full details
