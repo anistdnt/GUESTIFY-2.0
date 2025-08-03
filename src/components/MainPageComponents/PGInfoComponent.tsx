@@ -1,65 +1,97 @@
 "use client"
 
 import RoomCard from '@/components/DisplayCard/RoomCard';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { ForkKnife, WifiHigh, ThermometerCold, ArrowLeft, ArrowRight, X } from '@phosphor-icons/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { PGInfo, Room } from '@/types/pg_type';
 import 'swiper/css';
 import { Review } from '@/app/(sharedlayout)/pg/[id]/page';
+import type { LatLngTuple } from 'leaflet';
+import dynamic from "next/dynamic";
+const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 const Feedback = lazy(() => import('@/components/Feedback/Feedback'))
 
 interface Iprops {
-    id: string,
-    pginfo: PGInfo,
-    rooms: Room[],
-    reviewData: Review[]
+  id: string,
+  pginfo: PGInfo,
+  rooms: Room[],
+  reviewData: Review[]
 }
 const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
-    // const router = useRouter();
-    //   const { id } = router.query;
-    //   const [pgDetails, setPgDetails] = useState(null);
+  // const router = useRouter();
+  //   const { id } = router.query;
+  //   const [pgDetails, setPgDetails] = useState(null);
 
-    //   useEffect(() => {
-    //     if (id) {
-    //       axios.get(`/api/pg/${id}`)
-    //         .then(response => setPgDetails(response.data))
-    //         .catch(error => console.error('Error fetching PG details:', error));
-    //     }
-    //   }, [id]);
+  //   useEffect(() => {
+  //     if (id) {
+  //       axios.get(`/api/pg/${id}`)
+  //         .then(response => setPgDetails(response.data))
+  //         .catch(error => console.error('Error fetching PG details:', error));
+  //     }
+  //   }, [id]);
 
-    // if (!pgDetails) {
-    //     return <p className="text-center mt-10">Loading PG details...</p>;
-    // }
+  // if (!pgDetails) {
+  //     return <p className="text-center mt-10">Loading PG details...</p>;
+  // }
 
-    // const [showReviewPanel, setShowReviewPanel] = useState<boolean>(false);
-    // const [isClosing, setIsClosing] = useState(false);
+  // const [showReviewPanel, setShowReviewPanel] = useState<boolean>(false);
+  // const [isClosing, setIsClosing] = useState(false);
 
-    const formRef = useRef<HTMLDivElement>(null);
+  const params = useSearchParams();
+  const clg_coords = params.get("clg_coords");
+  const formRef = useRef<HTMLDivElement>(null);
+  const [college_longitude, setLongitude] = useState<number | null>(null);
+  const [college_latitude, setLatitude] = useState<number | null>(null);
 
-    // const handleCloseReviewPanel = () => {
-    //     setIsClosing(true);
-    //     setTimeout(() => {
-    //         setShowReviewPanel(false);
-    //         setIsClosing(false);
-    //     }, 300);
-    // };
 
-    useEffect(()=>{console.log(reviewData)},[reviewData])
-    const router = useRouter()
-    return (
-        <div className=" mx-auto">
-            <ArrowLeft size={32} onClick={() => router.back()} className='mb-4 cursor-pointer' />
-            <div className='flex flex-col sm:flex-row gap-6'>
+  useEffect(() => {
+    if (typeof clg_coords === "string") {
+      const parts = clg_coords.split(",");
+      if (parts.length === 2) {
+        const lon = Number(parts[0]);
+        const lat = Number(parts[1]);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          setLongitude(lon);
+          setLatitude(lat);
+        }
+      }
+    }
+  }, [clg_coords]);
 
-                <img src={pginfo.pg_image_url}
-                    alt="PG Image"
-                    className="sm:w-[70%] rounded-lg max-h-[480px]" />
+  // const handleCloseReviewPanel = () => {
+  //     setIsClosing(true);
+  //     setTimeout(() => {
+  //         setShowReviewPanel(false);
+  //         setIsClosing(false);
+  //     }, 300);
+  // };
 
-                {/* for slider use , will use it later */}
 
-                {/* <Swiper spaceBetween={10} slidesPerView={1} className="mb-6">
+
+  useEffect(() => { console.log(reviewData) }, [reviewData])
+  const router = useRouter()
+  // Default coordinates (can be replaced with actual PG location)
+
+  const position: LatLngTuple =
+    pginfo?.location
+      ? [pginfo.location.coordinates[1], pginfo.location.coordinates[0]] :
+      [28.6139, 77.2090]; // Delhi fallback
+  return (
+    <div className=" mx-auto">
+      <ArrowLeft size={32} onClick={() => router.back()} className='mb-4 cursor-pointer' />
+      <div className='flex flex-col sm:flex-row gap-6'>
+
+        <img src={pginfo.pg_image_url}
+          alt="PG Image"
+          className="sm:w-[70%] rounded-lg max-h-[480px]" />
+
+        {/* for slider use , will use it later */}
+
+        {/* <Swiper spaceBetween={10} slidesPerView={1} className="mb-6">
                     {pgDetails.images.map((img, index) => (
           <SwiperSlide key={index}>
           <img src={img} alt={`PG Image ${index + 1}`} className="w-full rounded-lg" />
@@ -72,75 +104,78 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
 
                 </Swiper> */}
 
-                <div className='w-full sm:w-full sm:max-w-[300px]'>
-                    <h1 className="text-3xl font-bold mb-3">{pginfo.pg_name}</h1>
-                    <span
-                        className={`${pginfo?.pg_type === "girls" && "bg-pink-500"
-                            } ${pginfo?.pg_type === "boys" && "bg-blue-500"} ${pginfo?.pg_type === "both" && "bg-yellow-700"
-                            } text-white text-xs px-2 py-1 rounded`}
-                    >
-                        {pginfo?.pg_type?.replace(
-                            pginfo?.pg_type[0],
-                            pginfo?.pg_type[0]?.toUpperCase()
-                        )}
-                    </span>
+        <div className='w-full sm:w-full sm:max-w-[300px]'>
+          <h1 className="text-3xl font-bold mb-3">{pginfo.pg_name}</h1>
+          <span
+            className={`${pginfo?.pg_type === "girls" && "bg-pink-500"
+              } ${pginfo?.pg_type === "boys" && "bg-blue-500"} ${pginfo?.pg_type === "both" && "bg-yellow-700"
+              } text-white text-xs px-2 py-1 rounded`}
+          >
+            {pginfo?.pg_type?.replace(
+              pginfo?.pg_type[0],
+              pginfo?.pg_type[0]?.toUpperCase()
+            )}
+          </span>
 
-                    <p className="text-xl font-semibold mt-4 mb-4">Rent: <span className='text-3xl text-red-500'>₹12000</span></p>
-                    <p className='flex flex-row gap-3 items-center mb-3'><WifiHigh size={20} /> <span className='font-semibold'>Wifi :</span> {pginfo.wifi_available === "yes" ? "Available" : "Not Available"}</p> {/* {pgDetails.wifi ? 'Available' : 'Not Available'} */}
-                    {/* <p className='flex flex-row gap-3 items-center mb-3'><ThermometerCold size={20} /><span className='font-semibold'>AC :</span>  Available</p> */}
-                    <p className='flex flex-row gap-3 items-center'><ForkKnife size={20} /> <span className='font-semibold'>Food :</span> {pginfo.food_available === "yes" ? "Provided" : "Not Provided"}</p> {/* {pgDetails.food ? 'Provided' : 'Not Provided'} */}
-                    <p className="mt-4 text-gray-600"><span className='font-semibold'>Address:</span> {pginfo.address}</p>
-                    <p className="mt-4 text-gray-600 mb-8"><span className='font-semibold'>Pincode:</span> {pginfo.pincode}</p>
-                    <button className="bg-buttons hover:bg-buttonsHover text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300">
-                        Get Contact Details
-                    </button>
+          <p className="text-xl font-semibold mt-4 mb-4">Rent: <span className='text-3xl text-red-500'>₹12000</span></p>
+          <p className='flex flex-row gap-3 items-center mb-3'><WifiHigh size={20} /> <span className='font-semibold'>Wifi :</span> {pginfo.wifi_available === "yes" ? "Available" : "Not Available"}</p> {/* {pgDetails.wifi ? 'Available' : 'Not Available'} */}
+          {/* <p className='flex flex-row gap-3 items-center mb-3'><ThermometerCold size={20} /><span className='font-semibold'>AC :</span>  Available</p> */}
+          <p className='flex flex-row gap-3 items-center'><ForkKnife size={20} /> <span className='font-semibold'>Food :</span> {pginfo.food_available === "yes" ? "Provided" : "Not Provided"}</p> {/* {pgDetails.food ? 'Provided' : 'Not Provided'} */}
+          <p className="mt-4 text-gray-600"><span className='font-semibold'>Address:</span> {pginfo.address}</p>
+          <p className="mt-4 text-gray-600 mb-8"><span className='font-semibold'>Pincode:</span> {pginfo.pincode}</p>
+          <button className="bg-buttons hover:bg-buttonsHover text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300">
+            Get Contact Details
+          </button>
 
-                </div>
-            </div>
-            <div className="mt-6 p-4 bg-gray-100 border-l-4 border-yellow-500 rounded-lg shadow-sm">
-                <p className="text-lg font-semibold text-gray-800"><strong>Rules:</strong></p>
-                <p className="mt-2 text-gray-700 leading-relaxed">{pginfo.rules}</p>
-            </div>
+        </div>
+      </div>
+      <div className="mt-6 p-4 bg-gray-100 border-l-4 border-yellow-500 rounded-lg shadow-sm">
+        <p className="text-lg font-semibold text-gray-800"><strong>Rules:</strong></p>
+        <p className="mt-2 text-gray-700 leading-relaxed">{pginfo.rules}</p>
+      </div>
 
-            <div className='w-full bg-yellow-100 flex flex-col sm:flex-row items-center justify-center gap-5 py-4 mt-6 rounded-md'>
-                <span>Share your thoughts about this PG</span>
-                <button
-                    className="text-buttonsHover flex flex-row items-center text-sm gap-1 hover:underline"
-                    onClick={() => { formRef.current?.scrollIntoView({ behavior: 'smooth' }) }}>Write a Review <ArrowRight size={16} /></button>
-            </div>
+      <div className='w-full bg-yellow-100 flex flex-col sm:flex-row items-center justify-center gap-5 py-4 mt-6 rounded-md'>
+        <span>Share your thoughts about this PG</span>
+        <button
+          className="text-buttonsHover flex flex-row items-center text-sm gap-1 hover:underline"
+          onClick={() => { formRef.current?.scrollIntoView({ behavior: 'smooth' }) }}>Write a Review <ArrowRight size={16} /></button>
+      </div>
 
-            <div className="grid grid-cols-1 max-sm:justify-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
-                {rooms && rooms.map((room) => (
-                    <RoomCard
-                        key={room._id}
-                        title={`${room.room_type[0].toUpperCase() + room.room_type.slice(1)} Room`}
-                        rent={room.room_rent}
-                        foodIncluded={true}
-                        roomsAvailable={10}
-                        depositDuration={room.deposit_duration}
-                        imageUrls={[room.room_image_url]} // need to change it later
-                        amenities={[
-                            "AC",
-                            "Washroom",
-                            "Cupboard",
-                            "TV",
-                            "Cot",
-                            "Mattress",
-                            "WiFi",
-                            "Geyser",
-                        ]}
-                    />
-                ))}
+      <div className="grid grid-cols-1 max-sm:justify-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+        {rooms && rooms.map((room) => (
+          <RoomCard
+            key={room._id}
+            title={`${room.room_type[0].toUpperCase() + room.room_type.slice(1)} Room`}
+            rent={room.room_rent}
+            foodIncluded={true}
+            roomsAvailable={10}
+            depositDuration={room.deposit_duration}
+            imageUrls={[room.room_image_url]} // need to change it later
+            amenities={[
+              "AC",
+              "Washroom",
+              "Cupboard",
+              "TV",
+              "Cot",
+              "Mattress",
+              "WiFi",
+              "Geyser",
+            ]}
+          />
+        ))}
+      </div>
 
-            </div>
+      {/* Leaflet Map Section */}
+      <div className="w-full flex justify-center items-center my-8">
+        <Map clg_coords={[college_latitude, college_longitude]} position={[position[0], position[1]]} name={pginfo.pg_name} address={pginfo.address} />
+      </div>
 
+      <Suspense fallback={<FeedbackSkeleton />}>
+        <Feedback ref={formRef} {...{ reviewData, id }} />
+      </Suspense>
 
-            <Suspense fallback={<FeedbackSkeleton />}>
-                <Feedback ref={formRef} {...{reviewData,id}} />
-            </Suspense>
-
-            {/* review offcanvas */}
-            {/* {showReviewPanel && (
+      {/* review offcanvas */}
+      {/* {showReviewPanel && (
                 <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-30">
                     <div
                         ref={panelRef}
@@ -196,8 +231,8 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
                 </div>
             )} */}
 
-        </div>
-    );
+    </div>
+  );
 };
 
 export default PGInfoComponent;
@@ -264,7 +299,7 @@ const FeedbackSkeleton = () => {
           {/* Image Upload */}
           <div className="space-y-2">
             <div className="h-4 w-60 bg-gray-300 rounded" />
-            <div className="w-[200px] h-[200px] bg-gray-200 rounded-md flex items-center justify-center"/>
+            <div className="w-[200px] h-[200px] bg-gray-200 rounded-md flex items-center justify-center" />
           </div>
 
           {/* Rating */}
@@ -284,5 +319,4 @@ const FeedbackSkeleton = () => {
     </div>
   );
 };
-
 

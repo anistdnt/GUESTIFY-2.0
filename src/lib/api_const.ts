@@ -4,7 +4,7 @@ export const API = {
         UPDATE_NOTIFICATION: "/updateNotification",
         UPDATE_NOTIFICATIONs : "/updateNotifications",
         DELETE_NOTIFICATION : "/deleteNotification",
-        DELETE_NOTIFICATIONS : "/deleteNotifications"
+        DELETE_NOTIFICATIONS : "/deleteNotifications",
     },
     USER: {
         LOGIN : "/loginUser",
