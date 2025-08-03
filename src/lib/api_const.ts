@@ -25,7 +25,8 @@ export const API = {
         GET_PG_BY_ID : "/getPg",
         ADD : "/addpg",
         DELETE : "/deletePG",
-        UPDATE : "/updatePg"
+        UPDATE : "/updatePg",
+        ADD_ROOM : "addRooms",
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",
