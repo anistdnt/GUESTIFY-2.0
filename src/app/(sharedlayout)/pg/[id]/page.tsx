@@ -9,6 +9,9 @@ interface Iprops {
   params: {
     id: string;
   };
+  searchParams : {
+    clg_coords?: string;
+  };
 }
 
 interface PGDetailsResponse {
@@ -62,7 +65,7 @@ export interface Review {
   rating: number
 }
 
-const PGDetails = async ({ params: { id } }: Iprops) => {
+const PGDetails = async ({ params: { id },searchParams:{clg_coords} }: Iprops) => {
   try {
     const resData: ApiReturn<PGDetailsResponse> = await api_caller<PGDetailsResponse>(
       "GET",
@@ -90,7 +93,7 @@ const PGDetails = async ({ params: { id } }: Iprops) => {
     const { pginfo, rooms } = resData.data;
 
     return (
-      <PGInfoComponent {...{ pginfo, rooms, reviewData:reviewData?.data, id }} />
+      <PGInfoComponent {...{ pginfo, rooms, reviewData:reviewData?.data, id, clg_coords}} />
     );
   } catch (error) {
     console.error("Failed to fetch PG details:", error);

@@ -19,9 +19,10 @@ interface Iprops {
   id: string,
   pginfo: PGInfo,
   rooms: Room[],
-  reviewData: Review[]
+  reviewData: Review[],
+  clg_coords?: string
 }
-const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
+const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords }: Iprops) => {
   // const router = useRouter();
   //   const { id } = router.query;
   //   const [pgDetails, setPgDetails] = useState(null);
@@ -41,26 +42,23 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
   // const [showReviewPanel, setShowReviewPanel] = useState<boolean>(false);
   // const [isClosing, setIsClosing] = useState(false);
 
-  const params = useSearchParams();
-  const clg_coords = params.get("clg_coords");
   const formRef = useRef<HTMLDivElement>(null);
-  const [college_longitude, setLongitude] = useState<number | null>(null);
-  const [college_latitude, setLatitude] = useState<number | null>(null);
+  const college_coords = clg_coords.split(",").map(coord => Number(coord)).reverse() as [number, number];
 
-
-  useEffect(() => {
-    if (typeof clg_coords === "string") {
-      const parts = clg_coords.split(",");
-      if (parts.length === 2) {
-        const lon = Number(parts[0]);
-        const lat = Number(parts[1]);
-        if (!isNaN(lat) && !isNaN(lon)) {
-          setLongitude(lon);
-          setLatitude(lat);
-        }
-      }
-    }
-  }, [clg_coords]);
+  // useEffect(() => {
+  //   if (typeof clg_coords === "string") {
+  //     college_coords.current = clg_coords.split(",").map(coord => Number(coord)).reverse() as [number, number];
+  //     console.log("College Coordinates:", college_coords);
+  //     // if (parts.length === 2) {
+  //     //   const lon = Number(parts[0]);
+  //     //   const lat = Number(parts[1]);
+  //     //   if (!isNaN(lat) && !isNaN(lon)) {
+  //     //     setLongitude(lon);
+  //     //     setLatitude(lat);
+  //     //   }
+  //     // }
+  //   }
+  // }, [clg_coords]);
 
   // const handleCloseReviewPanel = () => {
   //     setIsClosing(true);
@@ -166,8 +164,8 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id }: Iprops) => {
       </div>
 
       {/* Leaflet Map Section */}
-      <div className="w-full flex justify-center items-center my-8">
-        <Map clg_coords={[college_latitude, college_longitude]} position={[position[0], position[1]]} name={pginfo.pg_name} address={pginfo.address} />
+      <div className="w-full h-[500px] flex justify-center items-center mt-8 mb-36">
+        <Map clg_coords={college_coords} position={[position[0], position[1]]} name={pginfo.pg_name} address={pginfo.address} />
       </div>
 
       <Suspense fallback={<FeedbackSkeleton />}>
