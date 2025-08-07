@@ -1,55 +1,67 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
-import "leaflet-routing-machine";
-// If you have @types/leaflet-routing-machine installed, you can import types as well
-// import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 
 interface RoutingProps {
-    from?: [number, number]; // [lat, lon] e.g. PG coords
-    to?: [number, number];   // [lat, lon] e.g. college coords
+  from?: [number, number]; // PG coords
+  to?: [number, number];   // College coords
 }
 
 const CustomRoutingMachine: React.FC<RoutingProps> = ({ from, to }) => {
-    const map = useMap();
+  const map = useMap();
+  const [isReady, setIsReady] = useState(false);
 
-    useEffect(() => {
-        if (!map) return;
-        // Create routing control
-        // @ts-ignore: leaflet-routing-machine attaches Routing to window.L
-        const routingControl = (window as any)?.L.Routing.control({
-            waypoints: [
-                L.latLng(from[0], from[1]),
-                L.latLng(to[0], to[1]),
-            ],
-            lineOptions: {
-                styles: [{ color: "blue", weight: 4 }],
-                interactive: false,
-                pane: 'overlayPane',
-            },
-            routeWhileDragging: false,
-            show: false,
-            addWaypoints: false,
-            draggableWaypoints: false,
-            fitSelectedRoutes: true,
-            showAlternatives: false,
-        }).addTo(map);
+  // Dynamically import to avoid SSR issues
+  useEffect(() => {
+    const load = async () => {
+      try {
+        await import("leaflet-routing-machine");
+        setIsReady(true);
+      } catch (err) {
+        console.error("Routing machine load failed", err);
+      }
+    };
+    load();
+  }, []);
 
-        // Cleanup routing control on unmount
-        return () => {
-            if (map && routingControl) {
-                try {
-                    map.removeControl(routingControl);
-                } catch (error) {
-                    console.error("Error removing routing control:", error);
-                }
-            }
-        };
-    }, [from, to, map]);
+  useEffect(() => {
+    if (!map || !from || !to || !isReady) return;
 
-    return null;
+    const paneName = "route-pane";
+
+    // Create route pane with lower zIndex if it doesn't exist
+    if (!map.getPane(paneName)) {
+      const routePane = map.createPane(paneName);
+      routePane.style.zIndex = "399"; // Lower than marker-pane
+    }
+
+    const routingControl = (L as any).Routing.control({
+      waypoints: [L.latLng(from[0], from[1]), L.latLng(to[0], to[1])],
+      routeWhileDragging: false,
+      addWaypoints: false,
+      draggableWaypoints: false,
+      show: false,
+      fitSelectedRoutes: true,
+      showAlternatives: false,
+      lineOptions: {
+        styles: [{ color: "blue", weight: 4 }],
+        interactive: false, // Prevents blocking click
+        pane: paneName,
+      },
+    }).addTo(map);
+
+    return () => {
+      try {
+        map.removeControl(routingControl);
+      } catch (e) {
+        console.error("Failed to remove routing", e);
+      }
+    };
+  }, [from, to, map, isReady]);
+
+  return null;
 };
 
 export default CustomRoutingMachine;
