@@ -1,6 +1,5 @@
 "use client";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 // import Select from "react-select";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
@@ -8,82 +7,8 @@ import toast from "react-hot-toast";
 import { useDebounce } from "@/lib/useDebounce";
 import NoDataFound from "../NoDataFound/NoDataFound";
 import { useRouter } from "next/navigation";
+import { CollegeListSkeleton } from "./CollegeListSkeleton";
 
-interface distType {
-  id: number;
-  name: string;
-  altname: string;
-  searchval: string;
-  srcimage: string;
-}
-
-const districtMap: distType[] = [
-  {
-    id: 1,
-    name: "Alipore",
-    altname: "alipore",
-    searchval: "alipore",
-    srcimage: "/assets/login_illustration.webp",
-  },
-  {
-    id: 2,
-    name: "Kolkata",
-    altname: "kolkata",
-    searchval: "kolkata",
-    srcimage: "/assets/login_illustration.webp",
-  },
-  {
-    id: 3,
-    name: "Howrah",
-    altname: "howrah",
-    searchval: "howrah",
-    srcimage: "/assets/login_illustration.webp",
-  },
-  {
-    id: 4,
-    name: "Baruipur",
-    altname: "baruipur",
-    searchval: "baruipur",
-    srcimage: "/assets/login_illustration.webp",
-  },
-];
-
-const CollegeListSkeleton = () => {
-  return (
-    <ul className="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <li key={index}>
-          <div className="flex items-center py-2 pl-2 rounded animate-pulse">
-            <div className="w-10 h-10 mr-2 bg-gray-300 rounded-md" />
-            <div className="ml-2 space-y-1">
-              <div className="h-4 w-40 bg-gray-300 rounded" />
-              <div className="h-3 w-28 bg-gray-200 rounded" />
-            </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-const Districts = () => (
-  <div className="mx-auto flex space-x-4 overflow-x-auto p-4 w-full max-w-screen-md scrollbar-hide">
-    {districtMap.map((district) => (
-      <div
-        className="flex flex-col items-center justify-center w-32 h-36 bg-white border border-gray-800 text-sm font-semibold rounded-lg shrink-0"
-        key={district.id + district.altname}
-      >
-        <Image
-          src={district.srcimage}
-          height={600}
-          width={600}
-          alt={district.altname}
-        />
-        <p className="mt-2">{district.name}</p>
-      </div>
-    ))}
-  </div>
-);
 
 const ExpandedComp = memo(
   ({
@@ -178,7 +103,7 @@ const Searchbar = () => {
       url.set("clg_pin", college_pin?.toString());
 
 
-      router.push(`?${url.toString()}`, { scroll: false });
+      router.push(`/search?${url.toString()}`, { scroll: false });
       setSearchString("");
     },
     [debouncedQuery]
@@ -186,7 +111,7 @@ const Searchbar = () => {
 
   return (
     <div>
-      <Districts />
+      {/* <Districts /> */}
       <div className="mx-auto flex flex-col p-2 lg:w-3/5 bg-white rounded-md">
         <div className="flex items-center border w-full rounded-lg">
           {/* <Select

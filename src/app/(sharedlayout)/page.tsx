@@ -1,6 +1,5 @@
 // Importing Components
 
-import CardSection from "@/components/DisplayCard/CardSection";
 import Searchbar from "@/components/Searchbar/Searchbar";
 
 export default function Home() {
@@ -28,8 +27,6 @@ export default function Home() {
       <div className="bg-gray-100 py-10">
         <Searchbar />
       </div>
-
-      <CardSection/>
     </>
   );
 }
