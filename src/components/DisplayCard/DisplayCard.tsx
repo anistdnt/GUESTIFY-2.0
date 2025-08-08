@@ -80,6 +80,9 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
   
     const params = useSearchParams();
     const clg_coords = params.get("coordinates");
+    const clg_name = params.get("clg_name");
+    const clg_addr = params.get("clg_addr");
+    const clg_pin = params.get("clg_pin");
 
   return (
     <>
@@ -179,7 +182,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               <button
                 className="bg-buttons text-white px-4 py-2 rounded"
                 onClick={() => {
-                  router.push(`/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(clg_coords)}`);
+                  router.push(`/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(clg_coords)}&clg_name=${encodeURIComponent(clg_name)}&clg_addr=${encodeURIComponent(clg_addr)}&clg_pin=${clg_pin}`);
                 }}
               >
                 View full details
