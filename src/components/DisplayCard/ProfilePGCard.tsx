@@ -68,10 +68,12 @@ type Props = {
 //             ]
 //         }
 
+
 export default function ProfilePGCard({ item, number_of_stars }: Props) {
   const dispatch = useDispatch();
 
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
+
 
   return (
     <>
