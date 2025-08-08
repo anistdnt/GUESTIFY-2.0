@@ -29,6 +29,10 @@ export default function CardSection() {
         queryArray?.push(`coordinates=${query.get("coordinates")}`);
       }
 
+      if(query.get("sort")){
+        queryArray?.push(`sort=${query.get("sort")}`);
+      }
+
       // if(query.get("college")){
       //     urlquery = urlquery + `college=${query.get("college")}`;
       // }
@@ -59,24 +63,21 @@ export default function CardSection() {
   }
 
   if (loading) {
-    return <CardSkeleton no_of_card={2}/>;
+    return <CardSkeleton no_of_card={2} />;
+  } else if (!cards || cards?.length === 0) {
+    return (
+      <div className="w-full py-10">
+        <NoDataFound text="No Paying Guest Home Found" />
+      </div>
+    );
   } else {
     return (
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
-        {/* <DisplayCard number_of_stars={5} /> */}
-        {cards?.length === 0 ? (
-          <div className="w-full py-10">
-            <NoDataFound text="No Paying Guest Home Found" />
+        {cards?.map((item: any, index: number) => (
+          <div key={index}>
+            <DisplayCard item={item} number_of_stars={5} />
           </div>
-        ) : (
-          cards?.map((item: any, index: number) => (
-            <div
-              key={index}
-            >
-              <DisplayCard item={item} number_of_stars={5} />
-            </div>
-          ))
-        )}
+        ))}
       </div>
     );
   }
