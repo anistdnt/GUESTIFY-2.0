@@ -33,9 +33,25 @@ export default function CardSection() {
         queryArray?.push(`sort=${query.get("sort")}`);
       }
 
-      // if(query.get("college")){
-      //     urlquery = urlquery + `college=${query.get("college")}`;
-      // }
+      if(query.get("pg_type")){
+        queryArray?.push(`pg_type=${query.get("pg_type")}`);
+      }
+
+      if(query.get("minRent")){
+        queryArray?.push(`minRent=${query.get("minRent")}`);
+      }
+
+      if(query.get("maxRent")){
+        queryArray?.push(`maxRent=${query.get("maxRent")}`);
+      }
+
+      if(query.get("wifi_available")){
+        queryArray?.push(`wifi_available=${query.get("wifi_available")}`);
+      }
+
+      if(query.get("food_available")){
+        queryArray?.push(`food_available=${query.get("food_available")}`);
+      }
 
       const urlquery = queryArray?.join("&");
 
@@ -72,12 +88,18 @@ export default function CardSection() {
     );
   } else {
     return (
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
-        {cards?.map((item: any, index: number) => (
-          <div key={index}>
-            <DisplayCard item={item} number_of_stars={5} />
-          </div>
-        ))}
+      <div className="flex flex-col items-center justify-center w-full py-10">
+        <div className="flex justify-between items-center w-full max-w-7xl px-4">
+          <p className="font-semibold text-gray-500">Search For : {query.get("clg_name")}</p>
+          <p className="font-semibold text-gray-500">{cards?.length} Results Found</p>
+        </div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
+          {cards?.map((item: any, index: number) => (
+            <div key={index}>
+              <DisplayCard item={item} number_of_stars={5} />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

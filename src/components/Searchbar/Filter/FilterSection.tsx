@@ -1,14 +1,17 @@
-'use client';
+"use client";
 
-import React, { use, useEffect, useState } from 'react';
-import { RangeSlider } from './RangeSlider';
-import { FilterIcon } from './FilterIcon';
-import { SortIcon } from './SortIcon';
-import { sortType } from '@/types/generic';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { useDebounce } from '@/lib/useDebounce';
-const SortComp = dynamic(() => import('@/components/Searchbar/Filter/SortComp'), {
+import React, { use, useEffect, useState } from "react";
+import { RangeSlider } from "./RangeSlider";
+import { FilterIcon } from "./FilterIcon";
+import { SortIcon } from "./SortIcon";
+import { sortType } from "@/types/generic";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
+import { useDebounce } from "@/lib/useDebounce";
+import { AppliedFilters } from "./AppliedFilters";
+const SortComp = dynamic(
+  () => import("@/components/Searchbar/Filter/SortComp"),
+  {
     ssr: false,
     loading: () => (
       <div className="flex items-center space-x-4 h-12 p-3 rounded-md">
@@ -16,8 +19,8 @@ const SortComp = dynamic(() => import('@/components/Searchbar/Filter/SortComp'),
         <div className="w-48 animate-pulse bg-gray-200 h-10 rounded"></div>
       </div>
     ),
-  });
-
+  }
+);
 
 export const FilterSection = () => {
   const [values, setValues] = useState<number[]>([2]); // Maintaining Range Values
@@ -29,36 +32,52 @@ export const FilterSection = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  useEffect(() => { 
+  useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    params.set('kmradi', debouncedRange[0].toString());
+    params.set("kmradi", debouncedRange[0].toString());
 
     if (selectedOption?.value) {
-      if(sortOrder===null || sortOrder==='desc') {
-        params.set('sort', `-${selectedOption.value}`);
+      if (sortOrder === null || sortOrder === "desc") {
+        params.set("sort", `-${selectedOption.value}`);
       } else {
-        params.set('sort', `${selectedOption.value}`);
+        params.set("sort", `${selectedOption.value}`);
       }
     } else {
-      params.delete('sort');
+      params.delete("sort");
     }
 
     const queryString = params.toString();
     const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
     router.replace(newUrl);
-    
-  }, [debouncedRange,selectedOption, sortOrder, router, pathname, searchParams]);
+  }, [
+    debouncedRange,
+    selectedOption,
+    sortOrder,
+    router,
+    pathname,
+    searchParams,
+  ]);
 
   return (
-    <div className='flex justify-between items-center p-4 max-w-7xl mx-auto'>
-      <div className='w-1/2 flex justify-between items-center gap-4'>
-        <RangeSlider values={values} setValues={setValues}/>
-        <FilterIcon/>
+    <div className="flex flex-col max-w-7xl p-4 mx-auto">
+      <div className="flex justify-between items-center">
+        <div className="w-1/2 flex justify-between items-center gap-4">
+          <RangeSlider values={values} setValues={setValues} />
+          <FilterIcon allowed_query_highlight={['pg_type','wifi_available','food_available']}/>
+        </div>
+        <div className="w-1/2 flex justify-end items-center gap-4">
+          <SortComp
+            selectedOption={selectedOption}
+            setSelectedOption={setSelectedOption}
+          />
+          <div className={`${!selectedOption ? "pointer-events-none" : ""}`}>
+            <SortIcon sortOrder={sortOrder} setSortOrder={setSortOrder} />
+          </div>
+        </div>
       </div>
-      <div className='w-1/2 flex justify-end items-center gap-4'>
-        <SortComp selectedOption={selectedOption} setSelectedOption={setSelectedOption}/>
-        <div className={`${!selectedOption ? 'pointer-events-none' : ''}`}><SortIcon sortOrder={sortOrder} setSortOrder={setSortOrder}/></div>
+      <div>
+        <AppliedFilters />
       </div>
     </div>
   );

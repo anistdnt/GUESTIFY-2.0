@@ -5,8 +5,11 @@ export interface distType {
   searchval: string;
   srcimage: string;
 }
-
 export interface sortType {
+  label: string;
+  value: string;
+}
+export interface OptionType {
   label: string;
   value: string;
 }
