@@ -21,6 +21,7 @@ export const SortIcon = ({sortOrder, setSortOrder}) => {
       aria-label="Toggle sort order"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && toggleSort()}
+      data-tooltip="Toggle Sort Order"
     >
       {/* Up arrow */}
       <svg

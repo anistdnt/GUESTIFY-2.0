@@ -82,8 +82,12 @@ export default function CardSection() {
     return <CardSkeleton no_of_card={2} />;
   } else if (!cards || cards?.length === 0) {
     return (
-      <div className="w-full py-10">
-        <NoDataFound text="No Paying Guest Home Found" />
+      <div className="max-w-7xl py-10 mx-auto">
+        <div className="flex justify-between items-center max-w-7xl px-4 mx-auto">
+          <p className="font-semibold text-gray-500">Search For : {query.get("clg_name")}</p>
+          <p className="font-semibold text-gray-500">{cards?.length} Results Found</p>
+        </div>
+        <div className="pt-5"><NoDataFound text="No Paying Guest Home Found" /></div>
       </div>
     );
   } else {

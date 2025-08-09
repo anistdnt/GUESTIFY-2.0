@@ -64,7 +64,7 @@ export const FilterSection = () => {
       <div className="flex justify-between items-center">
         <div className="w-1/2 flex justify-between items-center gap-4">
           <RangeSlider values={values} setValues={setValues} />
-          <FilterIcon allowed_query_highlight={['pg_type','wifi_available','food_available']}/>
+          <FilterIcon allowed_query_highlight={['pg_type','wifi_available','food_available', 'minRent', 'maxRent']}/>
         </div>
         <div className="w-1/2 flex justify-end items-center gap-4">
           <SortComp

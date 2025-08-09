@@ -57,7 +57,7 @@ export const RangeSlider = ({ values, setValues, MAX=10, MIN=1, STEP=1, unit='km
               aria-valuemax={MAX}
               aria-valuenow={values[index]}
               aria-valuetext={`${values[index]} kilometers`}
-              title={`${values[index]} km`}
+              data-tooltip={`${values[index]} ${unit}`}
               className={`
                 relative flex items-center justify-center
                 h-6 w-6 rounded-full
@@ -86,8 +86,8 @@ export const RangeSlider = ({ values, setValues, MAX=10, MIN=1, STEP=1, unit='km
       />
       <div className="text-sm select-none font-semibold text-gray-500">
         {values?.length > 1 ?
-          `Selected range: ${values[0]} ${unit} - ${values[1]} ${unit}` :
-          `Selected value: ${values[0]} ${unit}`}
+          `Selected Range: ${values[0]} ${unit} - ${values[1]} ${unit}` :
+          `Selected Radius: ${values[0]} ${unit}`}
       </div>
     </div>
   );
