@@ -22,6 +22,7 @@
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "leaflet-routing-machine": "^3.2.12",
     "maplibre-gl": "^5.6.2",
+    "maplibre-gl-style-flipper": "^1.0.9",
     "mongoose": "^8.10.1",
     "next": "15.0.4",
     "react": "^19.0.0",
