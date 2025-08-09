@@ -60,3 +60,37 @@ body {
 .custom-swiper .swiper-pagination-bullet-active {
   background-color: #d0a400 !important;
 }
+
+.maplibregl-popup {
+    display: flex !important;
+    left: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    top: -30px !important;
+    will-change: transform !important;
+}
+
+.maplibregl-popup-content {
+    background: #fff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1) !important;
+    padding: 15px 10px !important;
+    pointer-events: auto !important;
+    position: relative !important;
+}
+
+.maplibregl-popup-close-button {
+    background-color: transparent !important;
+    border: 0 !important;
+    cursor: pointer !important;
+    position: absolute !important;
+    right: 1px !important;
+    top: 1px !important;
+    font-size: 18px !important;
+    border-radius: 50% !important;
+    padding: 2px 6px !important;
+}
+
+.maplibregl-popup-close-button:hover {
+  background: #f0f0f0 !important;
+}

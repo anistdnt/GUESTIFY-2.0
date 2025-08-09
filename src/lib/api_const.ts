@@ -18,7 +18,8 @@ export const API = {
         GET_PGs : "/getPg/user",
     },
     COLLEGE: {
-        LIST : "/getAllColleges"
+        LIST : "/getAllColleges",
+        GET_BY_ID : "/college",
     },
     PG: {
         ALL : "/getAllpg",

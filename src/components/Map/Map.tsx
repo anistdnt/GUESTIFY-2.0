@@ -6,6 +6,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import axios from 'axios';
 import type { Feature, LineString } from 'geojson';
 import { FullscreenControl, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
+import { MapPin, PushPinSimple } from '@phosphor-icons/react/dist/ssr';
+import { PinPopup } from './PinPopup';
+import { API } from '@/lib/api_const';
 
 interface MapProps {
   clg_coords?: [number, number];
@@ -15,9 +18,12 @@ interface MapProps {
   clg_name?: string;
   clg_addr?: string;
   clg_pin?: string;
+  clg_id?: string;
+  pg_idno?: string;
 }
 
-export default function CustomMap({ clg_coords, position, name, address,  clg_name, clg_addr, clg_pin }: MapProps) {
+export default function CustomMap({ clg_coords, position, name, address,  clg_name, clg_addr, clg_pin, clg_id, pg_idno }: MapProps) {
+  // console.log("Map Props:", { clg_coords, position, name, address, clg_name, clg_addr, clg_pin, clg_id, pg_idno });
   const isMulti = Array.isArray(position[0]);
   const userCoord = React.useMemo(() => {
     return !isMulti ? [position[1], position[0]] as [number, number] : null;
@@ -132,22 +138,22 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
             <Marker key={index} longitude={coord[1]} latitude={coord[0]} anchor="bottom">
               <div
                 style={{ fontSize: '24px', color: 'red', cursor: 'pointer' }}
-                onClick={() => setShowUserPopup(true)}
+                onClick={() => setShowUserPopup((prev)=> !prev)}
               >
-                📍
+                <MapPin size={30} color="#ac8720" weight="fill" />
               </div>
             </Marker>
-            <Popup
-              longitude={coord[1]} latitude={coord[0]}
-              onClose={() => setShowUserPopup(false)}
-              closeOnClick={false}
-            >
-              <div>
-                <strong>{name}</strong>
-                <br />
-                {address}
-              </div>
-            </Popup>
+            {showUserPopup && name && address && (
+                <PinPopup
+                  cords={userCoord as [number, number]}
+                  name={name}
+                  address={address}
+                  setShowUserPopup={setShowUserPopup}
+                  isMulti={isMulti}
+                  id={pg_idno}
+                  endpoint={API.PG.GET_PG_BY_ID}
+                />
+            )}
           </>
         )) :
           (
@@ -156,24 +162,21 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
               <Marker longitude={(userCoord as [number, number])[0]} latitude={(userCoord as [number, number])[1]} anchor="bottom">
                 <div
                   style={{ fontSize: '24px', color: 'red', cursor: 'pointer' }}
-                  onClick={() => setShowUserPopup(true)}
+                  onClick={() => setShowUserPopup((prev)=> !prev)}
                 >
-                  📍
+                  <MapPin size={30} color="#ac8720" weight="fill" />
                 </div>
               </Marker>
               {showUserPopup && name && address && (
-                <Popup
-                  longitude={(userCoord as [number, number])[0]}
-                  latitude={(userCoord as [number, number])[1]}
-                  onClose={() => setShowUserPopup(false)}
-                  closeOnClick={false}
-                >
-                  <div>
-                    <strong>{name}</strong>
-                    <br />
-                    {address}
-                  </div>
-                </Popup>
+                <PinPopup
+                  cords={userCoord as [number, number]}
+                  name={name}
+                  address={address}
+                  setShowUserPopup={setShowUserPopup}
+                  isMulti={isMulti}
+                  id={pg_idno}
+                  endpoint={API.PG.GET_PG_BY_ID}
+                />
               )}
             </>
           )
@@ -187,25 +190,22 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
             <Marker longitude={clgCoord[0]} latitude={clgCoord[1]} anchor="bottom">
               <div
                 style={{ fontSize: '24px', color: 'blue', cursor: 'pointer' }}
-                onClick={() => setShowCollegePopup(true)}
+                onClick={() => setShowCollegePopup((prev)=> !prev)}
               >
-                🎓
+                <PushPinSimple size={30} color="#ac8720" weight="fill" />
               </div>
             </Marker>
 
             {showCollegePopup && (
-              <Popup
-                longitude={clgCoord[0]}
-                latitude={clgCoord[1]}
-                onClose={() => setShowCollegePopup(false)}
-                closeOnClick={false}
-              >
-                <div>
-                  <strong>{clg_name}</strong>
-                  <br />
-                  {`${clg_addr}, ${clg_pin}`}
-                </div>
-              </Popup>
+              <PinPopup
+                cords={clgCoord as [number, number]}
+                name={clg_name}
+                address={`${clg_addr},${clg_pin}`}
+                setShowUserPopup={setShowCollegePopup}
+                isMulti={isMulti}
+                id={clg_id}
+                endpoint={API.COLLEGE.GET_BY_ID}
+              />
             )}
           </>
         )}

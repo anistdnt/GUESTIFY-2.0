@@ -24,8 +24,9 @@ interface Iprops {
   clg_name?: string,
   clg_addr?: string,
   clg_pin?: string
+  clg_id?: string;
 }
-const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name, clg_addr, clg_pin }: Iprops) => {
+const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name, clg_addr, clg_pin, clg_id }: Iprops) => {
   // const router = useRouter();
   //   const { id } = router.query;
   //   const [pgDetails, setPgDetails] = useState(null);
@@ -168,7 +169,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name,
 
       {/* Leaflet Map Section */}
       <div className="w-full h-[500px] flex justify-center items-center mt-8 mb-36">
-        <Map clg_coords={college_coords} position={[position[0], position[1]]} name={pginfo.pg_name} address={pginfo.address} {...{ clg_name, clg_addr, clg_pin}} />
+        <Map clg_coords={college_coords} position={[position[0], position[1]]} pg_idno={pginfo._id} name={pginfo.pg_name} address={pginfo.address} {...{ clg_name, clg_addr, clg_pin, clg_id}} />
       </div>
 
       <Suspense fallback={<FeedbackSkeleton />}>
