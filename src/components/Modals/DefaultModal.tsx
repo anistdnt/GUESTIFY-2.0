@@ -9,6 +9,7 @@ import { hideModal } from "@/redux/slices/modalSlice";
 import ConfirmationModal from "./ConfirmationModal";
 import DeleteModal from "./DeleteModal";
 import PGEditModal from "./PGEditModal";
+import FilterModal from "./FilterModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -40,6 +41,9 @@ export default function DefaultModal() {
           )}
           {type === "editPGDetails" && (
             <PGEditModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "filter" && (
+            <FilterModal setshowModal={setshowModal}/>
           )}
         </div>
       )}
