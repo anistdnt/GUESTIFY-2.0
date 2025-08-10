@@ -143,7 +143,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name,
           onClick={() => { formRef.current?.scrollIntoView({ behavior: 'smooth' }) }}>Write a Review <ArrowRight size={16} /></button>
       </div>
 
-      <div className="grid grid-cols-1 max-sm:justify-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+      <div className="grid grid-cols-1 max-sm:justify-items-center sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-6">
         {rooms && rooms.map((room) => (
           <RoomCard
             key={room._id}
@@ -168,7 +168,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name,
       </div>
 
       {/* Leaflet Map Section */}
-      <div className="w-full h-[500px] flex justify-center items-center mt-8 mb-36">
+      <div className="w-full h-[500px] flex justify-center items-center my-8">
         <Map clg_coords={college_coords} position={[position[0], position[1]]} pg_idno={pginfo._id} name={pginfo.pg_name} address={pginfo.address} {...{ clg_name, clg_addr, clg_pin, clg_id}} />
       </div>
 

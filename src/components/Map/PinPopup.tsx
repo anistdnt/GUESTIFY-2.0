@@ -11,7 +11,7 @@ type PinPopupProps = {
   cords: [number, number];
   name?: string;
   address?: string;
-  setShowUserPopup: (show: boolean) => void;
+  setActivePopup: (show: null) => void;
   isMulti?: boolean;
 };
 
@@ -33,7 +33,7 @@ export function PinPopup({
   cords,
   name,
   address,
-  setShowUserPopup,
+  setActivePopup,
 }: PinPopupProps) {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +74,7 @@ export function PinPopup({
       <Popup
         longitude={cords[0]}
         latitude={cords[1]}
-        onClose={() => setShowUserPopup(false)}
+        onClose={() => setActivePopup(null)}
         closeOnClick={false}
       >
         {error ? (
