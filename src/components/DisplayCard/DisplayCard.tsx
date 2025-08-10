@@ -83,6 +83,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
     const clg_name = params.get("clg_name");
     const clg_addr = params.get("clg_addr");
     const clg_pin = params.get("clg_pin");
+    const clg_id = params.get("clg_id") || "";
 
   return (
     <>
@@ -182,7 +183,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               <button
                 className="bg-buttons text-white px-4 py-2 rounded"
                 onClick={() => {
-                  router.push(`/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(clg_coords)}&clg_name=${encodeURIComponent(clg_name)}&clg_addr=${encodeURIComponent(clg_addr)}&clg_pin=${clg_pin}`);
+                  router.push(`/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(clg_coords)}&clg_name=${encodeURIComponent(clg_name)}&clg_addr=${encodeURIComponent(clg_addr)}&clg_pin=${clg_pin}&clg_id=${clg_id}`);
                 }}
               >
                 View full details

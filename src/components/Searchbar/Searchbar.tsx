@@ -16,7 +16,7 @@ const ExpandedComp = memo(
     handleChangePath,
   }: {
     query: string;
-    handleChangePath: (coordinates: string,college_name:string,college_addr:string,college_pin:number) => void;
+    handleChangePath: (coordinates: string,college_name:string,college_addr:string,college_pin:number,college_id:string) => void;
   }) => {
     const [Colleges, setColleges] = useState([]);
     const [loading, setloading] = useState<boolean>(true);
@@ -54,7 +54,7 @@ const ExpandedComp = memo(
               <li
                 key={item._id}
                 onClick={() => {
-                  handleChangePath(item?.location?.coordinates?.join(","),item.college_name,item.address,item.pincode);
+                  handleChangePath(item?.location?.coordinates?.join(","),item.college_name,item.address,item.pincode,item._id);
                 }}
               >
                 <div className="flex items-center py-2 pl-2 rounded hover:bg-gray-50 cursor-pointer">
@@ -92,7 +92,7 @@ const Searchbar = () => {
   const router = useRouter();
 
   const handleChangePath = useCallback(
-    (coordinates: string,college_name:string,college_addr:string,college_pin:number) => {
+    (coordinates: string,college_name:string,college_addr:string,college_pin:number,college_id:string) => {
       // console.log("Co-Ordinates",coordinates);
       const url = new URLSearchParams(window?.location.search);
 
@@ -101,6 +101,7 @@ const Searchbar = () => {
       url.set("clg_name",college_name);
       url.set("clg_addr",college_addr);
       url.set("clg_pin", college_pin?.toString());
+      url.set("clg_id", college_id);
 
 
       router.push(`/search?${url.toString()}`, { scroll: false });

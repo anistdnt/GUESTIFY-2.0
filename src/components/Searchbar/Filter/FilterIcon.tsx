@@ -31,7 +31,7 @@ export const FilterIcon = ({ allowed_query_highlight = [] }: FilterIconProps) =>
   `;
 
   return (
-    <div onClick={handleFilterClick} role="button" tabIndex={0} aria-label="Open filter modal">
+    <div onClick={handleFilterClick} role="button" tabIndex={0} aria-label="Open filter modal" data-tooltip="Apply Filters" className="relative">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className={svgClassName}

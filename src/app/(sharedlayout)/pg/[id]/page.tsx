@@ -14,6 +14,7 @@ interface Iprops {
     clg_name?: string;
     clg_addr?: string;
     clg_pin?: string;
+    clg_id?: string;
   };
 }
 
@@ -68,7 +69,7 @@ export interface Review {
   rating: number
 }
 
-const PGDetails = async ({ params: { id },searchParams:{clg_coords, clg_name, clg_addr, clg_pin} }: Iprops) => {
+const PGDetails = async ({ params: { id },searchParams:{clg_coords, clg_name, clg_addr, clg_pin, clg_id} }: Iprops) => {
   try {
     const resData: ApiReturn<PGDetailsResponse> = await api_caller<PGDetailsResponse>(
       "GET",
@@ -96,7 +97,7 @@ const PGDetails = async ({ params: { id },searchParams:{clg_coords, clg_name, cl
     const { pginfo, rooms } = resData.data;
 
     return (
-      <PGInfoComponent {...{ pginfo, rooms, reviewData:reviewData?.data, id, clg_coords, clg_name, clg_addr, clg_pin }} />
+      <div className="max-w-7xl mx-auto"><PGInfoComponent {...{ pginfo, rooms, reviewData:reviewData?.data, id, clg_coords, clg_name, clg_addr, clg_pin, clg_id }} /></div>
     );
   } catch (error) {
     console.error("Failed to fetch PG details:", error);

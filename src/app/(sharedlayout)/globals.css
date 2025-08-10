@@ -60,3 +60,66 @@ body {
 .custom-swiper .swiper-pagination-bullet-active {
   background-color: #d0a400 !important;
 }
+
+.maplibregl-popup {
+    display: flex !important;
+    left: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    top: -30px !important;
+    will-change: transform !important;
+}
+
+.maplibregl-popup-content {
+    background: #fff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1) !important;
+    padding: 15px 10px !important;
+    pointer-events: auto !important;
+    position: relative !important;
+}
+
+.maplibregl-popup-close-button {
+    background-color: transparent !important;
+    border: 0 !important;
+    cursor: pointer !important;
+    position: absolute !important;
+    right: 1px !important;
+    top: 1px !important;
+    font-size: 18px !important;
+    border-radius: 50% !important;
+    padding: 2px 6px !important;
+}
+
+.maplibregl-popup-close-button:hover {
+  background: #f0f0f0 !important;
+}
+
+/* Tooltip Css */
+
+[data-tooltip] {
+  position: relative;
+  cursor: pointer;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgb(31 41 55); /* Tailwind gray-800 */
+  color: white;
+  padding: 0.25rem 0.5rem; /* Tailwind p-1 px-2 */
+  font-size: 0.75rem; /* Tailwind text-xs */
+  border-radius: 0.375rem; /* Tailwind rounded-md */
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+  z-index: 50;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}

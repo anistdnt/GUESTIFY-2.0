@@ -127,7 +127,7 @@ const Feedback = forwardRef<HTMLDivElement, FeedbackProp>(({ reviewData, id }, r
   };
 
   return (
-    <div className="w-4/5 max-w-[1200px] mx-auto min-h-screen bg-[#fafafa] py-8 flex flex-col gap-12">
+    <div className="w-full mx-auto min-h-screen bg-[#fafafa] py-8 flex flex-col gap-12">
       {/* 1) Carousel Section */}
       <div>
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
