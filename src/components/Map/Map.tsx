@@ -9,10 +9,11 @@ import { FullscreenControl, NavigationControl, GeolocateControl } from 'react-ma
 import { MapPin, PushPinSimple } from '@phosphor-icons/react/dist/ssr';
 import { PinPopup } from './PinPopup';
 import { API } from '@/lib/api_const';
+import { Bicycle, Car, PersonSimpleWalk } from '@phosphor-icons/react';
 
 interface MapProps {
   clg_coords?: [number, number];
-  position: [number, number] | [number, number][];
+  position?: [number, number] | [number, number][];
   name?: string;
   address?: string;
   clg_name?: string;
@@ -22,7 +23,31 @@ interface MapProps {
   pg_idno?: string;
 }
 
-export default function CustomMap({ clg_coords, position, name, address,  clg_name, clg_addr, clg_pin, clg_id, pg_idno }: MapProps) {
+const mapStyles = [
+  {
+    label: "Default",
+    icon: "🗺️",
+    url: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+  },
+  {
+    label: "Dark",
+    icon: "🌙",
+    url: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+  },
+  {
+    label: "Voyager",
+    icon: "🧭",
+    url: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+  },
+  {
+    label: "Satellite",
+    icon: "🛰️",
+    url: `https://api.maptiler.com/maps/hybrid/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`,
+  },
+];
+
+
+export default function CustomMap({ clg_coords, position, name, address, clg_name, clg_addr, clg_pin, clg_id, pg_idno }: MapProps) {
   // console.log("Map Props:", { clg_coords, position, name, address, clg_name, clg_addr, clg_pin, clg_id, pg_idno });
   const isMulti = Array.isArray(position[0]);
 
@@ -53,6 +78,8 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
 
   const [activePopup, setActivePopup] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [transportMode, setTransportMode] = useState<'car' | 'bike' | 'walk'>('car');
+
   const hasFetchedRef = useRef(false);
 
   // 🌍 map style state
@@ -80,7 +107,7 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
     const fetchRoute = async () => {
       try {
         const res = await axios.post(
-          'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
+          `https://api.openrouteservice.org/v2/directions/${profileMap[transportMode]}/geojson`,
           {
             coordinates: [userCoord, clgCoord],
           },
@@ -107,7 +134,7 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
     };
 
     fetchRoute();
-  }, [userCoord, clgCoord, isMulti]);
+  }, [userCoord, clgCoord, isMulti, transportMode]);
 
   // Format helpers
   const formatDistance = (m: number) => `${(m / 1000).toFixed(2)} km`;
@@ -118,9 +145,30 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
     return `${m} min`;
   };
 
+  const profileMap: Record<typeof transportMode, string> = {
+    car: 'driving-car',
+    bike: 'cycling-regular',
+    walk: 'foot-walking',
+  };
+
+
   return (
-    <div style={{ height: "500px", width: "100%", position: "relative" }}>
-      {/* Distance & Time Info */}
+    <div style={{ height: "500px", width: "90%", position: "relative" }}>
+
+      <Map
+        initialViewState={{
+          longitude: (userLocation || center)?.[0],
+          latitude: (userLocation || center)?.[1],
+          zoom: 12,
+        }}
+        style={{ width: "100%", height: "90%" }}
+        mapStyle={mapStyle}
+        mapLib={import("maplibre-gl")}
+      >
+        {/* Fullscreen Control */}
+        <FullscreenControl position="top-right" />
+
+        {/* Distance & Time Info */}
       {distance !== null && duration !== null && (
         <div
           style={{
@@ -144,54 +192,96 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
         </div>
       )}
 
-      {/* Map Style Switcher */}
+      {/* transport options */}
       <div
         style={{
           position: "absolute",
           top: 10,
-          right: 50,
+          left: "50%",
+          transform: "translateX(-50%)",
           background: "white",
-          padding: "6px 8px",
-          borderRadius: "6px",
+          padding: "6px 12px",
+          borderRadius: "9999px",
           boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
           zIndex: 10,
-          fontSize: "14px",
+          display: "flex",
+          gap: "10px",
+          alignItems: "center",
         }}
       >
-        <select
-          value={mapStyle}
-          onChange={(e) => setMapStyle(e.target.value)}
-          className="border p-1 rounded text-sm"
-        >
-          <option value="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json">
-            Default
-          </option>
-          <option value="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json">
-            Dark
-          </option>
-          <option value="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json">
-            Voyager
-          </option>
-          <option
-            value={`https://api.maptiler.com/maps/hybrid/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`}
+        {[
+          { mode: "car", icon: <Car size={24} /> },
+          { mode: "bike", icon: <Bicycle size={24} /> },
+          { mode: "walk", icon: <PersonSimpleWalk size={24} /> },
+        ].map(({ mode, icon }) => (
+          <div
+            key={mode}
+            onClick={() => {
+              setTransportMode(mode as typeof transportMode);
+              hasFetchedRef.current = false; // trigger refetch
+            }}
+            style={{
+              background: transportMode === mode ? "#cceaf5" : "transparent",
+              borderRadius: "50%",
+              padding: "6px",
+              cursor: "pointer",
+            }}
           >
-            Satellite
-          </option>
-        </select>
+            {icon}
+          </div>
+        ))}
       </div>
 
-      <Map
-        initialViewState={{
-          longitude: (userLocation || center)?.[0],
-          latitude: (userLocation || center)?.[1],
-          zoom: 12,
+
+
+      {/* Map Style Switcher */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 10,
+          left: 10,
+          background: "white",
+          padding: "6px",
+          borderRadius: "10px",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+          zIndex: 10,
+          display: "flex",
+          gap: "6px",
         }}
-        style={{ width: "100%", height: "90%" }}
-        mapStyle={mapStyle}
-        mapLib={import("maplibre-gl")}
       >
-        {/* Fullscreen Control */}
-        <FullscreenControl position="top-right" />
+        {mapStyles.map((styleItem) => (
+          <div
+            key={styleItem.label}
+            onClick={() => setMapStyle(styleItem.url)}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "50px",
+              padding: "4px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              background:
+                mapStyle === styleItem.url ? "rgba(0, 123, 255, 0.1)" : "transparent",
+              border:
+                mapStyle === styleItem.url ? "2px solid #007bff" : "1px solid transparent",
+              transition: "all 0.2s ease-in-out",
+            }}
+          >
+            <div style={{ fontSize: "18px" }}>{styleItem.icon}</div>
+            <span
+              style={{
+                fontSize: "10px",
+                marginTop: "3px",
+                textAlign: "center",
+                lineHeight: "1.1",
+              }}
+            >
+              {styleItem.label}
+            </span>
+          </div>
+        ))}
+      </div>
 
         {/* Navigation Control */}
         <NavigationControl position="top-right" />
@@ -218,56 +308,56 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
         {/* PG Markers */}
         {isMulti
           ? (position as [number, number][]).map((coord, index) => (
-              <Marker
-                key={index}
-                longitude={coord[1]}
-                latitude={coord[0]}
-                anchor="bottom"
-                onClick={() => setActivePopup(`pg-${index}`)}
+            <Marker
+              key={index}
+              longitude={coord[1]}
+              latitude={coord[0]}
+              anchor="bottom"
+              onClick={() => setActivePopup(`pg-${index}`)}
+            >
+              <div
+                style={{ fontSize: "24px", color: "red", cursor: "pointer" }}
               >
-                <div
-                  style={{ fontSize: "24px", color: "red", cursor: "pointer" }}
-                >
-                  <MapPin size={30} color="#ac8720" weight="fill" />
-                </div>
-                {activePopup === `pg-${index}` && (
-                  <PinPopup
-                    cords={userCoord as [number, number]}
-                    name={name}
-                    address={address}
-                    setActivePopup={setActivePopup}
-                    isMulti={isMulti}
-                    id={pg_idno}
-                    endpoint={API.PG.GET_PG_BY_ID}
-                  />
-                )}
-              </Marker>
-            ))
+                <MapPin size={30} color="#ac8720" weight="fill" />
+              </div>
+              {activePopup === `pg-${index}` && (
+                <PinPopup
+                  cords={userCoord as [number, number]}
+                  name={name}
+                  address={address}
+                  setActivePopup={setActivePopup}
+                  isMulti={isMulti}
+                  id={pg_idno}
+                  endpoint={API.PG.GET_PG_BY_ID}
+                />
+              )}
+            </Marker>
+          ))
           : userCoord && (
-              <Marker
-                longitude={userCoord[0]}
-                latitude={userCoord[1]}
-                anchor="bottom"
-                onClick={() => setActivePopup("pg-single")}
+            <Marker
+              longitude={userCoord[0]}
+              latitude={userCoord[1]}
+              anchor="bottom"
+              onClick={() => setActivePopup("pg-single")}
+            >
+              <div
+                style={{ fontSize: "24px", color: "red", cursor: "pointer" }}
               >
-                <div
-                  style={{ fontSize: "24px", color: "red", cursor: "pointer" }}
-                >
-                  <MapPin size={30} color="#ac8720" weight="fill" />
-                </div>
-                {activePopup === "pg-single" && name && address && (
-                  <PinPopup
-                    cords={userCoord as [number, number]}
-                    name={name}
-                    address={address}
-                    setActivePopup={setActivePopup}
-                    isMulti={isMulti}
-                    id={pg_idno}
-                    endpoint={API.PG.GET_PG_BY_ID}
-                  />
-                )}
-              </Marker>
-            )}
+                <MapPin size={30} color="#ac8720" weight="fill" />
+              </div>
+              {activePopup === "pg-single" && name && address && (
+                <PinPopup
+                  cords={userCoord as [number, number]}
+                  name={name}
+                  address={address}
+                  setActivePopup={setActivePopup}
+                  isMulti={isMulti}
+                  id={pg_idno}
+                  endpoint={API.PG.GET_PG_BY_ID}
+                />
+              )}
+            </Marker>
+          )}
 
         {/* College Marker */}
         {clgCoord && (
@@ -302,7 +392,7 @@ export default function CustomMap({ clg_coords, position, name, address,  clg_na
               type="line"
               paint={{
                 "line-color": "#007bff",
-                "line-width": 4,
+                "line-width": 3,
               }}
             />
           </Source>
