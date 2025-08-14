@@ -1,5 +1,5 @@
 import { X } from "@phosphor-icons/react/dist/ssr";
-import React, {  useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { RangeSlider } from "../Searchbar/Filter/RangeSlider";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -127,9 +127,9 @@ function FilterModal({ setshowModal }: ModalType) {
               value={
                 formData.pg_type
                   ? {
-                      label: formData.pg_type.toUpperCase(),
-                      value: formData.pg_type,
-                    }
+                    label: formData.pg_type.toUpperCase(),
+                    value: formData.pg_type,
+                  }
                   : null
               }
               onChange={(option) =>
@@ -152,11 +152,10 @@ function FilterModal({ setshowModal }: ModalType) {
               <label className="text-gray-700 font-medium">Rent Range</label>
             </div>
             <div
-              className={`${
-                enabledFilters.rent
+              className={`${enabledFilters.rent
                   ? ""
                   : "opacity-50 pointer-events-none cursor-not-allowed"
-              }`}
+                }`}
             >
               <RangeSlider
                 values={values}
@@ -165,7 +164,7 @@ function FilterModal({ setshowModal }: ModalType) {
                 MIN={2000}
                 STEP={2000}
                 unit="Rs"
-                //
+              //
               />
             </div>
           </div>
@@ -193,15 +192,13 @@ function FilterModal({ setshowModal }: ModalType) {
                     formData.wifi_available === "yes" ? "no" : "yes",
                 })
               }
-              className={`w-12 h-6 rounded-full p-1 flex items-center transition ${
-                formData.wifi_available === "yes"
+              className={`w-12 h-6 rounded-full p-1 flex items-center transition ${formData.wifi_available === "yes"
                   ? "bg-buttons justify-end"
                   : "bg-gray-300 justify-start"
-              } ${
-                !enabledFilters.wifi_available
+                } ${!enabledFilters.wifi_available
                   ? "opacity-50 cursor-not-allowed"
                   : ""
-              }`}
+                }`}
             >
               <span className="w-4 h-4 bg-white rounded-full shadow"></span>
             </button>
@@ -230,15 +227,13 @@ function FilterModal({ setshowModal }: ModalType) {
                     formData.food_available === "yes" ? "no" : "yes",
                 })
               }
-              className={`w-12 h-6 rounded-full p-1 flex items-center transition ${
-                formData.food_available === "yes"
+              className={`w-12 h-6 rounded-full p-1 flex items-center transition ${formData.food_available === "yes"
                   ? "bg-buttons justify-end"
                   : "bg-gray-300 justify-start"
-              } ${
-                !enabledFilters.food_available
+                } ${!enabledFilters.food_available
                   ? "opacity-50 cursor-not-allowed"
                   : ""
-              }`}
+                }`}
             >
               <span className="w-4 h-4 bg-white rounded-full shadow"></span>
             </button>
@@ -251,6 +246,7 @@ function FilterModal({ setshowModal }: ModalType) {
           >
             Apply Filters
           </button>
+
         </form>
       </div>
     </div>
