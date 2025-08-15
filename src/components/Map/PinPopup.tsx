@@ -49,8 +49,8 @@ export function PinPopup({
         );
 
         if (isMounted) {
-          if (resData.success && resData.data) {
-            setData(resData.data);
+          if (resData?.success && resData?.data) {
+            setData(resData?.data);
           } else {
             setError("Data not found");
           }
@@ -83,8 +83,8 @@ export function PinPopup({
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 border rounded-full flex-shrink-0">
               <Image
-                src={data.image_url || data.pginfo.pg_image_url || "/assets/new_logo.png"}
-                alt={data.college_name || data.pginfo.pg_name || "Logo"}
+                src={data?.image_url || data?.pginfo?.pg_image_url || "/assets/new_logo.png"}
+                alt={data?.college_name || data?.pginfo?.pg_name || "Logo"}
                 fill
                 className="object-cover rounded-full"
                 sizes="48px"
@@ -92,10 +92,10 @@ export function PinPopup({
             </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-900">
-                {data.college_name || data.pginfo.pg_name || name}
+                {data?.college_name || data?.pginfo?.pg_name || name}
               </h3>
               <p className="text-xs text-gray-600">
-                {`${data.address || data.pginfo.address}, ${data.pincode || ''}`}
+                {`${data?.address || data.pginfo?.address}, ${data?.pincode || ''}`}
               </p>
             </div>
           </div>

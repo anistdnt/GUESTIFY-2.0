@@ -13,13 +13,17 @@ import { Bicycle, Car, PersonSimpleWalk } from '@phosphor-icons/react';
 
 interface MapProps {
   clg_coords?: [number, number];
-  position?: [number, number] | [number, number][];
-  name?: string;
-  address?: string;
+  pgInfo?: pgInfo | pgInfo[];
   clg_name?: string;
   clg_addr?: string;
   clg_pin?: string;
   clg_id?: string;
+}
+
+export interface pgInfo {
+  position?: [number, number];
+  name?: string;
+  address?: string;
   pg_idno?: string;
 }
 
@@ -47,13 +51,19 @@ const mapStyles = [
 ];
 
 
-export default function CustomMap({ clg_coords, position, name, address, clg_name, clg_addr, clg_pin, clg_id, pg_idno }: MapProps) {
+export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_pin, clg_id }: MapProps) {
   // console.log("Map Props:", { clg_coords, position, name, address, clg_name, clg_addr, clg_pin, clg_id, pg_idno });
-  const isMulti = Array.isArray(position[0]);
+  // const isMulti = Array.isArray(position[0]);
+  const isMulti = Array.isArray(pgInfo);
+
+  // const userCoord = useMemo(
+  //   () => (!isMulti ? [position[1], position[0]] as [number, number] : null),
+  //   [position, isMulti]
+  // );
 
   const userCoord = useMemo(
-    () => (!isMulti ? [position[1], position[0]] as [number, number] : null),
-    [position, isMulti]
+    () => (!isMulti ? [pgInfo?.position[1], pgInfo?.position[0]] as [number, number] : null),
+    [(pgInfo as pgInfo)?.position, isMulti]
   );
 
   const clgCoord = useMemo(
@@ -307,11 +317,11 @@ export default function CustomMap({ clg_coords, position, name, address, clg_nam
 
         {/* PG Markers */}
         {isMulti
-          ? (position as [number, number][]).map((coord, index) => (
+          ? (pgInfo as pgInfo[]).map((pg, index) => (
             <Marker
               key={index}
-              longitude={coord[1]}
-              latitude={coord[0]}
+              longitude={pg.position[1]}
+              latitude={pg.position[0]}
               anchor="bottom"
               onClick={() => setActivePopup(`pg-${index}`)}
             >
@@ -322,12 +332,12 @@ export default function CustomMap({ clg_coords, position, name, address, clg_nam
               </div>
               {activePopup === `pg-${index}` && (
                 <PinPopup
-                  cords={userCoord as [number, number]}
-                  name={name}
-                  address={address}
+                  cords={pg.position.reverse() as [number, number]}
+                  name={pg.name}
+                  address={pg.address}
                   setActivePopup={setActivePopup}
                   isMulti={isMulti}
-                  id={pg_idno}
+                  id={pg.pg_idno}
                   endpoint={API.PG.GET_PG_BY_ID}
                 />
               )}
@@ -345,14 +355,14 @@ export default function CustomMap({ clg_coords, position, name, address, clg_nam
               >
                 <MapPin size={30} color="#ac8720" weight="fill" />
               </div>
-              {activePopup === "pg-single" && name && address && (
+              {activePopup === "pg-single" && (pgInfo as pgInfo).name && (pgInfo as pgInfo).address && (
                 <PinPopup
                   cords={userCoord as [number, number]}
-                  name={name}
-                  address={address}
+                  name={(pgInfo as pgInfo).name}
+                  address={(pgInfo as pgInfo).address}
                   setActivePopup={setActivePopup}
                   isMulti={isMulti}
-                  id={pg_idno}
+                  id={(pgInfo as pgInfo).pg_idno}
                   endpoint={API.PG.GET_PG_BY_ID}
                 />
               )}
