@@ -169,7 +169,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name,
 
       {/* Leaflet Map Section */}
       <div className="w-full h-[500px] flex justify-center items-center my-8">
-        <Map clg_coords={college_coords} position={[position[0], position[1]]} pg_idno={pginfo._id} name={pginfo.pg_name} address={pginfo.address} {...{ clg_name, clg_addr, clg_pin, clg_id}} />
+        <Map clg_coords={college_coords} pgInfo={{position : position as [number, number] , name : pginfo.pg_name , address : pginfo.address, pg_idno : pginfo._id}} {...{ clg_name, clg_addr, clg_pin, clg_id}} />
       </div>
 
       <Suspense fallback={<FeedbackSkeleton />}>

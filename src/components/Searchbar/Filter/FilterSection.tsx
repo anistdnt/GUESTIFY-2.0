@@ -11,6 +11,7 @@ import { useDebounce } from "@/lib/useDebounce";
 import { AppliedFilters } from "./AppliedFilters";
 import { MapTrifold } from "@phosphor-icons/react";
 import { set } from "mongoose";
+import { pgInfo } from "../../Map/Map";
 const Map = dynamic(() => import("../../Map/Map"), { ssr: false }); // <-- Update this path as needed
 const SortComp = dynamic(
   () => import("@/components/Searchbar/Filter/SortComp"),
@@ -24,6 +25,13 @@ const SortComp = dynamic(
     ),
   }
 );
+
+const arr = [
+  { position: [20, 40] },
+  { position: [25, 45] },
+  { position: [30, 50] }
+];
+
 
 export const FilterSection = () => {
   const [values, setValues] = useState<number[]>([2]); // Maintaining Range Values
@@ -98,17 +106,17 @@ export const FilterSection = () => {
       </div>
       {showMap && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="relative bg-transparent rounded-lg w-[90%] h-[80%] max-w-5xl overflow-hidden">
+          <div className="relative bg-transparent w-[90%] h-[80%] max-w-5xl overflow-hidden">
             {/* Close Button */}
             <button
               onClick={() => setShowMap(false)}
-              className="absolute top-3 right-3 bg-white py-2 px-3 rounded-full shadow hover:bg-gray-100 z-10"
+              className="absolute top-0 right-3 text-white font-bold z-10"
             >
               ✕
             </button>
 
             {/* Map */}
-            <Map position={[20, 40]} />
+            <Map pgInfo={arr as pgInfo[]} clg_coords={[30,40]} />
           </div>
         </div>
       )}
