@@ -12,6 +12,7 @@ import { API } from "@/lib/api_const";
 import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { base64ToFile } from "@/lib/imageConvert";
+import ContactDetails from "@/components/Forms/ContactDetails";
 
 export default function PGFormWrapper() {
   const reduxUserData = useSelector(
@@ -85,6 +86,7 @@ export default function PGFormWrapper() {
         {({ validateForm, errors, touched, setTouched, submitForm }) => (
           <Stepper
             steps={[
+              { label: "Contact Details", content: <ContactDetails /> },
               { label: "Basic Paying Guest Details", content: <PGForm /> },
               { label: "Room Details", content: <RoomForm /> },
             ]}

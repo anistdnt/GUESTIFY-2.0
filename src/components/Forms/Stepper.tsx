@@ -9,6 +9,7 @@ type StepperProps = {
 };
 
 const stepFields = [
+  ["contact_details.country_code", "contact_details.phone_number", "contact_details.alt_country_code", "contact_details.alt_phone_number", "contact_details.whatsapp_code", "contact_details.whatsapp_number", "contact_details.same_as_phone", "contact_details.preferred_contact", "contact_details.email"],
   [
     "pg_name",
     "street_name",
