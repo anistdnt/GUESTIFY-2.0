@@ -95,6 +95,9 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
   // 🌍 map style state
   const [mapStyle, setMapStyle] = useState<string>('https://basemaps.cartocdn.com/gl/positron-gl-style/style.json');
 
+  useEffect(() => {
+    console.log(activePopup)
+  },[activePopup])
   // Get user's actual location
   useEffect(() => {
     if (navigator.geolocation) {
@@ -332,7 +335,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
               </div>
               {activePopup === `pg-${index}` && (
                 <PinPopup
-                  cords={pg.position.reverse() as [number, number]}
+                  cords={[pg.position[1], pg.position[0]] as [number, number]}
                   name={pg.name}
                   address={pg.address}
                   setActivePopup={setActivePopup}
