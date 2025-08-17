@@ -1,32 +1,39 @@
-// Importing Components
-
+import CTASection from "@/components/Landing/CTASection";
+import HeroSection from "@/components/Landing/HeroSection";
+import HowItWorks from "@/components/Landing/HowItWorks";
+import PopularSearches from "@/components/Landing/PopularSearches";
+import Statistics from "@/components/Landing/Statistics";
+import Testimonials from "@/components/Landing/Testimonials";
 import Searchbar from "@/components/Searchbar/Searchbar";
 
 export default function Home() {
   return (
     <>
-      <div className="bg-gray-100 ">
-        {/* Hero Section */}
-        <section className="relative bg-[url('/assets/about-us-banner.jpg')] bg-fixed bg-bottom bg-cover text-white h-80 flex flex-col justify-center items-center">
-          <div>
-            <div className="absolute inset-0 bg-black bg-opacity-35"></div>
-            <div className="relative mx-auto max-w-7xl text-center">
-              <h1 className="text-5xl font-medium">
-                {" "}
-                Discover Your Perfect PG Stay
-              </h1>
-              <p className="mt-4 text-sm">
-                Your trusted platform for finding paying guest accommodations in
-                West Bengal.
-              </p>
-            </div>
-          </div>
-        </section>
-      </div>
+      {/* Hero Section  */}
+      <HeroSection />
 
-      <div className="bg-gray-100 py-10">
-        <Searchbar />
+      <div className="bg-gray-100 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Search Section Header */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-headingCol mb-4">
+              Find Your Perfect PG
+            </h2>
+            <p className="text-lg text-primaryText">
+              Search by your college name to discover nearby accommodations
+            </p>
+          </div>
+
+          <div className="bg-gray-100 py-10">
+            <Searchbar />
+          </div>
+          <PopularSearches />
+        </div>
       </div>
+      <HowItWorks />
+      <Statistics/>
+      <Testimonials/>
+      <CTASection/>
     </>
   );
 }
