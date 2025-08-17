@@ -11,6 +11,9 @@ import { useDebounce } from "@/lib/useDebounce";
 import { AppliedFilters } from "./AppliedFilters";
 import { MapTrifold } from "@phosphor-icons/react";
 import { pgInfo } from "../../Map/Map";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import toast from "react-hot-toast";
 const Map = dynamic(() => import("../../Map/Map"), { ssr: false }); // <-- Update this path as needed
 const SortComp = dynamic(
   () => import("@/components/Searchbar/Filter/SortComp"),
@@ -38,6 +41,7 @@ export const FilterSection = () => {
   const [sortOrder, setSortOrder] = useState<string | null>(null); // 'asc', 'desc', or null
   const debouncedRange = useDebounce<number[]>(values, 500);
   const [showMap, setShowMap] = useState<boolean>(false);
+  const [pgInfo, setPgInfo] = useState<pgInfo[]>([]);
 
 
   const router = useRouter();
@@ -70,6 +74,78 @@ export const FilterSection = () => {
     pathname,
     searchParams,
   ]);
+
+  const query = useSearchParams();
+  const {coordinates , clg_name , clg_addr, clg_pin, clg_id} = Object.fromEntries(query.entries());
+  const [loading, setloading] = useState<boolean>(false);
+  useEffect(() => {
+      if (query.size !== 0) {
+        let queryArray = [];
+  
+        if (query.get("kmradi")) {
+          queryArray?.push(`kmradi=${query.get("kmradi")}`);
+        } else {
+          queryArray?.push("kmradi=10");
+        }
+  
+        if (query.get("coordinates")) {
+          queryArray?.push(`coordinates=${query.get("coordinates")}`);
+        }
+  
+        if(query.get("sort")){
+          queryArray?.push(`sort=${query.get("sort")}`);
+        }
+  
+        if(query.get("pg_type")){
+          queryArray?.push(`pg_type=${query.get("pg_type")}`);
+        }
+  
+        if(query.get("minRent")){
+          queryArray?.push(`minRent=${query.get("minRent")}`);
+        }
+  
+        if(query.get("maxRent")){
+          queryArray?.push(`maxRent=${query.get("maxRent")}`);
+        }
+  
+        if(query.get("wifi_available")){
+          queryArray?.push(`wifi_available=${query.get("wifi_available")}`);
+        }
+  
+        if(query.get("food_available")){
+          queryArray?.push(`food_available=${query.get("food_available")}`);
+        }
+  
+        const urlquery = queryArray?.join("&");
+  
+        const fetchPgs = async (searchQuery: string) => {
+          setloading(true);
+          const res: ApiReturn<any> = await api_caller<any>(
+            "GET",
+            `${API.PG.FOR_MAP}?${searchQuery}`
+          );
+          if (res.success) {
+            // setCards(res?.data);
+            setPgInfo(res?.data.map((pg: any) => ({
+              position: pg.location.coordinates.reverse(),
+              name: pg.pg_name,
+              address: pg.address,
+              pg_idno: pg._id,
+            })));
+          } else {
+            toast.error(`${res.message} : ${res.error}`);
+            setPgInfo([]);
+          }
+          setloading(false);
+        };
+  
+        fetchPgs(urlquery);
+      }
+    }, [query]);
+  
+    if (query.size === 0) {
+      return null;
+    }
 
   return (
     <div className="flex flex-col max-w-7xl p-4 mx-auto">
@@ -115,7 +191,7 @@ export const FilterSection = () => {
             </button>
 
             {/* Map */}
-            <Map pgInfo={arr as pgInfo[]} clg_coords={[30,40]} />
+            <Map pgInfo={pgInfo} clg_coords={coordinates?.split(",").map(Number).reverse() as [number, number]} {...{clg_addr,clg_name,clg_id,clg_pin}} />
           </div>
         </div>
       )}
