@@ -7,7 +7,7 @@ export const PGValidationSchema = {
     house_no: "",
     state: "",
     pincode: "",
-    district: "",               
+    district: "",
     pg_type: "",
     wifi_available: "",
     food_available: "",
@@ -23,45 +23,92 @@ export const PGValidationSchema = {
         attached_bathroom: "",
       },
     ],
+
+    contact_details: {
+      country_code: "",
+      phone_number: "",
+      is_phone_verified: false,
+      alt_country_code: "",
+      alt_phone_number: "",
+      whatsapp_code: "",
+      whatsapp_number: "",
+      same_as_phone: false,
+      preferred_contact: "phone",
+      email: "",
+      is_email_verified: false,
+    },
   },
   validation: Yup.object({
-    pg_name: Yup.string()
-      .required("Please enter the PG name"),
-    street_name: Yup.string()
-      .required("Please enter the street name"),
-    house_no: Yup.string()
-      .required("Please enter the house number"),
-    state: Yup.string()
-      .required("Please select the state"),
-    pincode: Yup.string()
-      .required("Please enter the pincode"),
-    district: Yup.string()
-      .required("Please enter the district"),
-    pg_type: Yup.string()
-      .required("Please select the PG type"),
-    wifi_available: Yup.string()
-      .required("Please specify if Wi-Fi is available"),
-    food_available: Yup.string()
-      .required("Please specify if food is available"),
-    rules: Yup.string()
-      .required("Please enter the PG rules"),
-    pg_image_url: Yup.mixed()
-      .nullable().required("PG Image is required"),
+    pg_name: Yup.string().required("Please enter the PG name"),
+    street_name: Yup.string().required("Please enter the street name"),
+    house_no: Yup.string().required("Please enter the house number"),
+    state: Yup.string().required("Please select the state"),
+    pincode: Yup.string().required("Please enter the pincode"),
+    district: Yup.string().required("Please enter the district"),
+    pg_type: Yup.string().required("Please select the PG type"),
+    wifi_available: Yup.string().required(
+      "Please specify if Wi-Fi is available"
+    ),
+    food_available: Yup.string().required(
+      "Please specify if food is available"
+    ),
+    rules: Yup.string().required("Please enter the PG rules"),
+    pg_image_url: Yup.mixed().nullable().required("PG Image is required"),
     rooms: Yup.array().of(
       Yup.object().shape({
-        room_type: Yup.string()
-          .required("Please enter the room type"),
-        room_rent: Yup.string()
-          .required("Please enter the room rent"),
-        deposit_duration: Yup.string()
-          .required("Please specify the deposit duration"),
-        ac_available: Yup.string()
-          .required("Please specify if AC is available in the room"),
-        attached_bathroom: Yup.string()
-          .required("Please specify if the room has an attached bathroom"),
+        room_type: Yup.string().required("Please enter the room type"),
+        room_rent: Yup.string().required("Please enter the room rent"),
+        deposit_duration: Yup.string().required(
+          "Please specify the deposit duration"
+        ),
+        ac_available: Yup.string().required(
+          "Please specify if AC is available in the room"
+        ),
+        attached_bathroom: Yup.string().required(
+          "Please specify if the room has an attached bathroom"
+        ),
         room_image_url: Yup.mixed()
-          .nullable().required("Room Image is required"),
+          .nullable()
+          .required("Room Image is required"),
       })
     ),
+    contact_details: Yup.object({
+      country_code: Yup.string()
+        .nullable()
+        .matches(/^\+?[0-9]{1,4}$/, "Invalid country code"),
+
+      phone_number: Yup.string()
+        .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits")
+        .required("Phone number is required"),
+
+      alt_country_code: Yup.string()
+        .nullable()
+        .matches(/^\+?[0-9]{1,4}$/, "Invalid alternate country code"),
+
+      alt_phone_number: Yup.string()
+        .nullable()
+        .matches(
+          /^[0-9]{10}$/,
+          "Alternate phone number must be exactly 10 digits"
+        ),
+
+      whatsapp_code: Yup.string()
+        .nullable()
+        .matches(/^\+?[0-9]{1,4}$/, "Invalid WhatsApp country code"),
+
+      whatsapp_number: Yup.string()
+        .nullable()
+        .matches(/^[0-9]{10}$/, "WhatsApp number must be exactly 10 digits"),
+
+      same_as_phone: Yup.boolean(),
+
+      email: Yup.string()
+        .email("Enter a valid email")
+        .required("Email is required"),
+
+      preferred_contact: Yup.string()
+        .oneOf(["phone", "whatsapp", "email"], "Invalid contact method")
+        .required("Preferred contact method is required"),
+    }),
   }),
 };

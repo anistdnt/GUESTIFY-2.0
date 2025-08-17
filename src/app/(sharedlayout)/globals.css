@@ -123,3 +123,66 @@ body {
 [data-tooltip]:hover::after {
   opacity: 1;
 }
+
+/* Remove default checkbox style */
+input[type="checkbox"],input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 18px;
+  height: 18px;
+  border: 2px solid #999;
+  border-radius: 4px; /* Change to 50% for round */
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Checked state */
+input[type="checkbox"]:checked {
+  background-color: #d0a400;
+  border-color: #d0a400; 
+}
+
+/* Radio shape */
+input[type="radio"] {
+  border-radius: 50%; /* perfect circle */
+}
+
+
+/* Checkmark */
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Checked state for radio */
+input[type="radio"]:checked {
+  border-color: #d0a400;
+}
+
+input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  background-color: #d0a400;
+  border-radius: 50%;
+}
+
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border: 2px solid red !important;
+}

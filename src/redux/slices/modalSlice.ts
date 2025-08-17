@@ -3,12 +3,14 @@ import { createSlice } from "@reduxjs/toolkit";
 interface ModalShowType {
   type: string;
   modalData?: any;
+  props?: any;
   open: boolean;
 }
 
 const initialState: ModalShowType = {
   type: "",
   modalData: {},
+  props: {},
   open: false,
 };
 
@@ -20,6 +22,7 @@ const modalSlice = createSlice({
       state.type = action.payload.type;
       state.modalData = action.payload.modalData;
       state.open = action.payload.open;
+      state.props = action.payload.props || {};
     },
     hideModal: (state, action: { payload: boolean }) => {
       state.type = "";
