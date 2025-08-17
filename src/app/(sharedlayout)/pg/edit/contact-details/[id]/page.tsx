@@ -114,7 +114,7 @@ export default function BasicDetailsEdit() {
             <button
               type="submit"
               disabled={!dirty} // ✅ disables if nothing changed
-              className={`ml-auto px-6 py-2 rounded transition ${
+              className={`mt-5 ml-auto px-6 py-2 rounded transition ${
                 dirty
                   ? "bg-yellow-600 hover:bg-yellow-700 text-white"
                   : "bg-gray-400 cursor-not-allowed text-white"
