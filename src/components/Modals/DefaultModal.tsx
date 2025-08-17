@@ -10,13 +10,14 @@ import ConfirmationModal from "./ConfirmationModal";
 import DeleteModal from "./DeleteModal";
 import PGEditModal from "./PGEditModal";
 import FilterModal from "./FilterModal";
+import OTPModal from "./ReturnModals/OTPModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
   const open = useSelector((state: RootState) => state.modal_slice.open);
   const modalData = useSelector((state: RootState) => state.modal_slice.modalData) || {};
+  const props = useSelector((state: RootState) => state.modal_slice.props) || {};
 
-  //   const [showModal,setshowModal] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   const setshowModal = (show: boolean) => {
@@ -44,6 +45,9 @@ export default function DefaultModal() {
           )}
           {type === "filter" && (
             <FilterModal setshowModal={setshowModal}/>
+          )}
+          {type === "otpVerify" && (
+            <OTPModal setshowModal={setshowModal} modalData={modalData} {...props}/>
           )}
         </div>
       )}

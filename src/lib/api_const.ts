@@ -38,7 +38,14 @@ export const API = {
     REVIEW: {
         GET_REVIWS_OF_PG : "/getReviews",
         ADD_REVIEW:"/addReview"
+    },
+    VERIFICATION: {
+        SEND_PHONE_OTP: "/auth/send-otp",
+        VERIFY_PHONE_OTP: "/auth/verify-otp",
+        SEND_EMAIL_OTP: "/auth/email/send-otp",
+        VERIFY_EMAIL_OTP: "/auth/email/verify-otp",
+    },
+    OWNER: {
+        GET_OWNER_BY_ID: "/getOwner",
     }
-
-    
 }

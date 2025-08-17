@@ -35,10 +35,10 @@ function PGEditModal({ setshowModal, modalData }: ModalType) {
       class: ""
     },
     {
-      title: "All Details",
-      path: '',
+      title: "Contact Details",
+      path: `/pg/edit/contact-details/${modalData?.rowid}`,
       svg_d: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 3h6v4H9V3zM9 12h6M9 16h6",
-      class: "pointer-events-none opacity-50"
+      class: ""
     },
     {
       title: "Add Rooms",
