@@ -1,17 +1,30 @@
 "use client";
 import { Field, ErrorMessage, useFormikContext } from "formik";
 import Select from "react-select";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hideModal, setModalVisibility } from "@/redux/slices/modalSlice";
 import { setLoading } from "@/redux/slices/loaderSlice";
 import { SealCheck } from "@phosphor-icons/react/dist/ssr";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import { RootState } from "@/redux/store";
+import {
+  setEmailVerified,
+  setPhoneVerified,
+} from "@/redux/slices/authVerifiactionSlice";
 
-export default function ContactDetails() {
+export default function ContactDetails({ caption }: { caption?: string }) {
+  // Get user data from Redux store
+  const reduxUserData = useSelector(
+    (state: RootState) => state.user_slice.userData
+  );
+  const reduxAuthVerification = useSelector(
+    (state: RootState) => state.auth_verification_slice
+  );
   const { setFieldValue, values } = useFormikContext<any>();
   const dispatch = useDispatch();
-  const isVerified = false;
 
   const countryCodes = [
     { label: "+91 (India)", value: "+91" },
@@ -20,6 +33,12 @@ export default function ContactDetails() {
     { label: "+61 (Australia)", value: "+61" },
     { label: "+81 (Japan)", value: "+81" },
   ];
+
+  // initialize redux state for phone and email verification
+  useEffect(() => {
+    dispatch(setPhoneVerified(values.contact_details.is_phone_verified));
+    dispatch(setEmailVerified(values.contact_details.is_email_verified));
+  },[dispatch, values.contact_details.is_phone_verified, values.contact_details.is_email_verified]);
 
   // Auto-fill WhatsApp number if toggle is checked
   useEffect(() => {
@@ -45,23 +64,83 @@ export default function ContactDetails() {
       toast.error("Phone number must be exactly 10 digits");
       return false;
     }
-    const phoneNumber = `${values.contact_details.country_code}${value}`;
-    dispatch(setLoading({ loading: true }));
-    const result = "";
 
-    if (result) {
+    const payload = {
+      phoneNumber: `${values.contact_details.country_code}${value}`,
+    };
+
+    dispatch(setLoading({ loading: true }));
+    const result: ApiReturn<any> = await api_caller<any>(
+      "POST",
+      `${API.VERIFICATION.SEND_PHONE_OTP}`,
+      payload
+    );
+
+    if (result.success) {
+      if (result?.data?.bypassed) {
+        dispatch(setPhoneVerified(true));
+        toast.success(result?.message || "Phone number verified successfully!");
+      } else {
+        toast.success(result?.message || "OTP sent successfully!");
+        dispatch(
+          setModalVisibility({
+            open: true,
+            type: "otpVerify",
+            modalData: {
+              validationType: "phone",
+              timerDuration: 60, // seconds
+              phoneNumber: payload?.phoneNumber,
+            },
+          })
+        );
+      }
+
       dispatch(setLoading({ loading: false }));
-      toast.success("OTP sent successfully!");
-      dispatch(
-        setModalVisibility({
-          open: true,
-          type: "otpVerify",
-          props: {
-            timerDuration: 40, // seconds
-            phoneNumber: phoneNumber,
-          },
-        })
-      );
+    } else {
+      dispatch(setLoading({ loading: false }));
+      toast.error("Failed to send OTP. Please try again.");
+    }
+  };
+
+  const handleValidationEmail = async (value: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    const payload = {
+      email: value,
+      owner_name: reduxUserData?.first_name + " " + reduxUserData?.last_name,
+    };
+
+    dispatch(setLoading({ loading: true }));
+    const result: ApiReturn<any> = await api_caller<any>(
+      "POST",
+      `${API.VERIFICATION.SEND_EMAIL_OTP}`,
+      payload
+    );
+
+    if (result.success) {
+      if (result?.data?.bypassed) {
+        dispatch(setEmailVerified(true));
+        toast.success(result?.message || "Email verified successfully!");
+      } else {
+        toast.success(result?.message || "OTP sent successfully!");
+        dispatch(
+          setModalVisibility({
+            open: true,
+            type: "otpVerify",
+            modalData: {
+              validationType: "email",
+              timerDuration: 60, // seconds
+              email: payload?.email,
+              owner_name: payload?.owner_name,
+            },
+          })
+        );
+      }
+      dispatch(setLoading({ loading: false }));
     } else {
       dispatch(setLoading({ loading: false }));
       toast.error("Failed to send OTP. Please try again.");
@@ -75,7 +154,7 @@ export default function ContactDetails() {
   return (
     <>
       <div className="mb-10">
-        <h2 className="text-2xl font-bold text-gray-800">Contact Details</h2>
+        <h2 className="text-2xl font-bold text-gray-800">{caption ?? 'Contact Details'}</h2>
         <p className="text-gray-600">
           Please provide valid contact information for verification purposes.
         </p>
@@ -98,24 +177,35 @@ export default function ContactDetails() {
                   setFieldValue("contact_details.country_code", option?.value)
                 }
                 placeholder="Code"
-                isDisabled={isVerified}
+                isDisabled={reduxAuthVerification.isPhoneVerified}
               />
             </div>
             <Field
               name="contact_details.phone_number"
               placeholder="Enter phone number"
               className="p-2 border rounded flex-1"
-              disabled={isVerified}
+              disabled={reduxAuthVerification.isPhoneVerified}
             />
             <button
               type="button"
-              disabled={isVerified}
-              className={`text-white flex px-4 rounded ${isVerified ? "opacity-85 cursor-not-allowed bg-green-600" : "bg-buttons hover:bg-buttonsHover"}`}
+              disabled={reduxAuthVerification.isPhoneVerified}
+              className={`text-white flex justify-center items-center px-4 rounded ${
+                reduxAuthVerification.isPhoneVerified
+                  ? "opacity-85 cursor-not-allowed bg-green-600"
+                  : "bg-buttons hover:bg-buttonsHover"
+              }`}
               onClick={() =>
                 handleValidationPhone(values.contact_details.phone_number)
               }
             >
-             {isVerified ? ( <div className="flex justify-center items-center gap-2"><SealCheck size={20} weight="fill" /><span>Verified</span></div> ) : ("Verify")}
+              {reduxAuthVerification.isPhoneVerified ? (
+                <div className="flex justify-center items-center gap-2">
+                  <SealCheck size={20} weight="fill" />
+                  <span>Verified</span>
+                </div>
+              ) : (
+                "Verify"
+              )}
             </button>
           </div>
           <ErrorMessage
@@ -201,12 +291,25 @@ export default function ContactDetails() {
             type="email"
             placeholder="Enter email"
             className="p-2 border rounded flex-1"
+            disabled={reduxAuthVerification.isEmailVerified}
           />
           <button
             type="button"
-            className="bg-buttons hover:bg-buttonsHover text-white px-4 rounded"
+            className={`text-white flex justify-center items-center px-4 rounded ${
+              reduxAuthVerification.isEmailVerified
+                ? "opacity-85 cursor-not-allowed bg-green-600"
+                : "bg-buttons hover:bg-buttonsHover"
+            }`}
+            onClick={() => handleValidationEmail(values.contact_details.email)}
           >
-            Verify
+            {reduxAuthVerification.isEmailVerified ? (
+              <div className="flex justify-center items-center gap-2">
+                <SealCheck size={20} weight="fill" />
+                <span>Verified</span>
+              </div>
+            ) : (
+              "Verify"
+            )}
           </button>
         </div>
         <ErrorMessage

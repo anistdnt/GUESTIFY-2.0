@@ -18,15 +18,48 @@ export default function PGFormWrapper() {
   const reduxUserData = useSelector(
     (state: RootState) => state.user_slice.userData
   );
+  const reduxAuthVerification = useSelector(
+    (state: RootState) => state.auth_verification_slice
+  );
   const dispatch = useDispatch();
   const router = useRouter();
 
   const handleSubmit = async (values: any) => {
     const formData = new FormData();
 
-    // ✅ Add top-level fields
+    delete values.contact_details.is_phone_verified;
+    delete values.contact_details.is_email_verified;
+
+    // Add top-level fields
     Object.entries(values).forEach(([key, value]) => {
       if (key === "rooms") return; // skip for now
+
+      // Special handling for contact_details
+      if (
+        key === "contact_details" &&
+        typeof value === "object" &&
+        value !== null
+      ) {
+        Object.entries(value).forEach(([subKey, subValue]) => {
+          formData.append(
+            `contact_details[${subKey}]`,
+            (subValue as string) ?? ""
+          );
+        });
+        formData.append(
+          "contact_details[is_phone_verified]",
+          reduxAuthVerification?.isPhoneVerified ? "true" : "false"
+        );
+        formData.append(
+          "contact_details[is_email_verified]",
+          reduxAuthVerification?.isEmailVerified ? "true" : "false"
+        );
+        formData.append(
+          "contact_details[image_url]", 
+          reduxUserData?.image_url || ""
+        );
+        return;
+      }
 
       if (key === "pg_image_url" && value) {
         if (typeof value === "string" && value.startsWith("data:image/")) {
@@ -36,11 +69,11 @@ export default function PGFormWrapper() {
           formData.append("pg_image_url", value as File);
         }
       } else if (key !== "pg_image_url") {
-        formData.append(key, value as string ?? "");
+        formData.append(key, (value as string) ?? "");
       }
     });
 
-    // ✅ Add rooms array with their files
+    // Add rooms array with their files
     values.rooms.forEach((room: any, index: number) => {
       Object.entries(room).forEach(([key, value]) => {
         if (key === "room_image_url" && value) {

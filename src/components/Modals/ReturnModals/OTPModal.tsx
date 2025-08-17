@@ -4,24 +4,24 @@ import { setLoading } from "@/redux/slices/loaderSlice";
 import { hideModal } from "@/redux/slices/modalSlice";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import toast from "react-hot-toast";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import { setEmailVerified, setPhoneVerified } from "@/redux/slices/authVerifiactionSlice";
 
 type OTPModalProps = {
   setshowModal: (show: boolean) => void;
-  timerDuration?: number; // seconds
-  onSubmitOTP: (otp: string) => Promise<boolean>; // returns OTP to parent
-  onResend?: () => Promise<void>;
+  modalData?: any;
 };
 
 function OTPModal({
   setshowModal,
-  timerDuration = 60,
-  onSubmitOTP,
-  onResend,
+  modalData = {}
 }: OTPModalProps) {
+  const { timerDuration = 60, validationType="phone" } = modalData;
   const dispatch = useDispatch();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const inputRefs = useRef<HTMLInputElement[]>([]);
-  const [timeLeft, setTimeLeft] = useState(timerDuration);
+  const [timeLeft, setTimeLeft] = useState<number>(timerDuration);
 
   useEffect(() => {
     setTimeLeft(timerDuration);
@@ -59,29 +59,69 @@ function OTPModal({
       toast.error("Please enter all 6 digits");
       return;
     }
+    let payload: any = {};
+    let url:string = "";
+    if(validationType === "phone") {
+      url = `${API.VERIFICATION.VERIFY_PHONE_OTP}`;
+      payload = {
+        phoneNumber: modalData.phoneNumber || "",
+        code: otpValue,
+      };
+    }
+    else if(validationType === "email") {
+      url = `${API.VERIFICATION.VERIFY_EMAIL_OTP}`;
+      payload = {
+        email: modalData.email || "",
+        code: otpValue,
+      };
+    }
+
     dispatch(setLoading({ loading: true }));
-    try {
-      const res = await onSubmitOTP(otpValue);
-      if(res){
-        toast.success("OTP verified successfully!");
-      }
-      else {
-        toast.error("Invalid OTP. Please try again.");
-     }
+
+    const result: ApiReturn<any> = await api_caller<any>("POST", url, payload);
+
+    if (result.success) {
       dispatch(hideModal(false));
-    } finally {
       dispatch(setLoading({ loading: false }));
+      if (validationType === "phone") {
+        dispatch(setPhoneVerified(true));
+      } else if (validationType === "email") {
+        dispatch(setEmailVerified(true));
+      }
+      toast.success(result?.message || "OTP verified successfully!");
+    }
+    else{
+      dispatch(setLoading({ loading: false }));
+      toast.error(result?.message || "Failed to verify OTP. Please try again.");
     }
   };
 
   const handleResend = async () => {
-    if (!onResend) return;
     dispatch(setLoading({ loading: true }));
     try {
-      await onResend();
-      setOtp(Array(6).fill(""));
-      setTimeLeft(timerDuration);
-      inputRefs.current[0]?.focus();
+      let payload: any = {};
+      if (validationType === "phone") {
+        payload = {
+          phoneNumber: modalData.phoneNumber || "",
+        };
+      } else if (validationType === "email") {
+        payload = {
+          email: modalData.email || "",
+          owner_name: modalData.owner_name || "",
+        };
+      }
+
+      const result: ApiReturn<any> = await api_caller<any>("POST",`${API.VERIFICATION.SEND_PHONE_OTP}`,payload);
+
+      if (result.success) {
+        setOtp(Array(6).fill(""));
+        setTimeLeft(timerDuration);
+        inputRefs.current[0]?.focus();
+        toast.success(result.message || "OTP Resend successfully!");
+      }
+      else {
+        toast.error(result?.message || "Failed to resend OTP. Please try again.");
+      }
     } finally {
       dispatch(setLoading({ loading: false }));
     }
@@ -129,10 +169,9 @@ function OTPModal({
           ) : (
             <button
               type="button"
-              onClick={handleResend}
-              className="text-blue-500 underline text-sm"
+              className="text-sm"
             >
-              Resend OTP
+              <span className=" text-gray-400">Haven't Receive OTP? </span><span className="text-blue-400" onClick={handleResend}>Resend</span>
             </button>
           )}
 

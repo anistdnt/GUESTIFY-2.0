@@ -10,7 +10,6 @@ import dynamic from "next/dynamic";
 import { useDebounce } from "@/lib/useDebounce";
 import { AppliedFilters } from "./AppliedFilters";
 import { MapTrifold } from "@phosphor-icons/react";
-import { set } from "mongoose";
 import { pgInfo } from "../../Map/Map";
 const Map = dynamic(() => import("../../Map/Map"), { ssr: false }); // <-- Update this path as needed
 const SortComp = dynamic(
@@ -34,7 +33,7 @@ const arr = [
 
 
 export const FilterSection = () => {
-  const [values, setValues] = useState<number[]>([2]); // Maintaining Range Values
+  const [values, setValues] = useState<number[]>([10]); // Maintaining Range Values
   const [selectedOption, setSelectedOption] = useState<sortType | null>(null); // Maintaining Selected Sort Option
   const [sortOrder, setSortOrder] = useState<string | null>(null); // 'asc', 'desc', or null
   const debouncedRange = useDebounce<number[]>(values, 500);

@@ -1,7 +1,10 @@
 "use client";
+import { RootState } from "@/redux/store";
 import { Check } from "@phosphor-icons/react/dist/ssr";
-import { Form } from "formik";
+import { Form, getIn, setIn } from "formik";
 import { ReactNode, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 type StepperProps = {
   steps: { label: string; content: ReactNode }[];
@@ -30,31 +33,44 @@ export default function Stepper({ steps, helpers }: StepperProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const isLast = currentStep === steps.length - 1;
   const isFirst = currentStep === 0;
+  const reduxAuthVerification = useSelector(
+    (state: RootState) => state.auth_verification_slice
+  );
 
   const handleNext = async (
-    index: number,
-    validateForm: any,
-    errors: any,
-    touched: any,
-    setTouched: any
-  ) => {
-    const fieldsToValidate = stepFields[index];
+  index: number,
+  validateForm: any,
+  errors: any,
+  touched: any,
+  setTouched: any
+) => {
+  const fieldsToValidate = stepFields[index];
 
-    // Mark all fields in this step as touched
-    const touchedMap: any = {};
-    fieldsToValidate.forEach((f) => {
-      touchedMap[f] = true;
-    });
-    setTouched({ ...touched, ...touchedMap });
+  // Mark fields as touched
+  let touchedMap: any = { ...touched };
+  fieldsToValidate.forEach((f) => {
+    touchedMap = setIn(touchedMap, f, true);
+  });
+  setTouched(touchedMap);
 
-    const allErrors = await validateForm();
+  const allErrors = await validateForm();
 
-    const hasErrors = fieldsToValidate.some((field) => !!allErrors[field]);
+  // Use getIn to handle nested fields
+  const hasErrors = fieldsToValidate.some((field) => !!getIn(allErrors, field));
 
-    if (!hasErrors) {
-      setCurrentStep((s) => s + 1);
+  if (!hasErrors) {
+    if(!reduxAuthVerification?.isPhoneVerified){
+      toast.error("Please verify your phone number before proceeding.");
+      return;
     }
-  };
+    if(!reduxAuthVerification?.isEmailVerified){
+      toast.error("Please verify your email address before proceeding.");
+      return;
+    }
+    setCurrentStep((s) => s + 1);
+  }
+};
+
 
   useEffect(() => {
     window?.scrollTo({ top: 0, behavior: "smooth" });
@@ -134,7 +150,7 @@ export default function Stepper({ steps, helpers }: StepperProps) {
             type="button"
             onClick={() => {
               handleNext(
-                0,
+                currentStep,
                 helpers?.validateForm,
                 helpers?.errors,
                 helpers?.touched,

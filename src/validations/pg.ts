@@ -27,6 +27,7 @@ export const PGValidationSchema = {
     contact_details: {
       country_code: "",
       phone_number: "",
+      is_phone_verified: false,
       alt_country_code: "",
       alt_phone_number: "",
       whatsapp_code: "",
@@ -34,6 +35,7 @@ export const PGValidationSchema = {
       same_as_phone: false,
       preferred_contact: "phone",
       email: "",
+      is_email_verified: false,
     },
   },
   validation: Yup.object({
