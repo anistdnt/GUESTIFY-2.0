@@ -39,7 +39,7 @@ export default function RootLayout({
           <GlobalLoaderWrapper />
           <Header />
           {/* <MapmyIndiaScriptLoader /> */}
-          <main className="px-4">
+          <main className="">
             <Toaster />
             {children}
           </main>
