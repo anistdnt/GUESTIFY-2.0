@@ -32,7 +32,7 @@ export default function DefaultModal() {
             <ResetPasswordModal setshowModal={setshowModal} />
           )}
           {type === "ownerinfo" && (
-            <OwnerInfoModal setshowModal={setshowModal} />
+            <OwnerInfoModal setshowModal={setshowModal} modalData={modalData}/>
           )}
           {type === "delete" && (
             <ConfirmationModal setshowModal={setshowModal}/>

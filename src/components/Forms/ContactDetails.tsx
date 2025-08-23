@@ -58,6 +58,20 @@ export default function ContactDetails({ caption }: { caption?: string }) {
     values.contact_details.country_code,
   ]);
 
+  // === Phone Verified would be false if the phone muber changes ===
+  useEffect(()=>{
+    if(reduxAuthVerification?.isPhoneVerified){
+      dispatch(setPhoneVerified(false))
+    }
+  },[values.contact_details.phone_number,values.contact_details.country_code])
+
+  // ==== Email verified would be false if email changes
+  useEffect(()=>{
+    if(reduxAuthVerification?.isEmailVerified){
+      dispatch(setEmailVerified(false))
+    }
+  },[values.contact_details.email])
+
   const handleValidationPhone = async (value: string) => {
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(value)) {
@@ -177,21 +191,19 @@ export default function ContactDetails({ caption }: { caption?: string }) {
                   setFieldValue("contact_details.country_code", option?.value)
                 }
                 placeholder="Code"
-                isDisabled={reduxAuthVerification.isPhoneVerified}
               />
             </div>
             <Field
               name="contact_details.phone_number"
               placeholder="Enter phone number"
               className="p-2 border rounded flex-1"
-              disabled={reduxAuthVerification.isPhoneVerified}
             />
             <button
               type="button"
               disabled={reduxAuthVerification.isPhoneVerified}
               className={`text-white flex justify-center items-center px-4 rounded ${
                 reduxAuthVerification.isPhoneVerified
-                  ? "opacity-85 cursor-not-allowed bg-green-600"
+                  ? "opacity-85 cursor-not-allowed bg-green-600 pointer-events-none"
                   : "bg-buttons hover:bg-buttonsHover"
               }`}
               onClick={() =>
@@ -291,13 +303,12 @@ export default function ContactDetails({ caption }: { caption?: string }) {
             type="email"
             placeholder="Enter email"
             className="p-2 border rounded flex-1"
-            disabled={reduxAuthVerification.isEmailVerified}
           />
           <button
             type="button"
             className={`text-white flex justify-center items-center px-4 rounded ${
               reduxAuthVerification.isEmailVerified
-                ? "opacity-85 cursor-not-allowed bg-green-600"
+                ? "opacity-85 cursor-not-allowed bg-green-600 pointer-events-none"
                 : "bg-buttons hover:bg-buttonsHover"
             }`}
             onClick={() => handleValidationEmail(values.contact_details.email)}
