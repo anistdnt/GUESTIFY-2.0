@@ -58,6 +58,10 @@ export default function PGFormWrapper() {
           "contact_details[image_url]", 
           reduxUserData?.image_url || ""
         );
+        formData.append(
+          "contact_details[owner_name]",
+          `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
+        );
         return;
       }
 

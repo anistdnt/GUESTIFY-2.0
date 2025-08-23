@@ -77,6 +77,11 @@ export default function BasicDetailsEdit() {
           "contact_details[image_url]",
           reduxUserData?.image_url || ""
         );
+        formData.append(
+          "contact_details[owner_name]",
+          `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
+        );
+
         return;
       }
     });
@@ -85,7 +90,7 @@ export default function BasicDetailsEdit() {
 
     const res: ApiReturn<any> = await api_caller<any>(
       "PUT",
-      `${API.PG.UPDATE}/${paying_guestID}/basic-details`,
+      `${API.OWNER.UPDATE_OWNER}/${paying_guestID}`,
       formData
     );
     if (res.success) {
