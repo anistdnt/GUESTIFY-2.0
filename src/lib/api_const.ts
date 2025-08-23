@@ -28,6 +28,7 @@ export const API = {
         DELETE : "/deletePG",
         UPDATE : "/updatePg",
         ADD_ROOM : "addRooms",
+        FOR_MAP : "/getPgForMap",
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",
