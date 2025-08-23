@@ -45,53 +45,34 @@ export default function BasicDetailsEdit() {
   }, []);
 
   const handleSubmit = async (values: any) => {
-    const formData = new FormData();
+
+    if(!reduxAuthVerification?.isPhoneVerified){
+      toast.error("Please verify your phone number before proceeding.");
+      return;
+    }
+    if(!reduxAuthVerification?.isEmailVerified){
+      toast.error("Please verify your email address before proceeding.");
+      return;
+    }
 
     delete values.contact_details.is_phone_verified;
     delete values.contact_details.is_email_verified;
 
-    // ✅ Add top-level fields
-    Object.entries(values).forEach(([key, value]) => {
-      if (key === "rooms") return; // skip for now
-
-      if (
-        key === "contact_details" &&
-        typeof value === "object" &&
-        value !== null
-      ) {
-        Object.entries(value).forEach(([subKey, subValue]) => {
-          formData.append(
-            `contact_details[${subKey}]`,
-            (subValue as string) ?? ""
-          );
-        });
-        formData.append(
-          "contact_details[is_phone_verified]",
-          reduxAuthVerification?.isPhoneVerified ? "true" : "false"
-        );
-        formData.append(
-          "contact_details[is_email_verified]",
-          reduxAuthVerification?.isEmailVerified ? "true" : "false"
-        );
-        formData.append(
-          "contact_details[image_url]",
-          reduxUserData?.image_url || ""
-        );
-        formData.append(
-          "contact_details[owner_name]",
-          `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
-        );
-
-        return;
-      }
-    });
+    const payload = {
+      ...values.contact_details,
+      same_as_phone: values.contact_details.same_as_phone ? "true" : "false",
+      is_phone_verified: reduxAuthVerification?.isPhoneVerified ? "true" : "false",
+      is_email_verified: reduxAuthVerification?.isEmailVerified ? "true" : "false",
+      image_url: reduxUserData?.image_url || "",
+      owner_name: `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
+    }
 
     dispatch(setLoading({ loading: true }));
 
     const res: ApiReturn<any> = await api_caller<any>(
       "PUT",
       `${API.OWNER.UPDATE_OWNER}/${paying_guestID}`,
-      formData
+      payload
     );
     if (res.success) {
       dispatch(setLoading({ loading: false }));

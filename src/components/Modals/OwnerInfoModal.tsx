@@ -1,5 +1,6 @@
 "use client";
 import {
+  AddressBook,
   EnvelopeSimple,
   Phone,
   SealCheck,
@@ -66,15 +67,7 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
 
         {/* Loader Skeleton */}
         {loading && (
-          <div className="flex flex-col sm:flex-row justify-start items-center gap-10 animate-pulse">
-            <div className="w-24 h-24 bg-gray-300 rounded-full"></div>
-            <div className="flex flex-col gap-3 w-full">
-              <div className="h-5 bg-gray-300 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-300 rounded w-2/3"></div>
-              <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-            </div>
-          </div>
+          <OwnerInfoSkeleton/>
         )}
 
         {/* Error */}
@@ -113,6 +106,7 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
                   {ownerInfo?.is_email_verified && (
                     <SealCheck size={20} color="#0eaf19" weight="fill" />
                   )}
+                  {ownerInfo?.preferred_contact === "email" && <AddressBook size={20} color="#0eaf19" weight="bold" />}
                 </p>
 
                 {/* Phone */}
@@ -127,13 +121,14 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
                   {ownerInfo?.is_phone_verified && (
                     <SealCheck size={20} color="#0eaf19" weight="fill" />
                   )}
+                  {ownerInfo?.preferred_contact === "phone" && <AddressBook size={20} color="#0eaf19" weight="bold" />}
                 </p>
 
                 {/* ALternate Number  */}
                 {ownerInfo?.alt_country_code !== "" &&
                   ownerInfo?.alt_phone_number !== "" && (
                     <div>
-                      <div className="flex items-center gap-4 my-4">
+                      <div className="flex items-center gap-4 my-1">
                         <div className="flex-grow h-px bg-gray-300"></div>
                         <span className="text-gray-500 text-sm font-medium">
                           OR
@@ -167,6 +162,7 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
                     >
                       {ownerInfo?.whatsapp_code} {ownerInfo?.whatsapp_number}
                     </Link>
+                    {ownerInfo?.preferred_contact === "whatsapp" && <AddressBook size={20} color="#0eaf19" weight="bold" />}
                   </p>
                 )}
               </div>
@@ -191,5 +187,52 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
     </div>
   );
 }
+
+const OwnerInfoSkeleton = () => {
+  return (
+    <div className="animate-pulse">
+      <div className="flex flex-col sm:flex-row justify-start items-center gap-10">
+        {/* Avatar */}
+        <div className="size-[150px] rounded-full overflow-hidden border flex-shrink-0 bg-gray-300" />
+
+        {/* Details */}
+        <div className="flex flex-col gap-3 w-full max-w-md">
+          {/* Owner name */}
+          <div className="h-6 w-40 bg-gray-300 rounded"></div>
+
+          {/* Email */}
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-300 rounded-full"></div>
+            <div className="h-4 w-52 bg-gray-300 rounded"></div>
+          </div>
+
+          {/* Phone */}
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-300 rounded-full"></div>
+            <div className="h-4 w-40 bg-gray-300 rounded"></div>
+          </div>
+
+          {/* Alt Phone */}
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-300 rounded-full"></div>
+            <div className="h-4 w-36 bg-gray-300 rounded"></div>
+          </div>
+
+          {/* WhatsApp */}
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-300 rounded-full"></div>
+            <div className="h-4 w-32 bg-gray-300 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="mt-4 flex justify-end items-center gap-4">
+        <div className="h-9 w-28 bg-gray-300 rounded-md"></div>
+        <div className="h-9 w-28 bg-gray-300 rounded-md"></div>
+      </div>
+    </div>
+  );
+};
 
 export default OwnerInfoModal;
