@@ -147,7 +147,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               WiFi Available
             </span>
             <div className="flex items-center gap-1">
-              <Rating no_of_star={number_of_stars} />
+              {number_of_stars && number_of_stars!==0 && <Rating no_of_star={number_of_stars} />}
             </div>
           </div>
 
@@ -191,7 +191,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               <span>
                 <MapPin size={18} weight="fill" />
               </span>{" "}
-              <span>0.7 km from the choosen location</span>
+              <span>{pginfo?.linearDistance} km from the choosen location</span>
             </p>
             <div className="flex gap-4">
               <button

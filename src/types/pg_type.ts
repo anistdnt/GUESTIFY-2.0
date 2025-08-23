@@ -21,6 +21,8 @@ export interface PGInfo {
   updatedAt: string;
   __v: number;
   minRent?: number;
+  averageRating?: number | string | null;
+  linearDistance?: number | string;
 }
 
 export interface Room {

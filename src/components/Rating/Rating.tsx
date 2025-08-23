@@ -5,11 +5,11 @@ type Props = {
 };
 
 const ratingConfig = {
-  1 : {comment : "Bad",color : "bg-red-300"},
-  2 : {comment : "Moderate",color : "bg-yellow-300"},
-  3 : {comment : "Good",color : "bg-yellow-600"},
-  4 : {comment : "Very Good",color : "bg-green-300"},
-  5 : {comment : "Excellent",color : "bg-green-600"},
+  1: { comment: "Bad", color: "bg-red-500" },        // Strong red
+  2: { comment: "Poor", color: "bg-orange-500" },    // Orange
+  3: { comment: "Average", color: "bg-yellow-500" }, // Yellow
+  4: { comment: "Good", color: "bg-green-400" },     // Light green
+  5: { comment: "Excellent", color: "bg-green-600" } // Dark green
 };
 
 export default function Rating({ no_of_star }: Props) {
