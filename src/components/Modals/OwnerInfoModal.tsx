@@ -1,37 +1,192 @@
-import { EnvelopeSimple, Phone, X } from '@phosphor-icons/react/dist/ssr';
-import Image from 'next/image';
-import Link from 'next/link';
-import React from 'react';
+"use client";
+import {
+  EnvelopeSimple,
+  Phone,
+  SealCheck,
+  WhatsappLogo,
+  X,
+} from "@phosphor-icons/react/dist/ssr";
+import { useEffect, useState } from "react";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import Image from "next/image";
+import Link from "next/link";
 
 type ModalType = {
-    setshowModal: (show: boolean) => void;
+  setshowModal: (show: boolean) => void;
+  modalData?: any;
 };
 
-function OwnerInfoModal({ setshowModal }: ModalType) {
+function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
+  const [ownerInfo, setOwnerInfo] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchOwnerInfo = async () => {
+      try {
+        setLoading(true);
+        const res: ApiReturn<any> = await api_caller<any>(
+          "GET",
+          `${API.OWNER.GET_OWNER_BY_ID}/${modalData?.rowid}`
+        );
+        if (res?.success) {
+          setOwnerInfo(res.data);
+        } else {
+          setError("Failed to load owner information.");
+        }
+      } catch (err) {
+        setError("Something went wrong.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (modalData?.rowid) {
+      fetchOwnerInfo();
+    }
+  }, [modalData?.rowid]);
+
   return (
-    <div 
-      className='fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-10'
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-10"
       onClick={() => setshowModal(false)}
     >
-      <div 
-        className='relative flex flex-col gap-5 bg-white p-6 mx-2 rounded-md shadow-lg max-w-[500px]' 
+      <div
+        className="relative flex flex-col gap-5 bg-white p-6 mx-2 rounded-md shadow-lg min-w-[500px] w-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className='flex flex-row justify-between items-center'>
-            <h3 className='text-xl'>Owner Information</h3>
-            <button onClick={()=>{
-                setshowModal(false);
-            }}><X size={20} /></button>
+        <div className="flex flex-row justify-between items-center">
+          <h3 className="text-xl">Owner Information</h3>
+          <button onClick={() => setshowModal(false)}>
+            <X size={20} />
+          </button>
         </div>
-        <hr/>
-        <div className='flex flex-col sm:flex-row justify-start items-center gap-10'>
-            <Image src={'/assets/profile.png'} alt='owner' width={100} height={100} className='rounded-full border' objectFit='cover'/>
-            <div className='flex flex-col gap-2 text-wrap'>
-                <p className='text-3xl mb-2'><span className='text-sm'>Mr. </span>Happy Singh</p>
-                <p className='text-sm flex flex-row gap-2 justify-start items-center text-gray-700'><EnvelopeSimple size={20} color="#e2553c" weight='bold'/><span><Link href='mailto:happy@gmail.com' className='hover:underline'>happy@gmail.com</Link></span></p>
-                <p className='text-sm flex flex-row gap-2 justify-start items-center text-gray-700'><Phone size={20} color="#0f763b" weight='bold' /><span><Link href='tel:6321452879' className='hover:underline'>6321452879</Link></span></p>
+        <hr />
+
+        {/* Loader Skeleton */}
+        {loading && (
+          <div className="flex flex-col sm:flex-row justify-start items-center gap-10 animate-pulse">
+            <div className="w-24 h-24 bg-gray-300 rounded-full"></div>
+            <div className="flex flex-col gap-3 w-full">
+              <div className="h-5 bg-gray-300 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+              <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/3"></div>
             </div>
-        </div>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && !loading && (
+          <p className="text-red-600 text-center py-4">{error}</p>
+        )}
+
+        {/* Owner Info */}
+        {!loading && ownerInfo && (
+          <div>
+            <div className="flex flex-col sm:flex-row justify-start items-center gap-10">
+              <div className="size-[150px] rounded-full overflow-hidden border flex-shrink-0">
+                <Image
+                  src={ownerInfo?.image_url || "/assets/profile.png"}
+                  alt="owner_image"
+                  width={150}
+                  height={150}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col gap-2 text-wrap">
+                <p className="text-2xl mb-2 font-semibold">
+                  <span className="text-sm font-normal">Owner </span>
+                  {ownerInfo?.owner_name || "John Doe"}
+                </p>
+
+                {/* Email */}
+                <p className="text-sm text-gray-700 flex items-center gap-2">
+                  <EnvelopeSimple size={20} weight="bold" />
+                  <Link
+                    href={`mailto:${ownerInfo?.email}`}
+                    className="hover:underline"
+                  >
+                    {ownerInfo?.email}
+                  </Link>
+                  {ownerInfo?.is_email_verified && (
+                    <SealCheck size={20} color="#0eaf19" weight="fill" />
+                  )}
+                </p>
+
+                {/* Phone */}
+                <p className="text-sm text-gray-700 flex items-center gap-2">
+                  <Phone size={20} weight="bold" />
+                  <Link
+                    href={`tel:${ownerInfo?.country_code}${ownerInfo?.phone_number}`}
+                    className="hover:underline"
+                  >
+                    {ownerInfo?.country_code} {ownerInfo?.phone_number}
+                  </Link>
+                  {ownerInfo?.is_phone_verified && (
+                    <SealCheck size={20} color="#0eaf19" weight="fill" />
+                  )}
+                </p>
+
+                {/* ALternate Number  */}
+                {ownerInfo?.alt_country_code !== "" &&
+                  ownerInfo?.alt_phone_number !== "" && (
+                    <div>
+                      <div className="flex items-center gap-4 my-4">
+                        <div className="flex-grow h-px bg-gray-300"></div>
+                        <span className="text-gray-500 text-sm font-medium">
+                          OR
+                        </span>
+                        <div className="flex-grow h-px bg-gray-300"></div>
+                      </div>
+                      <p className="text-sm text-gray-700 flex items-center gap-2">
+                        <Phone size={20} weight="bold" />
+                        <Link
+                          href={`tel:${ownerInfo?.alt_country_code}${ownerInfo?.alt_phone_number}`}
+                          className="hover:underline"
+                        >
+                          {ownerInfo?.alt_country_code}{" "}
+                          {ownerInfo?.alt_phone_number}
+                        </Link>
+                        {ownerInfo?.is_phone_verified && (
+                          <SealCheck size={20} color="#0eaf19" weight="fill" />
+                        )}
+                      </p>
+                    </div>
+                  )}
+
+                {/* WhatsApp */}
+                {ownerInfo?.whatsapp_number && (
+                  <p className="text-sm text-gray-700 flex items-center gap-2">
+                    <WhatsappLogo size={20} weight="bold" />
+                    <Link
+                      href={`https://wa.me/${ownerInfo?.whatsapp_code}${ownerInfo?.whatsapp_number}`}
+                      target="_blank"
+                      className="hover:underline"
+                    >
+                      {ownerInfo?.whatsapp_code} {ownerInfo?.whatsapp_number}
+                    </Link>
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end items-center gap-4">
+              <Link
+                href={`mailto:${ownerInfo?.email}`}
+                className=" bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-md"
+              >
+                Send an Email
+              </Link>
+              <Link
+                href={`tel:${ownerInfo?.country_code}${ownerInfo?.phone_number}`}
+                className=" bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-md"
+              >
+                Call Owner
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

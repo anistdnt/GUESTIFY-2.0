@@ -7,6 +7,8 @@ import OwnerInfoModal from "../Modals/OwnerInfoModal";
 import { useEffect, useState } from "react";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
+import { useDispatch } from "react-redux";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
 
 type Props = {
   item?: PGData;
@@ -70,20 +72,19 @@ type Props = {
 //         }
 
 export default function DisplayCard({ item, number_of_stars }: Props) {
-  const [showModal, setshowModal] = useState<boolean>(false);
   const router = useRouter();
-
+  const dispatch = useDispatch();
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
   // Utility to extract coordinates from query string
-    const [college_longitude, setLongitude] = useState<number | null>(null);
-    const [college_latitude, setLatitude] = useState<number | null>(null);
-  
-    const params = useSearchParams();
-    const clg_coords = params.get("coordinates");
-    const clg_name = params.get("clg_name");
-    const clg_addr = params.get("clg_addr");
-    const clg_pin = params.get("clg_pin");
-    const clg_id = params.get("clg_id") || "";
+  const [college_longitude, setLongitude] = useState<number | null>(null);
+  const [college_latitude, setLatitude] = useState<number | null>(null);
+
+  const params = useSearchParams();
+  const clg_coords = params.get("coordinates");
+  const clg_name = params.get("clg_name");
+  const clg_addr = params.get("clg_addr");
+  const clg_pin = params.get("clg_pin");
+  const clg_id = params.get("clg_id") || "";
 
   return (
     <>
@@ -91,13 +92,26 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
         <div className="relative">
           <Image
             className="w-full h-60 object-cover"
-            src={pginfo?.pg_image_url ? pginfo?.pg_image_url : "/assets/sample1.jpg"}
+            src={
+              pginfo?.pg_image_url
+                ? pginfo?.pg_image_url
+                : "/assets/sample1.jpg"
+            }
             alt="PG Image"
             width={500}
             height={500}
           />
-          <span className={`absolute top-2 right-2 ${pginfo?.pg_type==="girls" && 'bg-pink-500'} ${pginfo?.pg_type==="boys" && 'bg-blue-500'} ${pginfo?.pg_type==="both" && 'bg-yellow-700'} text-white text-xs px-2 py-1 rounded`}>
-            {pginfo?.pg_type?.replace(pginfo?.pg_type[0],pginfo?.pg_type[0]?.toUpperCase())}
+          <span
+            className={`absolute top-2 right-2 ${
+              pginfo?.pg_type === "girls" && "bg-pink-500"
+            } ${pginfo?.pg_type === "boys" && "bg-blue-500"} ${
+              pginfo?.pg_type === "both" && "bg-yellow-700"
+            } text-white text-xs px-2 py-1 rounded`}
+          >
+            {pginfo?.pg_type?.replace(
+              pginfo?.pg_type[0],
+              pginfo?.pg_type[0]?.toUpperCase()
+            )}
           </span>
         </div>
         <div className="p-4">
@@ -183,7 +197,15 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               <button
                 className="bg-buttons text-white px-4 py-2 rounded"
                 onClick={() => {
-                  router.push(`/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(clg_coords)}&clg_name=${encodeURIComponent(clg_name)}&clg_addr=${encodeURIComponent(clg_addr)}&clg_pin=${clg_pin}&clg_id=${clg_id}`);
+                  router.push(
+                    `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
+                      clg_coords
+                    )}&clg_name=${encodeURIComponent(
+                      clg_name
+                    )}&clg_addr=${encodeURIComponent(
+                      clg_addr
+                    )}&clg_pin=${clg_pin}&clg_id=${clg_id}`
+                  );
                 }}
               >
                 View full details
@@ -191,7 +213,16 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               <button
                 className="bg-buttonsSecondary text-white px-4 py-2 rounded"
                 onClick={() => {
-                  setshowModal(true);
+                  dispatch(
+                    setModalVisibility({
+                      open: true,
+                      type: "ownerinfo",
+                      modalData: {
+                        text: pginfo?.pg_name as string,
+                        rowid: pginfo?._id as string,
+                      },
+                    })
+                  );
                 }}
               >
                 Contact Owner
@@ -200,8 +231,6 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
           </div>
         </div>
       </div>
-
-      {showModal && <OwnerInfoModal setshowModal={setshowModal} />}
     </>
   );
 }
