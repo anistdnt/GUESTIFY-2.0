@@ -58,6 +58,7 @@ const Login = () => {
       setCookie("authToken", res.data?.token, {
         maxAge: 2 * 60 * 60, //2 hours
       });
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
       dispatch(setLoading({loading:false}))
       router.push("/");
       toast.success(res.message || "Loggged In successfully");
