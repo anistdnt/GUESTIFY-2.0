@@ -22,7 +22,7 @@ export default function CardSection() {
       if (query.get("kmradi")) {
         queryArray?.push(`kmradi=${query.get("kmradi")}`);
       } else {
-        queryArray?.push("kmradi=10");
+        queryArray?.push("kmradi=20");
       }
 
       if (query.get("coordinates")) {

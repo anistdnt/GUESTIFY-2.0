@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 export default function CTASection() {
@@ -12,9 +13,9 @@ export default function CTASection() {
           through Guestify
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="bg-buttons text-white font-semibold px-8 py-3 rounded-lg hover:bg-buttonsHover transition-all duration-300 hover:scale-105">
+          <Link href={"#searchbar"} className="bg-buttons text-white font-semibold px-8 py-3 rounded-lg hover:bg-buttonsHover transition-all duration-300 hover:scale-105">
             Start Searching
-          </button>
+          </Link>
           <button className="border-2 border-buttons text-buttons font-semibold px-8 py-3 rounded-lg hover:bg-white hover:text-buttons transition-all duration-300 hover:scale-105">
             List Your Property
           </button>
