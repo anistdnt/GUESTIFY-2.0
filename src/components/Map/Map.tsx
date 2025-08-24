@@ -11,6 +11,7 @@ import { PinPopup } from './PinPopup';
 import { API } from '@/lib/api_const';
 import { Bicycle, Car, PersonSimpleWalk } from '@phosphor-icons/react';
 import { api_caller, ApiReturn } from '@/lib/api_caller';
+import Loadercomp from '../Loader/Loadercomp';
 
 interface MapProps {
   clg_coords?: [number, number];
@@ -91,6 +92,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [transportMode, setTransportMode] = useState<'car' | 'bike' | 'walk'>('car');
   const [nearbyPGs, setNearbyPGs] = useState<pgInfo[]>([]);
+  const [loadingNearby, setLoadingNearby] = useState<boolean>(false);
 
   const hasFetchedRef = useRef(false);
 
@@ -163,15 +165,9 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
   const fetchNearbyPGs = async () => {
     if (!userLocation) return;
     try {
-      // const res = await axios.get(API.PG.GET_PG_NEAR_ME, {
-      //   params: {
-      //     lat: userLocation[1],
-      //     lng: userLocation[0],
-      //     radius: 3, // search within 3 km
-      //   },
-      // });
+      setLoadingNearby(true);
       const res: ApiReturn<any> = await api_caller<any>("GET", `${API.PG.GET_PG_NEAR_ME}?coordinates=${userLocation[0]},${userLocation[1]}`)
-      setNearbyPGs(res.data.map((pg)=>{
+      setNearbyPGs(res.data?.map((pg)=>{
         return{
           position: pg?.location?.coordinates,
           name: pg?.pg_name,
@@ -181,6 +177,8 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
       })); // store in state
     } catch (error) {
       console.error("Error fetching nearby PGs:", error);
+    }finally {
+      setLoadingNearby(false);
     }
   };
 
@@ -331,7 +329,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
           className="absolute bottom-[70px] right-2 bg-white px-3 py-2 rounded-md cursor-pointer shadow-md z-10"
           onClick={fetchNearbyPGs}
         >
-          🏠 PGs Near Me
+          {loadingNearby ? <Loadercomp size={20} color="buttons"/> : <span>🏠 PGs Near Me</span>}
         </div>
 
 
