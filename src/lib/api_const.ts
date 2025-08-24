@@ -48,5 +48,6 @@ export const API = {
     },
     OWNER: {
         GET_OWNER_BY_ID: "/getOwner",
+        UPDATE_OWNER: "/updateOwner"
     }
 }

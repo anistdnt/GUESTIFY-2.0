@@ -100,7 +100,7 @@ export default function CardSection() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 py-10 px-3 justify-items-center">
           {cards?.map((item: any, index: number) => (
             <div key={index}>
-              <DisplayCard item={item} number_of_stars={5} />
+              <DisplayCard item={item} number_of_stars={item?.pginfo?.averageRating} />
             </div>
           ))}
         </div>

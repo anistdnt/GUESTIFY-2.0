@@ -12,7 +12,7 @@ type RangeSliderProps = {
   unit?: string;
 };
 
-export const RangeSlider = ({ values, setValues, MAX=10, MIN=1, STEP=1, unit='km' } : RangeSliderProps) => {
+export const RangeSlider = ({ values, setValues, MAX=20, MIN=1, STEP=1, unit='km' } : RangeSliderProps) => {
 
   const scaleMarks = useMemo(() => {
     return Array.from({ length: (MAX - MIN) / STEP + 1 }, (_, i) => {
@@ -87,7 +87,7 @@ export const RangeSlider = ({ values, setValues, MAX=10, MIN=1, STEP=1, unit='km
       <div className="text-sm select-none font-semibold text-gray-500">
         {values?.length > 1 ?
           `Selected Range: ${values[0]} ${unit} - ${values[1]} ${unit}` :
-          `Selected Radius: ${values[0]} ${unit}`}
+          `Radius: ${values[0]} ${unit}`}
       </div>
     </div>
   );

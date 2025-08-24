@@ -36,7 +36,7 @@ const arr = [
 
 
 export const FilterSection = () => {
-  const [values, setValues] = useState<number[]>([10]); // Maintaining Range Values
+  const [values, setValues] = useState<number[]>([20]); // Maintaining Range Values
   const [selectedOption, setSelectedOption] = useState<sortType | null>(null); // Maintaining Selected Sort Option
   const [sortOrder, setSortOrder] = useState<string | null>(null); // 'asc', 'desc', or null
   const debouncedRange = useDebounce<number[]>(values, 500);
