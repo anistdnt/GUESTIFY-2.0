@@ -23,7 +23,7 @@ export default async function PopularSearches() {
             {colleges?.map((college: CollegeType, index: number) => (
               <Link
                 key={index}
-                href={`/search?coordinates=${college.location?.coordinates?.join(
+                href={`/search?kmradi=20&coordinates=${college.location?.coordinates?.join(
                   ","
                 )}&clg_name=${college?.college_name}&clg_addr=${
                   college?.address
