@@ -29,6 +29,7 @@ export const API = {
         UPDATE : "/updatePg",
         ADD_ROOM : "addRooms",
         FOR_MAP : "/getPgForMap",
+        GET_PG_NEAR_ME : "/getPgNearMe",
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",

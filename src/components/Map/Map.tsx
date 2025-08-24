@@ -10,6 +10,8 @@ import { MapPin, PushPinSimple } from '@phosphor-icons/react/dist/ssr';
 import { PinPopup } from './PinPopup';
 import { API } from '@/lib/api_const';
 import { Bicycle, Car, PersonSimpleWalk } from '@phosphor-icons/react';
+import { api_caller, ApiReturn } from '@/lib/api_caller';
+import Loadercomp from '../Loader/Loadercomp';
 
 interface MapProps {
   clg_coords?: [number, number];
@@ -89,6 +91,8 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
   const [activePopup, setActivePopup] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [transportMode, setTransportMode] = useState<'car' | 'bike' | 'walk'>('car');
+  const [nearbyPGs, setNearbyPGs] = useState<pgInfo[]>([]);
+  const [loadingNearby, setLoadingNearby] = useState<boolean>(false);
 
   const hasFetchedRef = useRef(false);
 
@@ -97,7 +101,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
 
   useEffect(() => {
     console.log(activePopup)
-  },[activePopup])
+  }, [activePopup])
   // Get user's actual location
   useEffect(() => {
     if (navigator.geolocation) {
@@ -158,6 +162,27 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
     return `${m} min`;
   };
 
+  const fetchNearbyPGs = async () => {
+    if (!userLocation) return;
+    try {
+      setLoadingNearby(true);
+      const res: ApiReturn<any> = await api_caller<any>("GET", `${API.PG.GET_PG_NEAR_ME}?coordinates=${userLocation[0]},${userLocation[1]}`)
+      setNearbyPGs(res.data?.map((pg)=>{
+        return{
+          position: pg?.location?.coordinates,
+          name: pg?.pg_name,
+          address: pg?.address,
+          pg_idno: pg?._id,
+        }
+      })); // store in state
+    } catch (error) {
+      console.error("Error fetching nearby PGs:", error);
+    }finally {
+      setLoadingNearby(false);
+    }
+  };
+
+
   const profileMap: Record<typeof transportMode, string> = {
     car: 'driving-car',
     bike: 'cycling-regular',
@@ -182,119 +207,131 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
         <FullscreenControl position="top-right" />
 
         {/* Distance & Time Info */}
-      {distance !== null && duration !== null && (
+        {distance !== null && duration !== null && (
+          <div
+            style={{
+              position: "absolute",
+              top: 10,
+              left: 10,
+              background: "white",
+              padding: "8px 12px",
+              borderRadius: "6px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              zIndex: 10,
+              fontSize: "14px",
+            }}
+          >
+            <div>
+              <strong>Distance:</strong> {formatDistance(distance)}
+            </div>
+            <div>
+              <strong>Time:</strong> {formatDuration(duration)}
+            </div>
+          </div>
+        )}
+
+        {/* transport options */}
+        {!isMulti && userCoord && clgCoord && (
+          <div
+            style={{
+              position: "absolute",
+              top: 10,
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "white",
+              padding: "6px 12px",
+              borderRadius: "9999px",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              zIndex: 10,
+              display: "flex",
+              gap: "10px",
+              alignItems: "center",
+            }}
+          >
+            {[
+              { mode: "car", icon: <Car size={24} /> },
+              { mode: "bike", icon: <Bicycle size={24} /> },
+              { mode: "walk", icon: <PersonSimpleWalk size={24} /> },
+            ].map(({ mode, icon }) => (
+              <div
+                key={mode}
+                onClick={() => {
+                  setTransportMode(mode as typeof transportMode);
+                  hasFetchedRef.current = false; // trigger refetch
+                }}
+                style={{
+                  background: transportMode === mode ? "#cceaf5" : "transparent",
+                  borderRadius: "50%",
+                  padding: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                {icon}
+              </div>
+            ))}
+          </div>
+        )
+        }
+
+
+
+        {/* Map Style Switcher */}
         <div
           style={{
             position: "absolute",
-            top: 10,
+            bottom: 10,
             left: 10,
             background: "white",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            padding: "6px",
+            borderRadius: "10px",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
             zIndex: 10,
-            fontSize: "14px",
+            display: "flex",
+            gap: "6px",
           }}
         >
-          <div>
-            <strong>Distance:</strong> {formatDistance(distance)}
-          </div>
-          <div>
-            <strong>Time:</strong> {formatDuration(duration)}
-          </div>
-        </div>
-      )}
-
-      {/* transport options */}
-      <div
-        style={{
-          position: "absolute",
-          top: 10,
-          left: "50%",
-          transform: "translateX(-50%)",
-          background: "white",
-          padding: "6px 12px",
-          borderRadius: "9999px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-          zIndex: 10,
-          display: "flex",
-          gap: "10px",
-          alignItems: "center",
-        }}
-      >
-        {[
-          { mode: "car", icon: <Car size={24} /> },
-          { mode: "bike", icon: <Bicycle size={24} /> },
-          { mode: "walk", icon: <PersonSimpleWalk size={24} /> },
-        ].map(({ mode, icon }) => (
-          <div
-            key={mode}
-            onClick={() => {
-              setTransportMode(mode as typeof transportMode);
-              hasFetchedRef.current = false; // trigger refetch
-            }}
-            style={{
-              background: transportMode === mode ? "#cceaf5" : "transparent",
-              borderRadius: "50%",
-              padding: "6px",
-              cursor: "pointer",
-            }}
-          >
-            {icon}
-          </div>
-        ))}
-      </div>
-
-
-
-      {/* Map Style Switcher */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 10,
-          left: 10,
-          background: "white",
-          padding: "6px",
-          borderRadius: "10px",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-          zIndex: 10,
-          display: "flex",
-          gap: "6px",
-        }}
-      >
-        {mapStyles.map((styleItem) => (
-          <div
-            key={styleItem.label}
-            onClick={() => setMapStyle(styleItem.url)}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              width: "50px",
-              padding: "4px",
-              borderRadius: "6px",
-              cursor: "pointer",
-              background:
-                mapStyle === styleItem.url ? "rgba(0, 123, 255, 0.1)" : "transparent",
-              border:
-                mapStyle === styleItem.url ? "2px solid #007bff" : "1px solid transparent",
-              transition: "all 0.2s ease-in-out",
-            }}
-          >
-            <div style={{ fontSize: "18px" }}>{styleItem.icon}</div>
-            <span
+          {mapStyles.map((styleItem) => (
+            <div
+              key={styleItem.label}
+              onClick={() => setMapStyle(styleItem.url)}
               style={{
-                fontSize: "10px",
-                marginTop: "3px",
-                textAlign: "center",
-                lineHeight: "1.1",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "50px",
+                padding: "4px",
+                borderRadius: "6px",
+                cursor: "pointer",
+                background:
+                  mapStyle === styleItem.url ? "rgba(0, 123, 255, 0.1)" : "transparent",
+                border:
+                  mapStyle === styleItem.url ? "2px solid #007bff" : "1px solid transparent",
+                transition: "all 0.2s ease-in-out",
               }}
             >
-              {styleItem.label}
-            </span>
-          </div>
-        ))}
-      </div>
+              <div style={{ fontSize: "18px" }}>{styleItem.icon}</div>
+              <span
+                style={{
+                  fontSize: "10px",
+                  marginTop: "3px",
+                  textAlign: "center",
+                  lineHeight: "1.1",
+                }}
+              >
+                {styleItem.label}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* pg near me button */}
+        <div
+          className="absolute bottom-[70px] right-2 bg-white px-3 py-2 rounded-md cursor-pointer shadow-md z-10"
+          onClick={fetchNearbyPGs}
+        >
+          {loadingNearby ? <Loadercomp size={20} color="buttons"/> : <span>🏠 PGs Near Me</span>}
+        </div>
+
 
         {/* Navigation Control */}
         <NavigationControl position="top-right" />
@@ -305,7 +342,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
         />
 
         {/* User's current location */}
-        {userLocation && (
+        {/* {userLocation && (
           <Marker
             longitude={userLocation[0]}
             latitude={userLocation[1]}
@@ -316,7 +353,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
               <div className="w-4 h-4 bg-[#4285F4] border-[3px] border-white rounded-full shadow-md" />
             </div>
           </Marker>
-        )}
+        )} */}
 
         {/* PG Markers */}
         {isMulti
@@ -371,6 +408,33 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
               )}
             </Marker>
           )}
+
+        {/* PG near me markers */}
+        {nearbyPGs.length !== 0 && nearbyPGs?.map((pg, index) => (
+          <Marker
+            key={`near-${index}`}
+            longitude={pg?.position[1]}
+            latitude={pg?.position[0]}
+            anchor="bottom"
+            onClick={() => setActivePopup(`near-${index}`)}
+          >
+            <div style={{ fontSize: "22px", cursor: "pointer" }}>
+              <MapPin size={28} color="green" weight="fill" />
+            </div>
+            {activePopup === `near-${index}` && (
+              <PinPopup
+                cords={[pg.position[1], pg.position[0]] as [number, number]}
+                name={pg.name}
+                address={pg.address}
+                setActivePopup={setActivePopup}
+                isMulti={true}
+                id={pg.pg_idno}
+                endpoint={API.PG.GET_PG_BY_ID}
+              />
+            )}
+          </Marker>
+        ))}
+
 
         {/* College Marker */}
         {clgCoord && (
