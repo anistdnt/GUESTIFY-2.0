@@ -14,6 +14,7 @@ import { pgInfo } from "../../Map/Map";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import toast from "react-hot-toast";
+import { X } from "@phosphor-icons/react/dist/ssr";
 const Map = dynamic(() => import("../../Map/Map"), { ssr: false }); // <-- Update this path as needed
 const SortComp = dynamic(
   () => import("@/components/Searchbar/Filter/SortComp"),
@@ -155,6 +156,7 @@ export const FilterSection = () => {
           <FilterIcon allowed_query_highlight={['pg_type', 'wifi_available', 'food_available', 'minRent', 'maxRent']} />
           <button
             type="button"
+            data-tooltip="Display Map"
             onClick={() => {
               // Handle map toggle/open here
               setShowMap(!showMap);
@@ -181,18 +183,20 @@ export const FilterSection = () => {
       </div>
       {showMap && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="relative bg-transparent w-[90%] h-[80%] max-w-5xl overflow-hidden">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowMap(false)}
-              className="absolute top-0 right-3 text-white font-bold z-10"
-            >
-              ✕
-            </button>
-
+          
+          <div className="relative bg-transparent w-[90%] h-[80%] max-w-5xl overflow-hidden mt-10">
             {/* Map */}
             <Map pgInfo={pgInfo} clg_coords={coordinates?.split(",").map(Number).reverse() as [number, number]} {...{clg_addr,clg_name,clg_id,clg_pin}} />
           </div>
+          {/* Close Button */}
+            <button
+              onClick={() => setShowMap(false)}
+              className="float-end text-black font-bold z-10 self-start mt-8 bg-white p-2 rounded-full"
+              data-tooltip="Close Map"
+              data-tooltip-pos="bottom"
+            >
+             <X size={25} weight="bold" />
+            </button>
         </div>
       )}
 

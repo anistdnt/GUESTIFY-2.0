@@ -10,7 +10,7 @@ export default function SearchPage({
 }) {
   return (
     <>
-      <div className="bg-gray-100 py-10 flex flex-col gap-5 bg-[url('/assets/contact-us-banner.jpg')]">
+      <div className="bg-gray-100 py-10 flex flex-col gap-5 bg-[url('/assets/about-us-banner.jpg')] bg-fixed">
         <CollegeSection searchParams={searchParams} />
         <Searchbar />
       </div>

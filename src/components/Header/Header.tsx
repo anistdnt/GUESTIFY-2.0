@@ -399,7 +399,7 @@ export default function Header() {
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
                 <div className="relative mt-2">
-                  <button onClick={handleNotification}>
+                  <button onClick={handleNotification} data-tooltip="Notifications" data-tooltip-pos="bottom">
                     <Bell size={24} weight="bold" className="cursor-pointer" />
                   </button>
                   {Array.isArray(notifications) && notifications.length > 0 && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>}

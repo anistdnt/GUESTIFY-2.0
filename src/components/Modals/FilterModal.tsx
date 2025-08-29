@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { RangeSlider } from "../Searchbar/Filter/RangeSlider";
 import { useRouter, useSearchParams } from "next/navigation";
+import Tooltip from "../Forms/Tooltip";
 
 type ModalType = {
   setshowModal: (show: boolean) => void;
@@ -96,7 +97,10 @@ function FilterModal({ setshowModal }: ModalType) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-row justify-between items-center">
-          <h3 className="text-xl">Additional Filters</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-xl">Additional Filters</h3>
+            <Tooltip text="You need to check the Checkbox to apply the filter"/>
+          </div>
           <button
             onClick={() => {
               setshowModal(false);
@@ -117,6 +121,7 @@ function FilterModal({ setshowModal }: ModalType) {
                 onChange={() => toggleFilterEnable("pg_type")}
               />
               <label className="text-gray-700 font-medium">PG Type</label>
+              <Tooltip text="Boys or Girls PG"/>
             </div>
             <Select
               isDisabled={!enabledFilters.pg_type}
@@ -150,6 +155,7 @@ function FilterModal({ setshowModal }: ModalType) {
                 onChange={() => toggleFilterEnable("rent")}
               />
               <label className="text-gray-700 font-medium">Rent Range</label>
+              <Tooltip text="On which rent range you want to search"/>
             </div>
             <div
               className={`${enabledFilters.rent
@@ -181,6 +187,7 @@ function FilterModal({ setshowModal }: ModalType) {
               <label className="text-gray-700 font-medium">
                 Wifi Available
               </label>
+              <Tooltip text="Disable and Enable Toggle indicates 'NO' and 'YES' respectively"/>
             </div>
             <button
               type="button"
@@ -216,6 +223,7 @@ function FilterModal({ setshowModal }: ModalType) {
               <label className="text-gray-700 font-medium">
                 Food Available
               </label>
+              <Tooltip text="Disable and Enable Toggle indicates 'NO' and 'YES' respectively"/>
             </div>
             <button
               type="button"
