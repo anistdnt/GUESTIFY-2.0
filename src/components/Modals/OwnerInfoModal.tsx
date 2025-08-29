@@ -104,9 +104,9 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
                     {ownerInfo?.email}
                   </Link>
                   {ownerInfo?.is_email_verified && (
-                    <SealCheck size={20} color="#0eaf19" weight="fill" />
+                    <span data-tooltip="Verified"><SealCheck size={20} color="#0eaf19" weight="fill"/></span>
                   )}
-                  {ownerInfo?.preferred_contact === "email" && <AddressBook size={20} color="#0eaf19" weight="bold" />}
+                  {ownerInfo?.preferred_contact === "email" && <span data-tooltip="Preffered Contact Medium"><AddressBook size={20} color="#0eaf19" weight="bold" /></span>}
                 </p>
 
                 {/* Phone */}
@@ -119,9 +119,9 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
                     {ownerInfo?.country_code} {ownerInfo?.phone_number}
                   </Link>
                   {ownerInfo?.is_phone_verified && (
-                    <SealCheck size={20} color="#0eaf19" weight="fill" />
+                    <span data-tooltip="Verified"><SealCheck size={20} color="#0eaf19" weight="fill"/></span>
                   )}
-                  {ownerInfo?.preferred_contact === "phone" && <AddressBook size={20} color="#0eaf19" weight="bold" />}
+                  {ownerInfo?.preferred_contact === "phone" && <span data-tooltip="Preffered Contact Medium"><AddressBook size={20} color="#0eaf19" weight="bold" /></span>}
                 </p>
 
                 {/* ALternate Number  */}
@@ -145,7 +145,7 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
                           {ownerInfo?.alt_phone_number}
                         </Link>
                         {ownerInfo?.is_phone_verified && (
-                          <SealCheck size={20} color="#0eaf19" weight="fill" />
+                          <span data-tooltip="Verified"><SealCheck size={20} color="#0eaf19" weight="fill"/></span>
                         )}
                       </p>
                     </div>
@@ -162,7 +162,7 @@ function OwnerInfoModal({ setshowModal, modalData }: ModalType) {
                     >
                       {ownerInfo?.whatsapp_code} {ownerInfo?.whatsapp_number}
                     </Link>
-                    {ownerInfo?.preferred_contact === "whatsapp" && <AddressBook size={20} color="#0eaf19" weight="bold" />}
+                    {ownerInfo?.preferred_contact === "whatsapp" && <span data-tooltip="Preffered Contact Medium"><AddressBook size={20} color="#0eaf19" weight="bold" /></span>}
                   </p>
                 )}
               </div>

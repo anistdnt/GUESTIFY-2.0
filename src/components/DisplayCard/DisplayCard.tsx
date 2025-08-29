@@ -195,7 +195,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
             </p>
             <div className="flex gap-4">
               <button
-                className="bg-buttons text-white px-4 py-2 rounded"
+                className="bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded"
                 onClick={() => {
                   router.push(
                     `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
@@ -211,7 +211,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
                 View full details
               </button>
               <button
-                className="bg-buttonsSecondary text-white px-4 py-2 rounded"
+                className="bg-buttonsSecondary hover:bg-buttons text-white px-4 py-2 rounded"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
