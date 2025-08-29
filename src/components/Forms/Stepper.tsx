@@ -2,6 +2,7 @@
 import { RootState } from "@/redux/store";
 import { Check } from "@phosphor-icons/react/dist/ssr";
 import { Form, getIn, setIn } from "formik";
+import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -12,7 +13,17 @@ type StepperProps = {
 };
 
 const stepFields = [
-  ["contact_details.country_code", "contact_details.phone_number", "contact_details.alt_country_code", "contact_details.alt_phone_number", "contact_details.whatsapp_code", "contact_details.whatsapp_number", "contact_details.same_as_phone", "contact_details.preferred_contact", "contact_details.email"],
+  [
+    "contact_details.country_code",
+    "contact_details.phone_number",
+    "contact_details.alt_country_code",
+    "contact_details.alt_phone_number",
+    "contact_details.whatsapp_code",
+    "contact_details.whatsapp_number",
+    "contact_details.same_as_phone",
+    "contact_details.preferred_contact",
+    "contact_details.email",
+  ],
   [
     "pg_name",
     "street_name",
@@ -36,41 +47,44 @@ export default function Stepper({ steps, helpers }: StepperProps) {
   const reduxAuthVerification = useSelector(
     (state: RootState) => state.auth_verification_slice
   );
+  const reduxUserData = useSelector((state: RootState) => state.user_slice);
+  const router = useRouter();
 
   const handleNext = async (
-  index: number,
-  validateForm: any,
-  errors: any,
-  touched: any,
-  setTouched: any
-) => {
-  const fieldsToValidate = stepFields[index];
+    index: number,
+    validateForm: any,
+    errors: any,
+    touched: any,
+    setTouched: any
+  ) => {
+    const fieldsToValidate = stepFields[index];
 
-  // Mark fields as touched
-  let touchedMap: any = { ...touched };
-  fieldsToValidate.forEach((f) => {
-    touchedMap = setIn(touchedMap, f, true);
-  });
-  setTouched(touchedMap);
+    // Mark fields as touched
+    let touchedMap: any = { ...touched };
+    fieldsToValidate.forEach((f) => {
+      touchedMap = setIn(touchedMap, f, true);
+    });
+    setTouched(touchedMap);
 
-  const allErrors = await validateForm();
+    const allErrors = await validateForm();
 
-  // Use getIn to handle nested fields
-  const hasErrors = fieldsToValidate.some((field) => !!getIn(allErrors, field));
+    // Use getIn to handle nested fields
+    const hasErrors = fieldsToValidate.some(
+      (field) => !!getIn(allErrors, field)
+    );
 
-  if (!hasErrors) {
-    if(!reduxAuthVerification?.isPhoneVerified){
-      toast.error("Please verify your phone number before proceeding.");
-      return;
+    if (!hasErrors) {
+      if (!reduxAuthVerification?.isPhoneVerified) {
+        toast.error("Please verify your phone number before proceeding.");
+        return;
+      }
+      if (!reduxAuthVerification?.isEmailVerified) {
+        toast.error("Please verify your email address before proceeding.");
+        return;
+      }
+      setCurrentStep((s) => s + 1);
     }
-    if(!reduxAuthVerification?.isEmailVerified){
-      toast.error("Please verify your email address before proceeding.");
-      return;
-    }
-    setCurrentStep((s) => s + 1);
-  }
-};
-
+  };
 
   useEffect(() => {
     window?.scrollTo({ top: 0, behavior: "smooth" });
@@ -146,27 +160,38 @@ export default function Stepper({ steps, helpers }: StepperProps) {
         )}
 
         {!isLast ? (
-          <button
-            type="button"
-            onClick={() => {
-              handleNext(
-                currentStep,
-                helpers?.validateForm,
-                helpers?.errors,
-                helpers?.touched,
-                helpers?.setTouched
-              );
-              //   setCurrentStep((s) => s + 1);
-            }}
-            className="ml-auto bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition"
-          >
-            Next
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                handleNext(
+                  currentStep,
+                  helpers?.validateForm,
+                  helpers?.errors,
+                  helpers?.touched,
+                  helpers?.setTouched
+                );
+                //   setCurrentStep((s) => s + 1);
+              }}
+              className="ml-auto bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                router.push(`/profile/${reduxUserData?.userData?._id}/mypg`);
+              }}
+              className="ml-auto bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+            >
+              Cancel
+            </button>
+          </div>
         ) : (
           <button
             type="submit"
-            onClick={()=>{
-                helpers?.submitForm();
+            onClick={() => {
+              helpers?.submitForm();
             }}
             className="ml-auto bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
           >
