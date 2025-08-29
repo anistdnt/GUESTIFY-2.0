@@ -3,7 +3,7 @@ import { API } from "@/lib/api_const";
 import { CollegeType } from "@/types/college";
 import Link from "next/link";
 import React from "react";
-import toast from "react-hot-toast";
+import NoDataFound from "../NoDataFound/NoDataFound";
 
 export default async function PopularSearches() {
   try {
@@ -38,10 +38,10 @@ export default async function PopularSearches() {
       );
     } else {
       console.error("API call failed or returned no data:", resData);
-      toast.error("Error While Loading Popular College Section");
+      return <NoDataFound text="No Popular Colleges are found" />;
     }
   } catch (error) {
     console.error("Failed to fetch College details:", error);
-    toast.error("Error While Loading Popular College Section");
+    return <NoDataFound text="Something went wrong while fetching Data" />;
   }
 }
