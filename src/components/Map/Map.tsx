@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { use, useEffect, useMemo, useRef, useState } from 'react';
 import Map, { Marker, Popup, Source, Layer } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import axios from 'axios';
@@ -12,6 +12,7 @@ import { API } from '@/lib/api_const';
 import { Bicycle, Car, PersonSimpleWalk } from '@phosphor-icons/react';
 import { api_caller, ApiReturn } from '@/lib/api_caller';
 import Loadercomp from '../Loader/Loadercomp';
+import toast from 'react-hot-toast';
 
 interface MapProps {
   clg_coords?: [number, number];
@@ -166,29 +167,44 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
     if (!userLocation) return;
     try {
       setLoadingNearby(true);
+
       const res: ApiReturn<any> = await api_caller<any>("GET", `${API.PG.GET_PG_NEAR_ME}?coordinates=${userLocation[0]},${userLocation[1]}`)
-      setNearbyPGs(res.data?.map((pg)=>{
-        return{
-          position: pg?.location?.coordinates,
-          name: pg?.pg_name,
-          address: pg?.address,
-          pg_idno: pg?._id,
+      // const res: ApiReturn<any> = await api_caller<any>("GET", `${API.PG.GET_PG_NEAR_ME}?coordinates=88.4167053,22.6149746`)
+      if (res.success) {
+        if(isMulti){
+
+          setNearbyPGs(res.data?.filter((pg) => !(pgInfo as pgInfo[]).some((info) => info.pg_idno === pg._id))?.map((pg) => {
+            return {
+              position: pg?.location?.coordinates,
+              name: pg?.pg_name,
+              address: pg?.address,
+              pg_idno: pg?._id,
+            }
+          }));
+        }else{
+          setNearbyPGs(res.data?.filter((pg) => (pgInfo as pgInfo)?.pg_idno !== pg._id)?.map((pg) => {
+            return {
+              position: pg?.location?.coordinates,
+              name: pg?.pg_name,
+              address: pg?.address,
+              pg_idno: pg?._id,
+            }
+          }));
         }
-      })); // store in state
+        toast.success(res.message)
+      }
     } catch (error) {
       console.error("Error fetching nearby PGs:", error);
-    }finally {
+    } finally {
       setLoadingNearby(false);
     }
   };
-
 
   const profileMap: Record<typeof transportMode, string> = {
     car: 'driving-car',
     bike: 'cycling-regular',
     walk: 'foot-walking',
   };
-
 
   return (
     <div style={{ height: "500px", width: "90%", position: "relative" }}>
@@ -329,7 +345,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
           className="absolute bottom-[70px] right-2 bg-white px-3 py-2 rounded-md cursor-pointer shadow-md z-10"
           onClick={fetchNearbyPGs}
         >
-          {loadingNearby ? <Loadercomp size={20} color="buttons"/> : <span>🏠 PGs Near Me</span>}
+          {loadingNearby ? <Loadercomp size={20} color="buttons" /> : <span>🏠 PGs Near Me</span>}
         </div>
 
 
@@ -413,17 +429,17 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
         {nearbyPGs.length !== 0 && nearbyPGs?.map((pg, index) => (
           <Marker
             key={`near-${index}`}
-            longitude={pg?.position[1]}
-            latitude={pg?.position[0]}
+            longitude={pg?.position[0]}
+            latitude={pg?.position[1]}
             anchor="bottom"
             onClick={() => setActivePopup(`near-${index}`)}
           >
             <div style={{ fontSize: "22px", cursor: "pointer" }}>
-              <MapPin size={28} color="green" weight="fill" />
+              <MapPin size={28} color="#ac8720" weight="fill" />
             </div>
             {activePopup === `near-${index}` && (
               <PinPopup
-                cords={[pg.position[1], pg.position[0]] as [number, number]}
+                cords={[pg.position[0], pg.position[1]] as [number, number]}
                 name={pg.name}
                 address={pg.address}
                 setActivePopup={setActivePopup}
