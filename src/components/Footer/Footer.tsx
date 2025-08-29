@@ -46,6 +46,16 @@ const Footer = () => {
                 Contact
               </Link>
             </li>
+            <li>
+              <Link href="/login" className="underline-offset-2 hover:underline">
+                Login
+              </Link>
+            </li>
+            <li>
+              <Link href="/signup" className="underline-offset-2 hover:underline">
+                Sign Up
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -69,18 +79,18 @@ const Footer = () => {
       <hr/>
       {/* Social Media */}
       <div className="mt-4 flex justify-center gap-6">
-        <a href="#" className="hover:text-buttons">
+        <Link href="#" className="hover:text-buttons" data-tooltip="Facebook" data-tooltip-pos="top">
           <FacebookLogo size={28} />
-        </a>
-        <a href="#" className="hover:text-buttons">
+        </Link>
+        <Link href="#" className="hover:text-buttons" data-tooltip="Instagram" data-tooltip-pos="top">
           <InstagramLogo size={28} />
-        </a>
-        <a href="#" className="hover:text-buttons">
+        </Link>
+        <Link href="#" className="hover:text-buttons" data-tooltip="Twitter" data-tooltip-pos="top">
           <TwitterLogo size={28} />
-        </a>
-        <a href="#" className="hover:text-buttons">
+        </Link>
+        <Link href="#" className="hover:text-buttons" data-tooltip="Linked In" data-tooltip-pos="top">
           <LinkedinLogo size={28} />
-        </a>
+        </Link>
       </div>
 
 

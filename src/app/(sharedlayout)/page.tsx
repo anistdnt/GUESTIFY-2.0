@@ -12,7 +12,7 @@ export default function Home() {
       {/* Hero Section  */}
       <HeroSection />
 
-      <div className="bg-gray-100 py-16">
+      <div id="searchbar" className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Section Header */}
           <div className="text-center mb-8">
