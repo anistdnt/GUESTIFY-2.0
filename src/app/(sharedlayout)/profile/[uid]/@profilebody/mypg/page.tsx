@@ -64,8 +64,10 @@ const Page = () => {
           onClick={handleRoute}
           title="Add PG"
         >
-          <p className="me-3">Add PG</p>
-          <Plus size={20} weight="bold" />
+          <div data-tooltip="Add New Paying Guest" className="flex justify-center items-center gap-2">
+            <p className="me-3">Add PG</p>
+            <Plus size={20} weight="bold" />
+          </div>
         </button>
       </div>
     );

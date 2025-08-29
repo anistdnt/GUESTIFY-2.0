@@ -13,7 +13,30 @@ import { setUserData } from "@/redux/slices/userSlice";
 import { getCookie, setCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
-import { Trash } from "@phosphor-icons/react/dist/ssr";
+import {
+  FloppyDisk,
+  Pencil,
+  Trash,
+  XCircle,
+} from "@phosphor-icons/react/dist/ssr";
+import Select from "react-select";
+
+const districtOptions = [
+  { value: "india", label: "India" },
+  { value: "usa", label: "USA" },
+  { value: "hoogly", label: "Hoogly" },
+];
+
+const genderOptions = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+];
+
+const languageOptions = [
+  { value: "english", label: "English" },
+  { value: "hindi", label: "Hindi" },
+  { value: "bengali", label: "Bengali" },
+];
 
 const Page = () => {
   const reduxUserData = useSelector(
@@ -148,28 +171,30 @@ const Page = () => {
               {isEditing ? (
                 <div className="flex flex-row justify-center items-center gap-5">
                   <button
-                    className="w-[93px] h-[44px] mt-6 px-6 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+                    className="mt-6 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-2"
                     type="submit"
                   >
-                    Save
+                    <FloppyDisk size={25} color="#ffffff" weight="fill" />
+                    <span>Save</span>
                   </button>
                   <button
-                    className="w-[93px] h-[44px] mt-6 px-6 bg-black/70 text-white rounded-lg hover:bg-black/80"
+                    className="mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80 flex justify-center items-center gap-2"
                     onClick={() => {
                       formik.resetForm();
                       setIsEditing(false);
                     }}
                   >
-                    Cancel
+                    <XCircle size={25} color="#ffffff" weight="fill" />
+                    <span>Cancel</span>
                   </button>
                 </div>
               ) : (
                 <button
-                  className="flex items-center justify-center w-[93px] h-[44px] mt-6 px-6 bg-black/70 text-white rounded-lg hover:bg-black/80"
+                  className="flex items-center justify-center gap-2 mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80"
                   onClick={() => setIsEditing(true)}
                 >
-                  <i className="fa-solid fa-pen-to-square text-[14px] mr-3 mb-1"></i>{" "}
-                  Edit
+                  <Pencil size={25} color="#ffffff" weight="fill" />
+                  <span>Edit</span>
                 </button>
               )}
             </div>
@@ -249,21 +274,40 @@ const Page = () => {
 
             <div>
               <label className="block text-gray-700 font-medium">Gender</label>
-              <select
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.gender && formik.errors.gender
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                disabled={!isEditing}
+              <Select
+                className="mt-2"
+                isDisabled={!isEditing}
                 name="gender"
-                value={formik.values.gender}
-                onChange={formik.handleChange}
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
+                options={genderOptions}
+                value={
+                  genderOptions.find(
+                    (option) => option.value === formik.values.gender
+                  ) || null
+                }
+                onChange={(option) =>
+                  formik.setFieldValue("gender", option?.value)
+                }
+                onBlur={() => formik.setFieldTouched("gender", true)}
+                placeholder="Select Gender"
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    borderRadius: "0.5rem", // rounded-lg
+                    padding: "6px",
+                    borderColor:
+                      formik.touched.gender && formik.errors.gender
+                        ? "#ef4444" // Tailwind red-500
+                        : "#d1d5db", // Tailwind gray-300
+                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // Tailwind gray-600 focus ring
+                    "&:hover": {
+                      borderColor:
+                        formik.touched.gender && formik.errors.gender
+                          ? "#ef4444"
+                          : "#9ca3af", // Tailwind gray-400
+                    },
+                  }),
+                }}
+              />
               {formik.touched.gender && formik.errors.gender ? (
                 <div className="text-red-500 text-sm mt-1">
                   {formik.errors.gender}
@@ -273,22 +317,40 @@ const Page = () => {
 
             <div>
               <label className="block text-gray-700 font-medium">Country</label>
-              <select
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.district && formik.errors.district
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                disabled={!isEditing}
+              <Select
+                className="mt-2 w-full"
+                isDisabled={!isEditing}
                 name="district"
-                value={formik.values.district}
-                onChange={formik.handleChange}
-              >
-                <option value="">Select Country</option>
-                <option value="india">India</option>
-                <option value="usa">USA</option>
-                <option value="hoogly">Hoogly</option>
-              </select>
+                options={districtOptions}
+                value={
+                  districtOptions.find(
+                    (option) => option.value === formik.values.district
+                  ) || null
+                }
+                onChange={(option) =>
+                  formik.setFieldValue("district", option?.value)
+                }
+                onBlur={() => formik.setFieldTouched("district", true)}
+                placeholder="Select Country"
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    borderRadius: "0.5rem", // rounded-lg
+                    padding: "6px",
+                    borderColor:
+                      formik.touched.district && formik.errors.district
+                        ? "#ef4444" // red-500
+                        : "#d1d5db", // gray-300
+                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
+                    "&:hover": {
+                      borderColor:
+                        formik.touched.district && formik.errors.district
+                          ? "#ef4444"
+                          : "#9ca3af", // gray-400
+                    },
+                  }),
+                }}
+              />
               {formik.touched.district && formik.errors.district ? (
                 <div className="text-red-500 text-sm mt-1">
                   {formik.errors.district}
@@ -300,23 +362,43 @@ const Page = () => {
               <label className="block text-gray-700 font-medium">
                 Language
               </label>
-              <select
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.mother_tongue && formik.errors.mother_tongue
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                disabled={!isEditing}
+              <Select
+                className="mt-2 w-full"
+                isDisabled={!isEditing}
                 name="mother_tongue"
-                value={formik.values.mother_tongue}
-                onChange={formik.handleChange}
-              >
-                <option value="">Select Language</option>
-                <option value="english">English</option>
-                <option value="spanish">Spanish</option>
-                <option value="hindi">Hindi</option>
-                <option value="benagli">Bengali</option>
-              </select>
+                options={languageOptions}
+                value={
+                  languageOptions.find(
+                    (option) => option.value === formik.values.mother_tongue
+                  ) || null
+                }
+                onChange={(option) =>
+                  formik.setFieldValue("mother_tongue", option?.value)
+                }
+                onBlur={() => formik.setFieldTouched("mother_tongue", true)}
+                placeholder="Select Language"
+                isSearchable // 🔎 makes it searchable
+                styles={{
+                  control: (base, state) => ({
+                    ...base,
+                    borderRadius: "0.5rem", // rounded-lg
+                    padding: "6px",
+                    borderColor:
+                      formik.touched.mother_tongue &&
+                      formik.errors.mother_tongue
+                        ? "#ef4444" // red-500
+                        : "#d1d5db", // gray-300
+                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
+                    "&:hover": {
+                      borderColor:
+                        formik.touched.mother_tongue &&
+                        formik.errors.mother_tongue
+                          ? "#ef4444"
+                          : "#9ca3af", // gray-400
+                    },
+                  }),
+                }}
+              />
               {formik.touched.mother_tongue && formik.errors.mother_tongue ? (
                 <div className="text-red-500 text-sm mt-1">
                   {formik.errors.mother_tongue}
@@ -399,9 +481,12 @@ const Page = () => {
           <button
             className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
             onClick={() => {
-              toast.success("You are redirecting to the Reset Password Page")
+              toast.success("You are redirecting to the Reset Password Page");
               setTimeout(() => {
-                window?.open(`/reset-password/${getCookie("authToken")}`,'_blank')
+                window?.open(
+                  `/reset-password/${getCookie("authToken")}`,
+                  "_blank"
+                );
               }, 2000);
             }}
           >
