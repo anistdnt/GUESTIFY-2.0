@@ -1,6 +1,6 @@
 "use client";
 import { Field, ErrorMessage, useFormikContext } from "formik";
-import Select from "react-select";
+import Select, { components } from "react-select";
 import { use, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +15,7 @@ import {
   setPhoneVerified,
 } from "@/redux/slices/authVerifiactionSlice";
 import Tooltip from "./Tooltip";
+import { countryCodes } from "@/data/countryPhone";
 
 export default function ContactDetails({ caption }: { caption?: string }) {
   // Get user data from Redux store
@@ -27,13 +28,13 @@ export default function ContactDetails({ caption }: { caption?: string }) {
   const { setFieldValue, values } = useFormikContext<any>();
   const dispatch = useDispatch();
 
-  const countryCodes = [
-    { label: "+91 (India)", value: "+91" },
-    { label: "+1 (USA)", value: "+1" },
-    { label: "+44 (UK)", value: "+44" },
-    { label: "+61 (Australia)", value: "+61" },
-    { label: "+81 (Japan)", value: "+81" },
-  ];
+  // const countryCodes = [
+  //   { label: "+91 (India)", value: "+91" },
+  //   { label: "+1 (USA)", value: "+1" },
+  //   { label: "+44 (UK)", value: "+44" },
+  //   { label: "+61 (Australia)", value: "+61" },
+  //   { label: "+81 (Japan)", value: "+81" },
+  // ];
 
   // initialize redux state for phone and email verification
   useEffect(() => {
@@ -169,6 +170,32 @@ export default function ContactDetails({ caption }: { caption?: string }) {
     }
   };
 
+  const CountryOption = (props: any) => (
+    <components.Option {...props}>
+      <div className="flex items-center gap-2">
+        <img
+          src={props.data.flagUrl}
+          alt={props.data.label}
+          className="w-5 h-5 object-cover rounded-sm"
+        />
+        <span>{props.data.value}</span>
+      </div>
+    </components.Option>
+  );
+
+  const CountrySingleValue = (props: any) => (
+    <components.SingleValue {...props}>
+      <div className="flex items-center gap-2">
+        <img
+          src={props.data.flagUrl}
+          alt={props.data.label}
+          className="w-5 h-5 object-cover rounded-sm"
+        />
+        <span>{props.data.value}</span>
+      </div>
+    </components.SingleValue>
+  );
+
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -204,6 +231,10 @@ export default function ContactDetails({ caption }: { caption?: string }) {
                   setFieldValue("contact_details.country_code", option?.value)
                 }
                 placeholder="Code"
+                components={{
+                  Option: CountryOption,
+                  SingleValue: CountrySingleValue,
+                }}
               />
             </div>
             <Field
@@ -262,6 +293,10 @@ export default function ContactDetails({ caption }: { caption?: string }) {
                   )
                 }
                 placeholder="Code"
+                components={{
+                  Option: CountryOption,
+                  SingleValue: CountrySingleValue,
+                }}
               />
             </div>
             <Field
@@ -291,6 +326,10 @@ export default function ContactDetails({ caption }: { caption?: string }) {
                   setFieldValue("contact_details.whatsapp_code", option?.value)
                 }
                 placeholder="Code"
+                components={{
+                  Option: CountryOption,
+                  SingleValue: CountrySingleValue,
+                }}
                 isDisabled={values.contact_details.same_as_phone}
               />
             </div>

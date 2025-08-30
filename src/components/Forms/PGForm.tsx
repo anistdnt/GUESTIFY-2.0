@@ -3,6 +3,8 @@ import { Field, ErrorMessage, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import Select from "react-select";
+import { yesNoOptions, PGType, districtOptions, stateOptions } from "@/data/countryPhone";
+import Tooltip from "./Tooltip";
 
 export default function PGForm({
   caption,
@@ -29,65 +31,6 @@ export default function PGForm({
     },
   });
 
-  const yesNoOptions = [
-    { label: "Yes", value: "yes" },
-    { label: "No", value: "no" },
-  ];
-
-  const districtOptions = [
-    // West Bengal districts
-    { label: "Kolkata", value: "kolkata" },
-    { label: "Howrah", value: "howrah" },
-    { label: "Darjeeling", value: "darjeeling" },
-    { label: "Siliguri", value: "siliguri" },
-    { label: "Hooghly", value: "hooghly" },
-
-    // Assam districts
-    { label: "Guwahati", value: "guwahati" },
-    { label: "Dibrugarh", value: "dibrugarh" },
-    { label: "Silchar", value: "silchar" },
-
-    // Bihar districts
-    { label: "Patna", value: "patna" },
-    { label: "Gaya", value: "gaya" },
-    { label: "Muzaffarpur", value: "muzaffarpur" },
-  ];
-
-  const stateOptions = [
-    { label: "West Bengal", value: "West Bengal" },
-    { label: "Assam", value: "Assam" },
-    { label: "Bihar", value: "Bihar" },
-    { label: "Odisha", value: "Odisha" },
-    { label: "Jharkhand", value: "Jharkhand" },
-    { label: "Uttar Pradesh", value: "Uttar Pradesh" },
-    { label: "Maharashtra", value: "Maharashtra" },
-    { label: "Karnataka", value: "Karnataka" },
-    { label: "Tamil Nadu", value: "Tamil Nadu" },
-    { label: "Kerala", value: "Kerala" },
-    { label: "Telangana", value: "Telangana" },
-    { label: "Andhra Pradesh", value: "Andhra Pradesh" },
-    { label: "Madhya Pradesh", value: "Madhya Pradesh" },
-    { label: "Rajasthan", value: "Rajasthan" },
-    { label: "Punjab", value: "Punjab" },
-    { label: "Haryana", value: "Haryana" },
-    { label: "Delhi", value: "Delhi" },
-  ];
-
-  const PGType = [
-    {
-      label: "Boys",
-      value: "boys",
-    },
-    {
-      label: "Girls",
-      value: "girls",
-    },
-    {
-      label: "Both",
-      value: "both",
-    },
-  ];
-
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -107,9 +50,10 @@ export default function PGForm({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
-          <label className="block mb-1 font-medium">
-            Name of the Paying Guest House{" "}
+          <label className="mb-1 font-medium flex items-center gap-1">
+            <span>Name of the Paying Guest House</span>
             <span className="text-red-600 font-semibold">*</span>
+            <Tooltip text="The end user will see this name on map"/>
           </label>
           <Field
             name="pg_name"
@@ -198,7 +142,7 @@ export default function PGForm({
           </label>
           <Field
             name="pincode"
-            placeholder="eg : 7000"
+            placeholder="eg : 700001"
             className="p-2 border rounded w-full"
           />
           <ErrorMessage
@@ -209,8 +153,10 @@ export default function PGForm({
         </div>
 
         <div>
-          <label className="block mb-1 font-medium">
-            Type of PG <span className="text-red-600 font-semibold">*</span>
+          <label className="flex items-center gap-1 mb-1 font-medium">
+            <span>Type of PG</span>
+            <span className="text-red-600 font-semibold">*</span>
+            <Tooltip text="Who can accomodate this PG"/>
           </label>
           <Select
             options={PGType}
@@ -225,7 +171,7 @@ export default function PGForm({
           />
         </div>
 
-        <div>
+        <div className="col-span-2">
           <label className="block mb-1 font-medium">
             WiFi Availability{" "}
             <span className="text-red-600 font-semibold">*</span>
