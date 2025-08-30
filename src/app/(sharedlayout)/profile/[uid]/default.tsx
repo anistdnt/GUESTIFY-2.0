@@ -76,7 +76,13 @@ export default function Profile() {
             href={`/profile/${uid}/mypg`}
             className={linkClass(`/profile/${uid}/mypg`)}
           >
-            My PG
+            My Enlisted PGs
+          </Link>
+          <Link
+            href={`/profile/${uid}/stats`}
+            className={linkClass(`/profile/${uid}/stats`)}
+          >
+            Statistics
           </Link>
         </div>
 
