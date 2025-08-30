@@ -13,6 +13,7 @@ import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { base64ToFile } from "@/lib/imageConvert";
 import ContactDetails from "@/components/Forms/ContactDetails";
+import HeaderSection from "@/components/Forms/FormHeaderSections/HeaderSection";
 
 export default function PGFormWrapper() {
   const reduxUserData = useSelector(
@@ -55,7 +56,7 @@ export default function PGFormWrapper() {
           reduxAuthVerification?.isEmailVerified ? "true" : "false"
         );
         formData.append(
-          "contact_details[image_url]", 
+          "contact_details[image_url]",
           reduxUserData?.image_url || ""
         );
         formData.append(
@@ -115,6 +116,8 @@ export default function PGFormWrapper() {
 
   return (
     <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
+      <HeaderSection/>
+      <hr className="my-4 border-gray-200" />
       <Formik
         initialValues={PGValidationSchema?.initials}
         validationSchema={PGValidationSchema?.validation}

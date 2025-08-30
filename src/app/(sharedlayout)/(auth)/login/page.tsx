@@ -58,6 +58,7 @@ const Login = () => {
       setCookie("authToken", res.data?.token, {
         maxAge: 2 * 60 * 60, //2 hours
       });
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
       dispatch(setLoading({loading:false}))
       router.push("/");
       toast.success(res.message || "Loggged In successfully");
@@ -108,6 +109,7 @@ const Login = () => {
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
                 {!showPassToggle ? (
+                  <span data-tooltip="Password not visible">
                   <EyeSlash
                     size={24}
                     className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
@@ -115,7 +117,9 @@ const Login = () => {
                       setshowPassToggle(true);
                     }}
                   />
+                  </span>
                 ) : (
+                  <span data-tooltip="Password visible">
                   <Eye
                     size={24}
                     className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
@@ -123,6 +127,7 @@ const Login = () => {
                       setshowPassToggle(false);
                     }}
                   />
+                  </span>
                 )}
               </div>
               {passwordError && (

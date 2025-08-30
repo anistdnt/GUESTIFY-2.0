@@ -8,6 +8,7 @@ import { useDebounce } from "@/lib/useDebounce";
 import NoDataFound from "../NoDataFound/NoDataFound";
 import { useRouter } from "next/navigation";
 import { CollegeListSkeleton } from "./CollegeListSkeleton";
+import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 
 
 const ExpandedComp = memo(
@@ -114,7 +115,7 @@ const Searchbar = () => {
     <div>
       {/* <Districts /> */}
       <div className="mx-auto flex flex-col p-2 lg:w-3/5 bg-white rounded-md">
-        <div className="flex items-center border w-full rounded-lg">
+        <div className="flex items-center border w-full rounded-lg px-4 gap-2">
           {/* <Select
             value={selectedOption}
             onChange={setSelectedOption}
@@ -125,6 +126,7 @@ const Searchbar = () => {
               { label: "College", value: "college" },
             ]}
           /> */}
+          <MagnifyingGlass size={20} color="#7d7d7d"/>
           <input
             type="text"
             // placeholder={
@@ -133,7 +135,7 @@ const Searchbar = () => {
             //     : "Search By Location"
             // }
             placeholder="Search By College Name"
-            className="w-full px-4 py-2 focus:outline-none"
+            className="w-full pe-4 py-2 focus:outline-none"
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
           />

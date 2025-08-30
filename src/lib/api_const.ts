@@ -16,6 +16,7 @@ export const API = {
         CHANGE_PASSWORD : "/changePassword",
         DELETE_ACCOUNT : "/deleteAccount",
         GET_PGs : "/getPg/user",
+        GET_STATS : "/getStats"
     },
     COLLEGE: {
         LIST : "/getAllColleges",

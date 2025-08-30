@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { hideModal, setModalVisibility } from "@/redux/slices/modalSlice";
 import { setLoading } from "@/redux/slices/loaderSlice";
-import { SealCheck } from "@phosphor-icons/react/dist/ssr";
+import { SealCheck, SealQuestion } from "@phosphor-icons/react/dist/ssr";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { RootState } from "@/redux/store";
@@ -14,6 +14,7 @@ import {
   setEmailVerified,
   setPhoneVerified,
 } from "@/redux/slices/authVerifiactionSlice";
+import Tooltip from "./Tooltip";
 
 export default function ContactDetails({ caption }: { caption?: string }) {
   // Get user data from Redux store
@@ -38,7 +39,11 @@ export default function ContactDetails({ caption }: { caption?: string }) {
   useEffect(() => {
     dispatch(setPhoneVerified(values.contact_details.is_phone_verified));
     dispatch(setEmailVerified(values.contact_details.is_email_verified));
-  },[dispatch, values.contact_details.is_phone_verified, values.contact_details.is_email_verified]);
+  }, [
+    dispatch,
+    values.contact_details.is_phone_verified,
+    values.contact_details.is_email_verified,
+  ]);
 
   // Auto-fill WhatsApp number if toggle is checked
   useEffect(() => {
@@ -59,18 +64,21 @@ export default function ContactDetails({ caption }: { caption?: string }) {
   ]);
 
   // === Phone Verified would be false if the phone muber changes ===
-  useEffect(()=>{
-    if(reduxAuthVerification?.isPhoneVerified){
-      dispatch(setPhoneVerified(false))
+  useEffect(() => {
+    if (reduxAuthVerification?.isPhoneVerified) {
+      dispatch(setPhoneVerified(false));
     }
-  },[values.contact_details.phone_number,values.contact_details.country_code])
+  }, [
+    values.contact_details.phone_number,
+    values.contact_details.country_code,
+  ]);
 
   // ==== Email verified would be false if email changes
-  useEffect(()=>{
-    if(reduxAuthVerification?.isEmailVerified){
-      dispatch(setEmailVerified(false))
+  useEffect(() => {
+    if (reduxAuthVerification?.isEmailVerified) {
+      dispatch(setEmailVerified(false));
     }
-  },[values.contact_details.email])
+  }, [values.contact_details.email]);
 
   const handleValidationPhone = async (value: string) => {
     const phoneRegex = /^[0-9]{10}$/;
@@ -168,7 +176,9 @@ export default function ContactDetails({ caption }: { caption?: string }) {
   return (
     <>
       <div className="mb-10">
-        <h2 className="text-2xl font-bold text-gray-800">{caption ?? 'Contact Details'}</h2>
+        <h2 className="text-2xl font-bold text-gray-800">
+          {caption ?? "Contact Details"}
+        </h2>
         <p className="text-gray-600">
           Please provide valid contact information for verification purposes.
         </p>
@@ -177,8 +187,11 @@ export default function ContactDetails({ caption }: { caption?: string }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Primary Phone Number */}
         <div className="">
-          <label className="block mb-1 font-medium">
-            Phone Number <span className="text-red-600 font-semibold">*</span>
+          <label className="flex items-center gap-1 mb-1 font-medium">
+            Phone Number <span className="text-red-600 font-semibold">*</span>{" "}
+            <span>
+              <Tooltip text="You Need to verify your primary mobile number" />
+            </span>
           </label>
           <div className="flex gap-2">
             <div className="w-32">
@@ -216,7 +229,10 @@ export default function ContactDetails({ caption }: { caption?: string }) {
                   <span>Verified</span>
                 </div>
               ) : (
-                "Verify"
+                <div className="flex justify-center items-center gap-2">
+                  <SealQuestion size={20} color="#ffffff" weight="fill" />
+                  <span>Verify</span>
+                </div>
               )}
             </button>
           </div>
@@ -294,8 +310,11 @@ export default function ContactDetails({ caption }: { caption?: string }) {
 
       {/* Email Field */}
       <div className="mb-4">
-        <label className="block mb-1 font-medium">
-          Email Address <span className="text-red-600 font-semibold">*</span>
+        <label className="flex items-center gap-1 mb-1 font-medium">
+          Email Address <span className="text-red-600 font-semibold">*</span>{" "}
+          <span>
+            <Tooltip text="You Need to verify your email address" />
+          </span>
         </label>
         <div className="flex gap-2">
           <Field
@@ -319,7 +338,10 @@ export default function ContactDetails({ caption }: { caption?: string }) {
                 <span>Verified</span>
               </div>
             ) : (
-              "Verify"
+              <div className="flex justify-center items-center gap-2">
+                <SealQuestion size={20} color="#ffffff" weight="fill" />
+                <span>Verify</span>
+              </div>
             )}
           </button>
         </div>
@@ -332,8 +354,11 @@ export default function ContactDetails({ caption }: { caption?: string }) {
 
       {/* Preferred Contact Method */}
       <div className="mb-4">
-        <label className="block mb-1 font-medium">
-          Preferred Contact Method
+        <label className="flex items-center gap-1 mb-1 font-medium">
+          Preferred Contact Method{" "}
+          <span>
+            <Tooltip text="Always try to contact with the owner via the selected contact method" />
+          </span>
         </label>
         <div className="flex gap-4">
           <label className="flex items-center gap-2">

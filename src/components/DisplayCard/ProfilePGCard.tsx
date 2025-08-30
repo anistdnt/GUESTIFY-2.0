@@ -1,11 +1,12 @@
 "use client";
 import Image from "next/image";
 import Rating from "../Rating/Rating";
-import { CurrencyInr, MapPin } from "@phosphor-icons/react/dist/ssr";
+import { CurrencyInr, MapPin, Pencil, Trash } from "@phosphor-icons/react/dist/ssr";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
 import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { formatDate } from "@/lib/utils/utilities";
 
 type Props = {
   item?: PGData;
@@ -177,14 +178,14 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
 
           <div className="flex flex-row flex-wrap gap-3 justify-between items-center text-sm text-gray-500 mt-3">
             <p className="flex flex-row justify-center items-center gap-2">
-              <span>
+              {/* <span>
                 <MapPin size={18} weight="fill" />
-              </span>{" "}
-              <span>0.7 km from the choosen location</span>
+              </span>{" "} */}
+              <span>Created At : {formatDate(pginfo?.createdAt as string)}</span>
             </p>
             <div className="flex gap-4">
               <button
-                className="bg-slate-500 text-white px-4 py-2 rounded"
+                className="bg-slate-500 hover:bg-slate-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -198,10 +199,11 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                   );
                 }}
               >
-                Edit PG
+                <Pencil size={20} color="#ffffff" weight="fill" />
+                <span>Edit PG</span>
               </button>
               <button
-                className="bg-red-500 text-white px-4 py-2 rounded"
+                className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -220,7 +222,8 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                   );
                 }}
               >
-                Delete PG
+                <Trash size={20} color="#ffffff" weight="fill" />
+                <span>Delete PG</span>
               </button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Rating from "../Rating/Rating";
-import { CurrencyInr, MapPin } from "@phosphor-icons/react/dist/ssr";
+import { CurrencyInr, MapPin, UserPlus } from "@phosphor-icons/react/dist/ssr";
 import { useRouter, useSearchParams } from "next/navigation";
 import OwnerInfoModal from "../Modals/OwnerInfoModal";
 import { useEffect, useState } from "react";
@@ -195,7 +195,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
             </p>
             <div className="flex gap-4">
               <button
-                className="bg-buttons text-white px-4 py-2 rounded"
+                className="bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded"
                 onClick={() => {
                   router.push(
                     `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
@@ -211,7 +211,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
                 View full details
               </button>
               <button
-                className="bg-buttonsSecondary text-white px-4 py-2 rounded"
+                className="bg-buttonsSecondary hover:bg-buttons text-white px-4 py-2 rounded flex justify-center items-center gap-2"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -225,7 +225,8 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
                   );
                 }}
               >
-                Contact Owner
+                <UserPlus size={20} color="#ffffff" weight="fill" />
+                <span>Contact Owner</span>
               </button>
             </div>
           </div>

@@ -173,6 +173,7 @@ const SignUp = () => {
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
                 {!showPassToggle ? (
+                  <span data-tooltip="Password not visible">
                   <EyeSlash
                     size={24}
                     className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
@@ -180,7 +181,9 @@ const SignUp = () => {
                       setshowPassToggle(true);
                     }}
                   />
+                  </span>
                 ) : (
+                  <span data-tooltip="Password visible">
                   <Eye
                     size={24}
                     className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
@@ -188,6 +191,7 @@ const SignUp = () => {
                       setshowPassToggle(false);
                     }}
                   />
+                  </span>
                 )}
               </div>
               {passwordError && (
@@ -208,6 +212,7 @@ const SignUp = () => {
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               {!showPassToggle ? (
+                <span data-tooltip="Password not visible">
                 <EyeSlash
                   size={24}
                   className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
@@ -215,7 +220,9 @@ const SignUp = () => {
                     setshowPassToggle(true);
                   }}
                 />
+                </span>
               ) : (
+                <span data-tooltip="Password visible">
                 <Eye
                   size={24}
                   className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
@@ -223,6 +230,7 @@ const SignUp = () => {
                     setshowPassToggle(false);
                   }}
                 />
+                </span>
               )}
             </div>
             {confirmpasswordError && (
