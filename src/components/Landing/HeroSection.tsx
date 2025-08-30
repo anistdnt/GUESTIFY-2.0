@@ -1,4 +1,15 @@
+"use client";
+import { useEffect, useState } from "react";
+
 export default function HeroSection() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger fade-in after mount
+    const timer = setTimeout(() => setIsVisible(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const Features = [
     {
       title: "Verified Properties",
@@ -66,45 +77,54 @@ export default function HeroSection() {
   ];
 
   return (
-    <>
-      <div className="bg-gray-100">
-        {/* Hero Section */}
-        <section className="relative bg-[url('/assets/about-us-banner.jpg')] bg-fixed bg-bottom bg-cover text-white min-h-[500px] flex flex-col justify-center items-center">
-          <div className="w-full">
-            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-            <div className="relative mx-auto max-w-7xl text-center px-4 sm:px-6 lg:px-8">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                Discover Your
-                <span className="block text-buttons mt-2">Perfect PG Stay</span>
-              </h1>
-              <p className="mt-6 text-lg sm:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
-                Your trusted platform for finding paying guest accommodations in
-                West Bengal
-              </p>
+    <div className="bg-gray-100">
+      {/* Hero Section */}
+      <section className="relative bg-[url('/assets/about-us-banner.jpg')] bg-fixed bg-bottom bg-cover text-white min-h-[500px] flex flex-col justify-center items-center">
+        <div className="w-full">
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
 
-              {/* Feature highlights with icons and animations */}
-              <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                {Features.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 hover:border-white/30 hover:scale-105 transition-all duration-300 group cursor-pointer"
-                  >
-                    <div className="w-12 h-12 bg-buttons rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:scale-110 group-hover:rotate-6 group-hover:bg-buttonsSecondary transition-all duration-500">
-                      {feature.icon}
-                    </div>
-                    <h3 className="font-semibold text-white mb-2 group-hover:text-buttonsSecondary transition-colors duration-300">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">
-                      {feature.description}
-                    </p>
+          <div
+            className={`relative mx-auto max-w-7xl text-center px-4 sm:px-6 lg:px-8 transition-all duration-1000 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              Discover Your
+              <span className="block text-buttons mt-2">Perfect PG Stay</span>
+            </h1>
+            <p className="mt-6 text-lg sm:text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+              Your trusted platform for finding paying guest accommodations in
+              West Bengal
+            </p>
+
+            {/* Feature highlights with staggered animations */}
+            <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {Features.map((feature, index) => (
+                <div
+                  key={index}
+                  className={`bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 hover:border-white/30 hover:scale-105 transition-all duration-500 group cursor-pointer
+                    ${
+                      isVisible
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-6"
+                    }`}
+                  style={{ transitionDelay: `${index * 200}ms` }}
+                >
+                  <div className="w-12 h-12 bg-buttons rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:scale-110 group-hover:rotate-6 group-hover:bg-buttonsSecondary transition-all duration-500">
+                    {feature.icon}
                   </div>
-                ))}
-              </div>
+                  <h3 className="font-semibold text-white mb-2 group-hover:text-buttonsSecondary transition-colors duration-300">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-300 text-sm group-hover:text-gray-200 transition-colors duration-300">
+                    {feature.description}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
-        </section>
-      </div>
-    </>
+        </div>
+      </section>
+    </div>
   );
 }
