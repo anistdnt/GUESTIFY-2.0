@@ -31,6 +31,7 @@ export const API = {
         ADD_ROOM : "addRooms",
         FOR_MAP : "/getPgForMap",
         GET_PG_NEAR_ME : "/getPgNearMe",
+        GET_PG_NEAR_PG : "/getPgNearPg",
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",

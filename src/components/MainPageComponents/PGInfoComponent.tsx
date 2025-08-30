@@ -12,8 +12,10 @@ import 'swiper/css';
 import { Review } from '@/app/(sharedlayout)/pg/[id]/page';
 import type { LatLngTuple } from 'leaflet';
 import dynamic from "next/dynamic";
+
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 const Feedback = lazy(() => import('@/components/Feedback/Feedback'))
+const SimilerPgs = lazy(()=> import("@/components/MainPageComponents/SimilerPgs"));
 
 interface Iprops {
   id: string,
@@ -27,6 +29,7 @@ interface Iprops {
   clg_id?: string;
 }
 const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name, clg_addr, clg_pin, clg_id }: Iprops) => {
+  console.log("pginfo",pginfo);
   // const router = useRouter();
   //   const { id } = router.query;
   //   const [pgDetails, setPgDetails] = useState(null);
@@ -171,6 +174,10 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords,  clg_name,
       <div className="w-full h-[500px] flex justify-center items-center my-8">
         <Map clg_coords={college_coords} pgInfo={{position : position as [number, number] , name : pginfo.pg_name , address : pginfo.address, pg_idno : pginfo._id}} {...{ clg_name, clg_addr, clg_pin, clg_id}} />
       </div>
+
+      <Suspense fallback={<FeedbackSkeleton />}>
+        <SimilerPgs current_pgid={pginfo?._id} current_pg_cords={pginfo?.location?.coordinates}/>
+      </Suspense>
 
       <Suspense fallback={<FeedbackSkeleton />}>
         <Feedback ref={formRef} {...{ reviewData, id }} />
