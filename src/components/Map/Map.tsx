@@ -100,6 +100,34 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
   // 🌍 map style state
   const [mapStyle, setMapStyle] = useState<string>('https://basemaps.cartocdn.com/gl/positron-gl-style/style.json');
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // check mobile
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    // listen to fullscreen change
+    const handleFullscreenChange = () => {
+      if (document.fullscreenElement) {
+        setIsFullscreen(true);
+      } else {
+        setIsFullscreen(false);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+
+
   useEffect(() => {
     console.log(activePopup)
   }, [activePopup])
@@ -171,7 +199,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
       const res: ApiReturn<any> = await api_caller<any>("GET", `${API.PG.GET_PG_NEAR_ME}?coordinates=${userLocation[0]},${userLocation[1]}`)
       // const res: ApiReturn<any> = await api_caller<any>("GET", `${API.PG.GET_PG_NEAR_ME}?coordinates=88.4167053,22.6149746`)
       if (res.success) {
-        if(isMulti){
+        if (isMulti) {
 
           setNearbyPGs(res.data?.filter((pg) => !(pgInfo as pgInfo[]).some((info) => info.pg_idno === pg._id))?.map((pg) => {
             return {
@@ -181,7 +209,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
               pg_idno: pg?._id,
             }
           }));
-        }else{
+        } else {
           setNearbyPGs(res.data?.filter((pg) => (pgInfo as pgInfo)?.pg_idno !== pg._id)?.map((pg) => {
             return {
               position: pg?.location?.coordinates,
@@ -207,7 +235,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
   };
 
   return (
-    <div style={{ height: "500px", width: "90%", position: "relative" }}>
+    <div style={{ height: "100%", width: "100%", position: "relative" }}>
 
       <Map
         initialViewState={{
@@ -227,7 +255,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
           <div
             style={{
               position: "absolute",
-              top: 10,
+              bottom: 90,
               left: 10,
               background: "white",
               padding: "8px 12px",
@@ -251,7 +279,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
           <div
             style={{
               position: "absolute",
-              top: 10,
+              top: isFullscreen && isMobile ? 50 : 10,
               left: "50%",
               transform: "translateX(-50%)",
               background: "white",
