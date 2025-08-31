@@ -73,10 +73,11 @@ export default function SimilerPgs({
 
   return (
     <div className="my-8">
-      <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center">
+      <h2 className="text-3xl font-bold mb-2 text-gray-800 text-center">
         Paying Guest Houses Near Your Location
       </h2>
-      <p className="text-center text-gray-500 mb-10">
+      <div className="w-36 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
+      <p className="text-center text-gray-500 mb-10 mt-9">
         Discover PGs with similar amenities and convenient locations close to
         you.
       </p>

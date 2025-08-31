@@ -20,5 +20,25 @@ export function middleware(req: NextRequest) {
     });
   }
 
+  //protected routes
+
+  const authToken = req.cookies.get("authToken");
+  console.log("Auth Token in Middleware:", authToken);
+
+  if (!authToken) {
+    console.log("Redirecting to login page");
+    console.log("Request URL:", req.url);
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
   return res;
 }
+
+export const config = {
+  matcher: [
+    "/pg/:path*/add-room",
+    "/pg/edit/:path*",
+    "/pg/new/:path*",
+    "/profile/:path*",
+  ],
+};

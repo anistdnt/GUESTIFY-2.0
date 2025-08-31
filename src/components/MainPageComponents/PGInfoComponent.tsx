@@ -68,11 +68,11 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header with back button */}
-      <div className="sticky top-16 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
+      <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 group"
+            className="flex items-center gap-2 text-gray-700 hover:text-headingCol transition-colors duration-200 group"
           >
             <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform duration-200" />
             <span className="font-medium">Back</span>
