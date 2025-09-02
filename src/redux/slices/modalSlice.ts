@@ -5,6 +5,7 @@ interface ModalShowType {
   modalData?: any;
   props?: any;
   open: boolean;
+  isDeleted?: boolean;
 }
 
 const initialState: ModalShowType = {
@@ -12,6 +13,7 @@ const initialState: ModalShowType = {
   modalData: {},
   props: {},
   open: false,
+  isDeleted: false,
 };
 
 const modalSlice = createSlice({
@@ -28,8 +30,11 @@ const modalSlice = createSlice({
       state.type = "";
       state.open = action.payload;
     },
+    deleteSuccess: (state, action: { payload: boolean }) => {
+      state.isDeleted = action.payload;
+    }
   },
 });
 
-export const { setModalVisibility , hideModal} = modalSlice.actions;
+export const { setModalVisibility , hideModal, deleteSuccess} = modalSlice.actions;
 export default modalSlice.reducer;

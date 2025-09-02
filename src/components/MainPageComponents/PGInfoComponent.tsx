@@ -65,6 +65,8 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
     return (sum / reviewData.length).toFixed(1);
   };
 
+  console.log("Rendering PGInfoComponent with pginfo:", pginfo);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header with back button */}
@@ -171,7 +173,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                   {/* Rent Section */}
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
                     <p className="text-sm text-gray-600 mb-1">Starting from</p>
-                    <p className="text-4xl font-bold text-green-600">₹12,000</p>
+                    <p className="text-4xl font-bold text-green-600">₹{pginfo?.minRent}</p>
                     <p className="text-sm text-gray-500">per month</p>
                   </div>
 
