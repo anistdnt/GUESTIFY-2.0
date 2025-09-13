@@ -2,6 +2,7 @@ import { getCookie, deleteCookie} from "cookies-next/client";
 import { JwtPayload } from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import toast from "react-hot-toast";
+import { API } from "./api_const";
 
 export const tokenIsVerified = (token: string) => {
   //Check if the token not exists
@@ -58,3 +59,24 @@ export const decodeToken = (cookieName: string): JwtPayload => {
     return {} as JwtPayload;
   }
 };
+
+export function shouldSkipAuthCheck(url: string): boolean {
+  const exemptedUrls = [
+    API.USER.LOGIN,
+    API.USER.REGISTER,
+    API.USER.FORGET_PASSWORD,
+    API.USER.CHANGE_PASSWORD,
+    API.NOTIFICATION.ALL_NOTIFICATIONS,
+    API.COLLEGE.LIST,
+    API.COLLEGE.GET_BY_ID,
+    API.PG.ALL,
+    API.PG.GET_PG_BY_ID,
+    API.PG.FOR_MAP,
+    API.PG.GET_PG_NEAR_ME,
+    API.PG.GET_PG_NEAR_PG,
+    API.REVIEW.GET_REVIWS_OF_PG,
+    API.REVIEW.ADD_REVIEW,
+    API.OWNER.GET_OWNER_BY_ID,
+  ];
+  return exemptedUrls.some(exempted => url.includes(exempted));
+}

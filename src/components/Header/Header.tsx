@@ -24,6 +24,7 @@ const navigation: {
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Contact Us", href: "/contact" },
+    { name: "Terms & Services", href: "/terms-and-services" },
   ];
 
 interface UserInfo {

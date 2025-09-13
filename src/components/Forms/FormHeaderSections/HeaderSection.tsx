@@ -30,7 +30,7 @@ export default function HeaderSection() {
           </p>
 
           {/* Button */}
-          <button className="mt-4 px-5 py-2 rounded-lg bg-buttons text-white font-medium hover:bg-buttonsHover transition flex items-center justify-center gap-2">
+          <button className="mt-4 px-5 py-2 rounded-lg bg-buttons text-white font-medium hover:bg-buttonsHover transition flex items-center justify-center gap-2" onClick={()=> window.open('/terms-and-services', '_blank')}>
             <span>Read Terms & Services</span>
             <ArrowSquareOut size={20} color="#ffffff" />
           </button>
