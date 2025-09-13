@@ -16,7 +16,9 @@ import { useDispatch, useSelector } from "react-redux";
 export default function RoomDetailsEdit() {
   const params = useParams();
   const paying_guestID = params?.id;
-  const isDeleted = useSelector((state: RootState) => state.modal_slice.isDeleted);
+  const isDeleted = useSelector(
+    (state: RootState) => state.modal_slice.isDeleted
+  );
   const [initialFieldData, setInitialFieldData] = useState(
     Only_RoomValidationSchema?.initials
   );
@@ -39,7 +41,7 @@ export default function RoomDetailsEdit() {
       );
       if (res.success) {
         setInitialFieldData({
-          rooms: res?.data
+          rooms: res?.data,
         });
       } else {
         toast.error(`${res.message} : ${res.error}`);
@@ -48,7 +50,6 @@ export default function RoomDetailsEdit() {
     fetchInformation();
     dispatch(deleteSuccess(false));
   }, [isDeleted]);
-
 
   const handleSubmit = async (values: any) => {
     const formData = new FormData();
@@ -100,16 +101,37 @@ export default function RoomDetailsEdit() {
         {({ dirty }) => (
           <Form>
             <RoomForm hasAddBtn={false} caption="Update Room Details" />
-            <button
-              type="submit"
-              disabled={!dirty} // ✅ disables if nothing changed
-              className={`ml-auto px-6 py-2 rounded transition ${dirty
-                  ? "bg-yellow-600 hover:bg-yellow-700 text-white"
-                  : "bg-gray-400 cursor-not-allowed text-white"
-                }`}
-            >
-              Update Details
-            </button>
+            <div className="flex justify-between w-full items-center">
+              <div className="flex items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={!dirty} // ✅ disables if nothing changed
+                  className={`px-6 py-2 rounded transition ${
+                    dirty
+                      ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                      : "bg-gray-400 cursor-not-allowed text-white"
+                  }`}
+                >
+                  Update Details
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    router.back();
+                  }}
+                  className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+                >
+                  Cancel
+                </button>
+              </div>
+              <button
+                type="button"
+                className="px-6 py-2 rounded transition bg-buttonsSecondary hover:bg-buttonsHover text-white"
+                onClick={() => router.push(`/pg/${paying_guestID}/add-room`)}
+              >
+                Enlist New Rooms
+              </button>
+            </div>
           </Form>
         )}
       </Formik>

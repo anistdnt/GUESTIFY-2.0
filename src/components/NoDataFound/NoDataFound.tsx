@@ -1,4 +1,12 @@
-const NoDataFound = ({text}:{text:string}) => {
+import Link from "next/link";
+
+const NoDataFound = ({
+  text,
+  redirectBtn = {},
+}: {
+  text: string;
+  redirectBtn?: { text?: string; link?: string };
+}) => {
   return (
     <div className="flex flex-col items-center justify-center py-6 text-gray-500 text-sm h-full">
       <svg
@@ -16,6 +24,14 @@ const NoDataFound = ({text}:{text:string}) => {
         />
       </svg>
       <p>{text}</p>
+      {redirectBtn?.link && redirectBtn?.text && (
+        <Link
+          href={redirectBtn.link}
+          className="mt-4 px-3 py-2 bg-buttonsSecondary hover:bg-buttonsHover text-white rounded"
+        >
+          {redirectBtn.text}
+        </Link>
+      )}
     </div>
   );
 };

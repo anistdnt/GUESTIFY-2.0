@@ -3,7 +3,7 @@ import { Field, ErrorMessage, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import Select from "react-select";
-import { yesNoOptions, PGType, districtOptions, stateOptions } from "@/data/countryPhone";
+import { yesNoOptions, PGType, districtOptions, stateOptions, depositOptions } from "@/data/countryPhone";
 import Tooltip from "./Tooltip";
 
 export default function PGForm({
@@ -53,7 +53,7 @@ export default function PGForm({
           <label className="mb-1 font-medium flex items-center gap-1">
             <span>Name of the Paying Guest House</span>
             <span className="text-red-600 font-semibold">*</span>
-            <Tooltip text="The end user will see this name on map"/>
+            <Tooltip text="The end user will see this name on map" />
           </label>
           <Field
             name="pg_name"
@@ -156,7 +156,7 @@ export default function PGForm({
           <label className="flex items-center gap-1 mb-1 font-medium">
             <span>Type of PG</span>
             <span className="text-red-600 font-semibold">*</span>
-            <Tooltip text="Who can accomodate this PG"/>
+            <Tooltip text="Who can accomodate this PG" />
           </label>
           <Select
             options={PGType}
@@ -171,7 +171,7 @@ export default function PGForm({
           />
         </div>
 
-        <div className="col-span-2">
+        <div>
           <label className="block mb-1 font-medium">
             WiFi Availability{" "}
             <span className="text-red-600 font-semibold">*</span>
@@ -192,6 +192,58 @@ export default function PGForm({
             className="text-red-500 text-sm"
           />
         </div>
+
+        {values.wifi_available === "yes" && (
+          <div>
+            <label className="block mb-1 font-medium">
+              Wifi-Network Speed{" "}
+              <span className="text-gray-600">(In Mbps)</span>{" "}
+              <span className="text-red-600 font-semibold">*</span>
+            </label>
+            <Field
+              name="wifi_speed"
+              placeholder="eg : 30 Mbps"
+              className="p-2 border rounded w-full"
+            />
+            <ErrorMessage
+              name="wifi_speed"
+              component="span"
+              className="text-red-500 text-sm"
+            />
+          </div>
+        )}
+
+        {values.wifi_available === "yes" && (
+          <div>
+            <label className="block mb-1 font-medium">
+              Additional Wifi-Charge{" "}
+              <span className="text-red-600 font-semibold">*</span>
+            </label>
+            <div className="flex items-center gap-2 w-full">
+              <Field
+                name="additional_wifi_charges"
+                placeholder="eg : 300"
+                className="p-2 border rounded w-9/12"
+              />
+              <Select
+                options={depositOptions}
+                className="w-3/12"
+                value={depositOptions.find(
+                  (opt) => opt.value === values.charge_duration
+                )}
+                onChange={(option) =>
+                  setFieldValue("charge_duration", option?.value)
+                }
+                placeholder="Duration"
+              />
+            </div>
+            <ErrorMessage
+              name="additional_wifi_charges"
+              component="span"
+              className="text-red-500 text-sm"
+            />
+          </div>
+        )}
 
         <div>
           <label className="block mb-1 font-medium">

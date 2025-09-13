@@ -55,6 +55,7 @@ export interface Room {
   ac_available: "yes" | "no";
   attached_bathroom: "yes" | "no";
   deposit_duration: "monthly" | "quarterly" | "halfyearly" | "yearly";
+  aminities: string[];
   pg_id: string;
   createdAt: string;
   updatedAt: string;

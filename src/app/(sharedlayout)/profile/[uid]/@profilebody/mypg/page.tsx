@@ -19,7 +19,9 @@ const Page = () => {
   const router = useRouter();
   const param = useParams();
   const dispatch = useDispatch();
-  const isDeleted = useSelector((state: RootState) => state.modal_slice.isDeleted);
+  const isDeleted = useSelector(
+    (state: RootState) => state.modal_slice.isDeleted
+  );
 
   function handleRoute() {
     router.push("/pg/new");
@@ -51,30 +53,34 @@ const Page = () => {
 
   if (loading) {
     return <CardSkeleton no_of_card={2} />;
+  } else if (cards?.length === 0 && !loading) {
+    return (
+      <div className="w-full py-10">
+        <NoDataFound text="No Paying Guest House Found" redirectBtn={{
+          text: "Add New Paying Guest House",
+          link: "/pg/new"
+        }}/>
+      </div>
+    );
   } else {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 justify-items-center">
-        {cards?.length === 0 ? (
-          <div className="w-full py-10">
-            <NoDataFound text="No Paying Guest Home Found" />
+        {cards?.map((item: any, index: number) => (
+          <div key={index}>
+            <ProfilePGCard item={item} />
+            {/* <DisplayCard item={item} number_of_stars={5} /> */}
           </div>
-        ) : (
-          cards?.map((item: any, index: number) => (
-            <div
-              key={index}
-            >
-              <ProfilePGCard item={item} number_of_stars={5}/>
-              {/* <DisplayCard item={item} number_of_stars={5} /> */}
-            </div>
-          ))
-        )}
+        ))}
 
         <button
           className="fixed flex bottom-10 right-10 bg-black/70 text-white p-4 rounded-full shadow-lg hover:bg-black/80 transition-transform transform hover:scale-105"
           onClick={handleRoute}
           title="Add PG"
         >
-          <div data-tooltip="Add New Paying Guest" className="flex justify-center items-center gap-2">
+          <div
+            data-tooltip="Add New Paying Guest"
+            className="flex justify-center items-center gap-2"
+          >
             <p className="me-3">Add PG</p>
             <Plus size={20} weight="bold" />
           </div>
