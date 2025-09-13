@@ -196,3 +196,15 @@ export const roomAmenitiesOptions = [
     ],
   },
 ];
+
+
+// Function to extract Label by value
+export function getAmenityLabel(value: string): string | null {
+  for (const category of roomAmenitiesOptions) {
+    const option = category.options.find(opt => opt.value === value);
+    if (option) {
+      return option.label;
+    }
+  }
+  return null;
+}
