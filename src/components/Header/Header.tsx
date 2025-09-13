@@ -80,6 +80,7 @@ export default function Header() {
       }
 
       deleteCookie("authToken");
+      dispatch(setUserData({}));
       setisLoggedIn(false);
       setshowProfileDropdown(false);
       setNotifications([]); // Clear notifications
