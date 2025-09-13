@@ -99,3 +99,10 @@ export const PGType = [
     value: "girls",
   },
 ];
+
+export const depositOptions = [
+  { label: "Monthly", value: "monthly" },
+  { label: "Quarterly", value: "quarterly" },
+  { label: "Half-Yearly", value: "halfyearly" },
+  { label: "Yearly", value: "yearly" },
+];

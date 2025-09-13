@@ -29,7 +29,7 @@ type RoomImageUploaderProps = {
 const depositOptions = [
   { label: "Monthly", value: "monthly" },
   { label: "Quarterly", value: "quarterly" },
-  { label: "Half-Yearly", value: "half-yearly" },
+  { label: "Half-Yearly", value: "halfyearly" },
   { label: "Yearly", value: "yearly" },
 ];
 
