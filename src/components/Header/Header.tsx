@@ -399,12 +399,13 @@ export default function Header() {
               {/* Profile dropdown */}
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
-                <div className="relative mt-2">
+                
+                {/* <div className="relative mt-2">
                   <button onClick={handleNotification} data-tooltip="Notifications" data-tooltip-pos="bottom">
                     <Bell size={24} weight="bold" className="cursor-pointer" />
                   </button>
                   {Array.isArray(notifications) && notifications.length > 0 && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>}
-                </div>
+                </div> */}
 
                 {/* Notification Dropdown  */}
                 {showNotification && (
@@ -539,7 +540,7 @@ export default function Header() {
 
                 {/* Dropdown  */}
                 {showProfileDropdown && (
-                  <div className="absolute right-0 top-14 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
+                  <div className="absolute right-0 top-14 z-40 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg">
                     <div className="block px-4 py-2 text-sm text-gray-700 border-b-2">
                       Welcome,{" "}
                       <span className="font-bold">{userInfo?.full_name}</span>

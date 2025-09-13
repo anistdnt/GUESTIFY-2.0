@@ -4,6 +4,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { base64ToFile } from "@/lib/imageConvert";
 import { setLoading } from "@/redux/slices/loaderSlice";
+import { deleteSuccess } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
 import { Only_RoomValidationSchema } from "@/validations/onlyroom";
 import { Form, Formik } from "formik";
@@ -15,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 export default function RoomDetailsEdit() {
   const params = useParams();
   const paying_guestID = params?.id;
+  const isDeleted = useSelector((state: RootState) => state.modal_slice.isDeleted);
   const [initialFieldData, setInitialFieldData] = useState(
     Only_RoomValidationSchema?.initials
   );
@@ -26,6 +28,10 @@ export default function RoomDetailsEdit() {
   const router = useRouter();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [isDeleted]);
+
+  useEffect(() => {
     const fetchInformation = async () => {
       const res: ApiReturn<any> = await api_caller<any>(
         "GET",
@@ -33,14 +39,15 @@ export default function RoomDetailsEdit() {
       );
       if (res.success) {
         setInitialFieldData({
-          rooms : res?.data
+          rooms: res?.data
         });
       } else {
         toast.error(`${res.message} : ${res.error}`);
       }
     };
     fetchInformation();
-  }, []);
+    dispatch(deleteSuccess(false));
+  }, [isDeleted]);
 
 
   const handleSubmit = async (values: any) => {
@@ -92,15 +99,14 @@ export default function RoomDetailsEdit() {
       >
         {({ dirty }) => (
           <Form>
-            <RoomForm hasAddBtn={false} caption="Update Room Details"/>
+            <RoomForm hasAddBtn={false} caption="Update Room Details" />
             <button
               type="submit"
               disabled={!dirty} // ✅ disables if nothing changed
-              className={`ml-auto px-6 py-2 rounded transition ${
-                dirty
+              className={`ml-auto px-6 py-2 rounded transition ${dirty
                   ? "bg-yellow-600 hover:bg-yellow-700 text-white"
                   : "bg-gray-400 cursor-not-allowed text-white"
-              }`}
+                }`}
             >
               Update Details
             </button>

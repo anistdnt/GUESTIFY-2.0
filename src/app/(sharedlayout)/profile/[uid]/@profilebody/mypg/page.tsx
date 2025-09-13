@@ -5,20 +5,29 @@ import { CardSkeleton } from "@/components/Loader/CardSkeleton";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
+import { deleteSuccess } from "@/redux/slices/modalSlice";
+import { RootState } from "@/redux/store";
 import { Plus } from "@phosphor-icons/react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 
 const Page = () => {
   const [loading, setloading] = useState<boolean>(false);
   const [cards, setCards] = useState<any>(null);
   const router = useRouter();
   const param = useParams();
+  const dispatch = useDispatch();
+  const isDeleted = useSelector((state: RootState) => state.modal_slice.isDeleted);
 
   function handleRoute() {
     router.push("/pg/new");
   }
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [isDeleted]);
 
   useEffect(() => {
     const fetchPgs_ByUser = async () => {
@@ -37,7 +46,8 @@ const Page = () => {
     };
 
     fetchPgs_ByUser();
-  }, []);
+    dispatch(deleteSuccess(false));
+  }, [isDeleted]);
 
   if (loading) {
     return <CardSkeleton no_of_card={2} />;

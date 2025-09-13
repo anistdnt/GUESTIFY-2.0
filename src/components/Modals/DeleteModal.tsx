@@ -1,7 +1,7 @@
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { setLoading } from "@/redux/slices/loaderSlice";
-import { hideModal } from "@/redux/slices/modalSlice";
+import { deleteSuccess, hideModal } from "@/redux/slices/modalSlice";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -36,6 +36,7 @@ function DeleteModal({ setshowModal, modalData }: ModalType) {
     );
     if (res.success) {
       dispatch(hideModal(false));
+      dispatch(deleteSuccess(true));
       dispatch(setLoading({ loading: false }));
     //   router.push("/");
       toast.success(res.message || "Deleted Successfully");
