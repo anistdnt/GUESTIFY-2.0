@@ -18,12 +18,13 @@ export const PGValidationSchema = {
     pg_image_url: null,
     rooms: [
       {
-        room_type: "",
+        room_type: "single",
         room_rent: "",
-        ac_available: "",
-        deposit_duration: "",
+        ac_available: "no",
+        deposit_duration: "monthly",
+        aminities: [],
         room_image_url: null,
-        attached_bathroom: "",
+        attached_bathroom: "yes",
       },
     ],
 

@@ -51,7 +51,8 @@ export default function AddRoomsForm() {
     );
     if (res.success) {
       dispatch(setLoading({ loading: false }));
-      router?.push(`/profile/${reduxUserData?._id}/mypg`);
+      // router?.push(`/profile/${reduxUserData?._id}/mypg`);
+      router?.back();
       toast.success(res.message || "Save In successfully");
     } else {
       dispatch(setLoading({ loading: false }));
@@ -71,17 +72,28 @@ export default function AddRoomsForm() {
         {({ dirty }) => (
           <Form>
             <RoomForm />
-            <button
-              type="submit"
-              disabled={!dirty} // ✅ disables if nothing changed
-              className={`ml-auto px-6 py-2 rounded transition ${
-                dirty
-                  ? "bg-yellow-600 hover:bg-yellow-700 text-white"
-                  : "bg-gray-400 cursor-not-allowed text-white"
-              }`}
-            >
-              Submit Room Details
-            </button>
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                disabled={!dirty} // ✅ disables if nothing changed
+                className={`px-6 py-2 rounded transition ${
+                  dirty
+                    ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                    : "bg-gray-400 cursor-not-allowed text-white"
+                  }`}
+              >
+                Submit Room Details
+              </button>
+              <button
+                  type="button"
+                  onClick={() => {
+                    router.back();
+                  }}
+                  className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+              >
+                Cancel
+              </button>
+            </div>
           </Form>
         )}
       </Formik>

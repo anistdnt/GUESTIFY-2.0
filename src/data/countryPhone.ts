@@ -106,3 +106,93 @@ export const depositOptions = [
   { label: "Half-Yearly", value: "halfyearly" },
   { label: "Yearly", value: "yearly" },
 ];
+
+export const roomTypeOptions = [
+  { label: "Single", value: "single" },
+  { label: "Double", value: "double" },
+];
+
+export const roomAmenitiesOptions = [
+  {
+    label: "Basic Amenities",
+    options: [
+      { value: "wifi", label: "Wi-Fi" },
+      { value: "air_conditioning", label: "Air Conditioning" },
+      { value: "heater", label: "Heater" },
+      { value: "power_backup", label: "Power Backup" },
+      { value: "fan", label: "Ceiling Fan" },
+    ],
+  },
+  {
+    label: "Furnishings",
+    options: [
+      { value: "bed", label: "Bed" },
+      { value: "mattress", label: "Mattress" },
+      { value: "wardrobe", label: "Wardrobe" },
+      { value: "study_table", label: "Study Table" },
+      { value: "chair", label: "Chair" },
+      { value: "sofa", label: "Sofa" },
+      { value: "tv", label: "Television" },
+    ],
+  },
+  {
+    label: "Kitchen & Food",
+    options: [
+      { value: "kitchen", label: "Kitchen Access" },
+      { value: "induction", label: "Induction Stove" },
+      { value: "fridge", label: "Refrigerator" },
+      { value: "microwave", label: "Microwave" },
+      { value: "cooking_utensils", label: "Cooking Utensils" },
+      { value: "meals_included", label: "Meals Included" },
+      { value: "water_purifier", label: "Water Purifier" },
+    ],
+  },
+  {
+    label: "Bathroom",
+    options: [
+      { value: "attached_bathroom", label: "Attached Bathroom" },
+      { value: "geyser", label: "Geyser" },
+      { value: "western_toilet", label: "Western Toilet" },
+      { value: "indian_toilet", label: "Indian Toilet" },
+      { value: "shower", label: "Shower" },
+    ],
+  },
+  {
+    label: "Safety & Security",
+    options: [
+      { value: "cctv", label: "CCTV" },
+      { value: "security_guard", label: "Security Guard" },
+      { value: "fire_extinguisher", label: "Fire Extinguisher" },
+      { value: "first_aid", label: "First Aid Kit" },
+      { value: "lockable_storage", label: "Lockable Storage" },
+    ],
+  },
+  {
+    label: "Recreation",
+    options: [
+      { value: "balcony", label: "Balcony" },
+      { value: "terrace", label: "Terrace Access" },
+      { value: "garden", label: "Garden Access" },
+      { value: "gym", label: "Gym Access" },
+      { value: "common_room", label: "Common Room" },
+    ],
+  },
+  {
+    label: "Parking & Transport",
+    options: [
+      { value: "bike_parking", label: "Bike Parking" },
+      { value: "car_parking", label: "Car Parking" },
+      { value: "public_transport_nearby", label: "Public Transport Nearby" },
+    ],
+  },
+  {
+    label: "Other",
+    options: [
+      { value: "laundry", label: "Laundry Service" },
+      { value: "housekeeping", label: "Housekeeping" },
+      { value: "elevator", label: "Elevator" },
+      { value: "intercom", label: "Intercom" },
+      { value: "pets_allowed", label: "Pets Allowed" },
+    ],
+  },
+];

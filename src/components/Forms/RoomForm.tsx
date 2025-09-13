@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  depositOptions,
+  roomAmenitiesOptions,
+  roomTypeOptions,
+  yesNoOptions,
+} from "@/data/countryPhone";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { Trash } from "@phosphor-icons/react/dist/ssr";
 import { FieldArray, Field, ErrorMessage, useFormikContext } from "formik";
@@ -9,6 +15,7 @@ import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
+import Tooltip from "./Tooltip";
 
 type RoomFormValues = {
   _id?: string;
@@ -18,6 +25,7 @@ type RoomFormValues = {
   ac_available: string;
   deposit_duration: string;
   room_image_url: any;
+  aminities?: string[];
 };
 
 type RoomImageUploaderProps = {
@@ -25,13 +33,6 @@ type RoomImageUploaderProps = {
   values: any;
   setFieldValue: (field: string, value: any) => void;
 };
-
-const depositOptions = [
-  { label: "Monthly", value: "monthly" },
-  { label: "Quarterly", value: "quarterly" },
-  { label: "Half-Yearly", value: "halfyearly" },
-  { label: "Yearly", value: "yearly" },
-];
 
 // ===== Room Image Uploader component =======
 
@@ -113,15 +114,6 @@ export default function RoomForm({
 
   const dispatch = useDispatch();
 
-  const yesNoOptions = [
-    { label: "Yes", value: "yes" },
-    { label: "No", value: "no" },
-  ];
-  const roomTypeOptions = [
-    { label: "Single", value: "single" },
-    { label: "Double", value: "double" },
-  ];
-
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -150,9 +142,10 @@ export default function RoomForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   {/* Room Type */}
                   <div>
-                    <label className="block mb-1 font-medium">
+                    <label className="mb-1 font-medium flex items-center gap-1">
                       Type of Room{" "}
                       <span className="text-red-600 font-semibold">*</span>
+                      <Tooltip text="Whether the Room contains single or double beds" />
                     </label>
                     <Select
                       options={roomTypeOptions}
@@ -268,6 +261,32 @@ export default function RoomForm({
                       className="text-red-500 text-sm mt-1"
                     />
                   </div>
+
+                  {/* Amenities */}
+                  <div>
+                    <label className="block mb-1 font-medium">
+                      Room Amenities
+                    </label>
+                    <Select
+                      options={roomAmenitiesOptions}
+                      isMulti
+                      value={roomAmenitiesOptions
+                        .flatMap((group) => group.options)
+                        .filter((opt) => room.aminities?.includes(opt.value))}
+                      onChange={(selected) =>
+                        setFieldValue(
+                          `rooms[${index}].aminities`,
+                          selected ? selected.map((opt) => opt.value) : []
+                        )
+                      }
+                      placeholder="Select room amenities..."
+                    />
+                    <ErrorMessage
+                      name={`rooms[${index}].aminities`}
+                      component="div"
+                      className="text-red-500 text-sm mt-1"
+                    />
+                  </div>
                 </div>
 
                 {/* Image Upload */}
@@ -290,31 +309,32 @@ export default function RoomForm({
                     if (hasAddBtn) {
                       remove(index);
                     } else {
-                      if(values?.rooms?.length < 2){
-                        toast.error("Unable to Delete : You have to enlist at least 1 room")
-                      }
-                      else{
+                      if (values?.rooms?.length < 2) {
+                        toast.error(
+                          "Unable to Delete : You have to enlist at least 1 room"
+                        );
+                      } else {
                         dispatch(
-                        setModalVisibility({
-                          open: true,
-                          type: "deletePG",
-                          modalData: {
-                            target: "room",
-                            caption: "Delete Room",
-                            btnText: "Delete Room",
-                            deletedCred: ["This Room"],
-                            placeholder: "The Room",
-                            rowid: room?._id as string,
-                          },
-                        })
-                      );
+                          setModalVisibility({
+                            open: true,
+                            type: "deletePG",
+                            modalData: {
+                              target: "room",
+                              caption: "Delete Room",
+                              btnText: "Delete Room",
+                              deletedCred: ["This Room"],
+                              placeholder: "The Room",
+                              rowid: room?._id as string,
+                            },
+                          })
+                        );
                       }
                     }
                   }}
                   disabled={hasAddBtn && values?.rooms?.length < 2}
-                  className="absolute top-4 right-4 text-red-500 hover:text-red-700"
+                  className="absolute top-4 right-4 text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <Trash size={20} weight="bold" />
+                  <Trash size={20} weight="bold" data-tooltip="Remove Room"/>
                 </button>
               </div>
             ))}
@@ -332,9 +352,10 @@ export default function RoomForm({
                       ac_available: "",
                       deposit_duration: "",
                       room_image_url: null,
+                      aminities: []
                     })
                   }
-                  className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                  className="bg-buttonsSecondary text-white px-4 py-2 rounded hover:bg-buttonsHover transition"
                 >
                   + Add Room
                 </button>

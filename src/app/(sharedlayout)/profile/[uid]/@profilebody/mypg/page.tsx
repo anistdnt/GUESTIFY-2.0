@@ -67,7 +67,7 @@ const Page = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 justify-items-center">
         {cards?.map((item: any, index: number) => (
           <div key={index}>
-            <ProfilePGCard item={item} number_of_stars={5} />
+            <ProfilePGCard item={item} />
             {/* <DisplayCard item={item} number_of_stars={5} /> */}
           </div>
         ))}
