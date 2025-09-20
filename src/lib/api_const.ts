@@ -1,6 +1,7 @@
 export const API = {
     NOTIFICATION: {
-        ALL_NOTIFICATIONS: "/getNotification",
+        GET_ALL: "/getAllNotifications",
+        ALL_NOTIFICATIONS: "/sse-listener",
         UPDATE_NOTIFICATION: "/updateNotification",
         UPDATE_NOTIFICATIONs : "/updateNotifications",
         DELETE_NOTIFICATION : "/deleteNotification",
