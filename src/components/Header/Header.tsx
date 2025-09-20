@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUp, Bell, EnvelopeSimple, List, XCircle } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUp, List } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -14,8 +14,8 @@ import { API } from "@/lib/api_const";
 import { setLoading } from "@/redux/slices/loaderSlice";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
-import { space } from "postcss/lib/list";
-import Loadercomp from "../Loader/Loadercomp";
+import Notification from "./Notification";
+import Noti from "./Noti";
 
 const navigation: {
   name: string;
@@ -54,14 +54,7 @@ export default function Header() {
     useState<boolean>(false);
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
-  const [showNotification, setshowNotification] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
-  const [notifications, setNotifications] = useState<any[]>()
-  const [loadingNotifications, setLoadingNotifications] = useState<boolean>(false);
-  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
-  const [bulkActionLoading, setBulkActionLoading] = useState<"read" | "delete" | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
-
 
   // const [isloading,setisloading] = useState<boolean>(false);
 
@@ -74,17 +67,11 @@ export default function Header() {
     dispatch(setLoading({ loading: true }));
     const res: ApiReturn<any> = await api_caller<any>("GET", API.USER.LOGOUT);
     if (res.success) {
-      // Close SSE connection when logging out
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
-
       deleteCookie("authToken");
       dispatch(setUserData({}));
+      setuserInfo(null);
       setisLoggedIn(false);
       setshowProfileDropdown(false);
-      setNotifications([]); // Clear notifications
       router.push("/");
       toast.success(res.message || "Logged out successfully");
     } else {
@@ -106,213 +93,6 @@ export default function Header() {
     }
   };
 
-  // useEffect(() => {
-  //   if (hasCookie("authToken")) {
-  //     setisLoggedIn(true);
-  //   }
-  // }, [pathname]);
-  // notification api handler
-
-
-  async function handleNotification(e: React.MouseEvent<HTMLButtonElement>) {
-    setshowNotification((prev) => !prev);
-    setshowProfileDropdown(false);
-
-    // Only fetch notifications if we're opening the dropdown and there are no notifications yet
-    // if (!showNotification && (!notifications || notifications.length === 0)) {
-    //   await fetchAllNotifications();
-    // }
-  }
-
-  const fetchAllNotifications = async () => {
-    setLoadingNotifications(true);
-    try {
-      const resData: ApiReturn<any> = await api_caller<any>(
-        "GET",
-        API.NOTIFICATION.ALL_NOTIFICATIONS
-      );
-      console.log(resData);
-      setNotifications(resData?.data);
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    } finally {
-      setLoadingNotifications(false);
-    }
-  };
-
-
-  const markNotificationAsRead = async (id: string) => {
-    setActionLoadingId(id);
-    try {
-      const resData: ApiReturn<any> = await api_caller<any>("PATCH", `${API.NOTIFICATION.UPDATE_NOTIFICATION}/${id}`);
-      if (resData.success) {
-        toast.success(resData.message);
-        // await fetchAllNotifications();
-      } else {
-        toast.error(resData.message);
-      }
-    } catch (error) {
-      console.error("Error updating notification:", error);
-    } finally {
-      setActionLoadingId(null);
-    }
-  };
-
-
-  const markAllNotificationsAsRead = async () => {
-    setBulkActionLoading("read");
-    try {
-      const resData: ApiReturn<any> = await api_caller<any>("PUT", API.NOTIFICATION.UPDATE_NOTIFICATIONs);
-      if (resData.success) {
-        toast.success(resData.message);
-        // await fetchAllNotifications();
-      } else {
-        toast.error(resData.message);
-      }
-    } catch (error) {
-      console.error("Error updating all notifications:", error);
-    } finally {
-      setBulkActionLoading(null);
-    }
-  };
-
-
-  const deleteNotification = async (id: string) => {
-    setActionLoadingId(id);
-    try {
-      const resData: ApiReturn<any> = await api_caller<any>("DELETE", `${API.NOTIFICATION.DELETE_NOTIFICATION}/${id}`);
-      if (resData.success) {
-        toast.success(resData.message);
-        // await fetchAllNotifications();
-      } else {
-        toast.error(resData.message);
-      }
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-    } finally {
-      setActionLoadingId(null);
-    }
-  };
-
-
-  const deleteAllNotifications = async () => {
-    setBulkActionLoading("delete");
-    try {
-      const resData: ApiReturn<any> = await api_caller<any>("DELETE", API.NOTIFICATION.DELETE_NOTIFICATIONS);
-      if (resData.success) {
-        toast.success(resData.message);
-        // await fetchAllNotifications();
-      } else {
-        toast.error(resData.message);
-      }
-    } catch (error) {
-      console.error("Error deleting all notifications:", error);
-    } finally {
-      setBulkActionLoading(null);
-    }
-  };
-
-
-
-
-  // Setup SSE connection for real-time notifications
-  const setupSSEConnection = () => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-    }
-
-    if (!hasCookie("authToken")) return;
-
-    const auth_token = getCookie("authToken");
-    const device_token = getCookie("device_token");
-    const baseUrl = (process.env.NEXT_PUBLIC_SERVER_URL || "").replace(/\/+$/, "");
-    const apiPath = API.NOTIFICATION.ALL_NOTIFICATIONS.replace(/^\/+/, "");
-    const sseUrl = `${baseUrl}/${apiPath}`;
-
-    const eventSource = new EventSource(`${sseUrl}?auth_token=${auth_token}&device_token=${device_token}`);
-    eventSourceRef.current = eventSource;
-
-    eventSource.onopen = () => {
-      console.log("SSE connection established");
-    };
-
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log(data, "event update data")
-
-        if (data.initialNotifications) {
-          // Initial load of notifications
-          setNotifications(data.initialNotifications);
-        } else if (data.error) {
-          toast.error(data.error);
-        } else if (data.updateType) {
-          switch (data.updateType) {
-            case "all_deleted":
-              // Remove all notifications whose _id is in batchIds from state
-              setNotifications(prev => prev.filter(n => !data.batchIds.includes(n._id)));
-              toast.success("All notifications deleted");
-              break;
-
-            case "all_read":
-              // Mark notifications in batchIds as read
-              setNotifications(prev => prev.map(n =>
-                data.batchIds.includes(n._id) ? { ...n, isRead: true } : n
-              ));
-              toast.success("All notifications marked as read");
-              break;
-
-            case "deleted":
-              // Remove single notification
-              setNotifications(prev => prev.filter(n => n._id !== data.notification._id));
-              toast.success("Notification deleted");
-              break;
-
-            case "updated":
-            case "new":
-              // Add or update a single notification
-              const notif = data.notification ?? data.newNotification;
-              setNotifications(prev => {
-                if (!prev) return [notif];
-                const exists = prev.find(n => n._id === notif._id);
-                if (exists) {
-                  return prev.map(n => n._id === notif._id ? notif : n);
-                }
-                return [notif, ...prev];
-              });
-              toast.success("Notification updated");
-              break;
-
-            default:
-              // Unknown updateType, optionally ignore or log
-              console.warn("Unknown SSE updateType:", data.updateType);
-              break;
-          }
-        } else if (data.notification || data.newNotification) {
-          // Fallback case if no updateType but notification present
-          const newNotif = data.notification ?? data.newNotification;
-          setNotifications(prev => {
-            if (!prev) return [newNotif];
-            if (prev.find(n => n._id === newNotif._id)) return prev;
-            return [newNotif, ...prev];
-          });
-          toast.success("New notification received!");
-        }
-      } catch (error) {
-        console.error("Error processing SSE message:", error);
-      }
-    };
-
-
-    eventSource.onerror = (error) => {
-      console.error("SSE connection error:", error);
-      eventSource.close();
-      eventSourceRef.current = null;
-      setisLoggedIn(false);
-    };
-  };
-
-
   useEffect(() => {
     if (hasCookie("authToken")) {
       if (Object.keys(reduxUserData).length !== 0) {
@@ -331,29 +111,10 @@ export default function Header() {
         fetcheUserProfile(user_info_fromToken.user_id);
       }
       setisLoggedIn(true);
-      // Setup SSE connection when user is logged in
-      setupSSEConnection();
-      // Initial fetch of notifications
-      // fetchAllNotifications();
     }
     else {
       setisLoggedIn(false);
-
-      // Close SSE connection when user logs out
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
-      setNotifications([]);
     }
-
-    // Cleanup function to close SSE connection when component unmounts
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
-    };
   }, [isLoggedIn, pathname, reduxUserData]);
 
   return (
@@ -401,101 +162,9 @@ export default function Header() {
               <div className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
                 
-                {/* <div className="relative mt-2">
-                  <button onClick={handleNotification} data-tooltip="Notifications" data-tooltip-pos="bottom">
-                    <Bell size={24} weight="bold" className="cursor-pointer" />
-                  </button>
-                  {Array.isArray(notifications) && notifications.length > 0 && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>}
-                </div> */}
-
-                {/* Notification Dropdown  */}
-                {showNotification && (
-                  <div className="absolute right-1 top-14 z-10 mt-2 w-80 max-h-80 origin-top-right rounded-md bg-white py-1 shadow-lg">
-                    <span className="px-4"> Notifications</span>
-                    <ul className="border-t-[1px] border-black py-2  max-h-64 overflow-y-scroll">
-                      {loadingNotifications ? (
-                        Array(3)
-                          .fill(0)
-                          .map((_, idx) => (
-                            <li
-                              key={idx}
-                              className="flex items-center gap-4 px-4 py-3 animate-pulse text-sm text-gray-700"
-                            >
-                              <div className="h-6 w-6 bg-gray-300 rounded-full" />
-                              <div className="h-4 bg-gray-300 rounded w-3/4" />
-                            </li>
-                          ))
-                      ) : Array.isArray(notifications) && notifications.length > 0 ? (
-                        notifications.map((notif: any, idx: number) => (
-                          <li
-                            key={idx}
-                            className="flex flex-row gap-8 justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            <span className={`flex flex-row items-start gap-2 ${!notif?.isRead ? "font-bold" : ""}`}>
-                              {notif?.notification_type === "transactional" && (
-                                <Bell className="bg-blue-400 p-1 h-7 w-7 text-white rounded-full" />
-                              )}
-                              {notif.message}
-                            </span>
-                            <div className="flex flex-row items-start gap-2 text-gray-400">
-                              <EnvelopeSimple
-                                size={24}
-                                className={`cursor-pointer transition-colors duration-200 ${actionLoadingId === notif._id ? "opacity-50 pointer-events-none" : "hover:text-gray-600"}`}
-                                onClick={() => markNotificationAsRead(notif._id)}
-                              />
-                              <XCircle
-                                size={24}
-                                className={`cursor-pointer transition-colors duration-200 ${actionLoadingId === notif._id ? "opacity-50 pointer-events-none" : "hover:text-gray-600"}`}
-                                onClick={() => deleteNotification(notif._id)}
-                              />
-
-                              {actionLoadingId === notif._id && (
-                                <div className="flex items-center justify-center ml-1">
-                                  <Loadercomp size={16} />
-                                </div>
-                              )}
-
-
-                            </div>
-                          </li>
-                        ))
-                      ) : (
-                        <li className="text-sm text-gray-600 px-4 py-3 h-24 flex items-center justify-center w-full">
-                          No Notifications to display
-                        </li>
-                      )}
-                    </ul>
-
-                    <div className="flex flex-row items-center justify-end h-10 gap-4 px-4">
-                      <button
-                        className="text-gray-500 hover:text-gray-800 flex items-center gap-1"
-                        onClick={markAllNotificationsAsRead}
-                        disabled={bulkActionLoading === "read"}
-                      >
-                        {bulkActionLoading === "read" ? (
-                          <Loadercomp size={14} />
-                        ) : (
-                          "Read All"
-                        )}
-                      </button>
-
-                      <button
-                        className="text-gray-500 hover:text-gray-800 flex items-center gap-1"
-                        onClick={deleteAllNotifications}
-                        disabled={bulkActionLoading === "delete"}
-                      >
-                        {bulkActionLoading === "delete" ? (
-                          <Loadercomp size={14} />
-                        ) : (
-                          "Clear All"
-                        )}
-                      </button>
-
-
-                    </div>
-                  </div>
-                )}
-
+                
+                {/* <Notification/> */}
+                {userInfo?.user_id && <Noti user_id={userInfo?.user_id}/>}
 
                 <div className="border-2" style={{ height: "3em" }}></div>
 
@@ -505,7 +174,6 @@ export default function Header() {
                       className="flex flex-row justify-center items-center gap-3 cursor-pointer"
                       onClick={() => {
                         setshowProfileDropdown((prev) => !prev);
-                        setshowNotification(false);
                       }}
                     >
                       <span className="text-gray-700 text-sm hidden sm:block font-semibold">
