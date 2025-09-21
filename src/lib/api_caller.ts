@@ -62,12 +62,15 @@ const handleApiRequest = async <T>(
 export const api_caller = async <T, R = unknown>(
     method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH",
     url: string,
-    data?: R
+    data?: R,
+    headers?: Record<string, string>
+    
 ): Promise<ApiReturn<T>> => {
     const result = await handleApiRequest<T>({
         method,
         url,
         data,
+        headers
     });
 
     if (result.success) {
