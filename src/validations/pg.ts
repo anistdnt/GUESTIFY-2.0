@@ -16,6 +16,7 @@ export const PGValidationSchema = {
     food_available: "",
     rules: "",
     pg_image_url: null,
+    // pg_images: [] as { pg_image_url: string; public_id: string }[],
     rooms: [
       {
         room_type: "single",
@@ -75,6 +76,12 @@ export const PGValidationSchema = {
     ),
     rules: Yup.string().required("Please enter the PG rules"),
     pg_image_url: Yup.mixed().nullable().required("PG Image is required"),
+    // pg_images: Yup.array().of(
+    //   Yup.object().shape({
+    //     pg_image_url: Yup.string().required("PG Image URL is required"),
+    //     public_id: Yup.string().required("Public ID is required"),
+    //   })
+    // ),
     rooms: Yup.array().of(
       Yup.object().shape({
         room_type: Yup.string().required("Please enter the room type"),
