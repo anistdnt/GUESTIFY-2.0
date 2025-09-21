@@ -1,4 +1,7 @@
 export interface PGInfo {
+  charge_duration?: string;
+  wifi_speed?: string;
+  additional_wifi_charges?: number;
   location: {
     type: "Point";
     coordinates: [number, number]; // [longitude, latitude]
@@ -26,6 +29,7 @@ export interface PGInfo {
 }
 
 export interface Room {
+  aminities: string[];
   _id: string;
   room_type: "single" | "double" | string;
   room_image_url: string;

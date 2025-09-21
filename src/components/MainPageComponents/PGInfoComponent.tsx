@@ -16,6 +16,7 @@ import 'swiper/css';
 import { Review } from '@/app/(sharedlayout)/pg/[id]/page';
 import type { LatLngTuple } from 'leaflet';
 import dynamic from "next/dynamic";
+import { getAmenityLabel } from '@/data/countryPhone';
 
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 const Feedback = lazy(() => import('@/components/Feedback/Feedback'))
@@ -271,28 +272,24 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-            {rooms && rooms.map((room, index) => (
-              <div key={room._id} className="animate-fadeIn" style={{ animationDelay: `${index * 0.1}s` }}>
+            {rooms && rooms.map((room, index) => {
+              // Getting room amenities labels 
+              const aminities = room?.aminities?.map((item: string)=> getAmenityLabel(item));
+              return <div key={room._id} className="animate-fadeIn" style={{ animationDelay: `${index * 0.1}s` }}>
                 <RoomCard
                   title={`${room.room_type[0].toUpperCase() + room.room_type.slice(1)} Room`}
                   rent={room.room_rent}
-                  foodIncluded={true}
+                  foodIncluded={pginfo.food_available === "yes"}
                   roomsAvailable={10}
                   depositDuration={room.deposit_duration}
                   imageUrls={[room.room_image_url]}
-                  amenities={[
-                    "AC",
-                    "Washroom",
-                    "Cupboard",
-                    "TV",
-                    "Cot",
-                    "Mattress",
-                    "WiFi",
-                    "Geyser",
-                  ]}
+                  amenities={aminities}
+                  wifidetails={pginfo.wifi_available === "yes" ? { available: "yes", speed: `${pginfo.wifi_speed} Mbps`, cost: pginfo.additional_wifi_charges, duration: pginfo.charge_duration } : { available: "no", speed: "", cost: 0, duration: "" }}
+                  attachedBathroom={room.attached_bathroom}
+                  airconditioned={room.ac_available}
                 />
               </div>
-            ))}
+            })}
           </div>
         </div>
 

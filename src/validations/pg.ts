@@ -5,27 +5,31 @@ export const PGValidationSchema = {
     pg_name: "",
     street_name: "",
     house_no: "",
-    state: "",
+    state: "West Bengal",
     pincode: "",
-    district: "",
+    district: "kolkata",
     pg_type: "",
-    wifi_available: "",
+    wifi_available: "no",
+    wifi_speed: "",
+    additional_wifi_charges: 0,
+    charge_duration: "quarterly",
     food_available: "",
     rules: "",
     pg_image_url: null,
     rooms: [
       {
-        room_type: "",
+        room_type: "single",
         room_rent: "",
-        ac_available: "",
-        deposit_duration: "",
+        ac_available: "no",
+        deposit_duration: "monthly",
+        aminities: [],
         room_image_url: null,
-        attached_bathroom: "",
+        attached_bathroom: "yes",
       },
     ],
 
     contact_details: {
-      country_code: "",
+      country_code: "+91",
       phone_number: "",
       is_phone_verified: false,
       alt_country_code: "",
@@ -48,6 +52,23 @@ export const PGValidationSchema = {
     pg_type: Yup.string().required("Please select the PG type"),
     wifi_available: Yup.string().required(
       "Please specify if Wi-Fi is available"
+    ),
+    wifi_speed: Yup.string().when("wifi_available", (wifi_available, schema) =>
+      (wifi_available as unknown) === "yes"
+        ? schema
+            .matches(/^\d+$/, "Wi-Fi speed must be a number")
+            .required("Please enter the Wi-Fi speed")
+        : schema.notRequired()
+    ),
+
+    additional_wifi_charges: Yup.string().when(
+      "wifi_available",
+      (wifi_available, schema) =>
+        (wifi_available as unknown) === "yes"
+          ? schema
+              .matches(/^\d+$/, "Wi-Fi charges must be a number")
+              .required("Please enter additional Wi-Fi charges")
+          : schema.notRequired()
     ),
     food_available: Yup.string().required(
       "Please specify if food is available"

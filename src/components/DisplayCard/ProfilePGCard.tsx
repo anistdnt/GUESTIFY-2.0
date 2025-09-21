@@ -10,7 +10,7 @@ import { formatDate } from "@/lib/utils/utilities";
 
 type Props = {
   item?: PGData;
-  number_of_stars: number;
+  number_of_stars?: number;
 };
 
 // {
@@ -137,7 +137,7 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
               WiFi Available
             </span>
             <div className="flex items-center gap-1">
-              <Rating no_of_star={number_of_stars} />
+              {number_of_stars && number_of_stars!==0 && <Rating no_of_star={number_of_stars} />}
             </div>
           </div>
 
