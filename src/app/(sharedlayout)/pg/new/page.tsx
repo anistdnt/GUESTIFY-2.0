@@ -123,7 +123,7 @@ export default function PGFormWrapper() {
         validationSchema={PGValidationSchema?.validation}
         onSubmit={handleSubmit}
       >
-        {({ validateForm, errors, touched, setTouched, submitForm }) => (
+        {({ validateForm, errors, touched, setTouched, submitForm, values }) => (
           <Stepper
             steps={[
               { label: "Contact Details", content: <ContactDetails /> },

@@ -17,27 +17,29 @@ import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
+import { API } from "@/lib/api_const";
 
 interface IProps {
-    formik: any;
+    values?: any;
+    setFieldValue?: any;
     imageKey?: string;
 }
 
 interface ImageInfo {
-    image_url: string,
+    url: string,
     public_id: string,
 }
 
-const ImagePicker = ({ formik , imageKey }: IProps) => {
-    const [images, setImages] = useState<{ [key:string] : string , public_id : string }[]>([]);
+const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
+    const [images, setImages] = useState<{ [key: string]: string, public_id: string }[]>([]);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const selectedImageIndex = useRef<number>(-1);
 
     useEffect(() => {
-        if (formik.values.images) {
-            setImages(formik.values.images);
+        if (values?.pg_images && imageKey === "pg_image_url") {
+            setImages(values.pg_images);
         }
-    }, [formik.values.images]);
+    }, [values.pg_images, imageKey]);
 
     const onDrop = useCallback(
         async (acceptedFiles: any) => {
@@ -53,13 +55,13 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
 
                     const res = await api_caller<ImageInfo>(
                         "POST",
-                        "IMAGE_UPLOAD",
+                        API.IMAGE.UPLOAD,
                         formData,
                         headers
                     );
 
                     if (res?.success) {
-                        return { [imageKey]: res.data?.image_url, public_id : res.data?.public_id };
+                        return { [imageKey]: res.data?.url, public_id: res.data?.public_id };
                     } else {
                         throw new Error(res?.message || "Image upload failed");
                     }
@@ -67,12 +69,14 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
 
                 let newImages: any[] = [];
 
+                console.log("Selected Image Index:", selectedImageIndex.current);
+
                 if (selectedImageIndex.current !== -1) {
                     const replacement = await uploadImage(acceptedFiles[0]);
                     if (!replacement) throw new Error("Image upload failed");
 
                     const payload = { public_id: images[selectedImageIndex.current]?.public_id };
-                    const res = await api_caller<any>("POST", "IMAGE_DELETE", payload);
+                    const res = await api_caller<any>("DELETE", API.IMAGE.DELETE, payload);
 
                     if (res?.success) {
                         newImages = previousImages.toSpliced(
@@ -93,7 +97,7 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
                 }
 
                 setImages(newImages);
-                formik.setFieldValue("images", newImages);
+                imageKey === "pg_image_url" ? setFieldValue("pg_images", newImages) : setFieldValue("room_image_url", newImages);
 
                 selectedImageIndex.current = -1;
             } catch (error: any) {
@@ -101,7 +105,7 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
                 console.error("Error uploading images:", error);
             }
         },
-        [images, formik, selectedImageIndex]
+        [images, values, selectedImageIndex]
     );
 
     const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -128,12 +132,12 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
 
     const deleteImage = async (index: number) => {
         const payload = { public_id: images[index]?.public_id };
-        const res = await api_caller<any>("POST", "IMAGE_DELETE", payload);
+        const res = await api_caller<any>("DELETE", API.IMAGE.DELETE, payload);
 
         if (res?.success) {
             const updatedImages = [...images].toSpliced(index, 1);
             setImages(updatedImages);
-            formik.setFieldValue("images", updatedImages);
+            imageKey === "pg_image_url" ? setFieldValue("pg_images", updatedImages) : setFieldValue("room_image_url", updatedImages);
             toast.success(res?.message || "Image deleted successfully");
         } else {
             toast.error(res?.message || "Image deletion failed");
@@ -142,6 +146,7 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
 
     const editImage = (index: number) => {
         selectedImageIndex.current = index;
+        console.log("Selected Image Index for Edit:", selectedImageIndex.current);
         open();
     };
 
@@ -161,13 +166,13 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
                                             className={imageActionsBtn}
                                             onClick={() => editImage(index)}
                                         >
-                                            <PencilSimple size={20} color="rgba(255,255,255,.8)" />
+                                            <PencilSimple size={20} color="rgb(0,0,0)" />
                                         </button>
                                         <button
                                             className={imageActionsBtn}
                                             onClick={() => deleteImage(index)}
                                         >
-                                            <Trash size={20} color="rgba(255,255,255,.8)" />
+                                            <Trash size={20} color="rgb(0,0,0)" />
                                         </button>
                                     </div>
                                 </div>
@@ -200,7 +205,10 @@ const ImagePicker = ({ formik , imageKey }: IProps) => {
                                 Drag and drop image or{" "}
                                 <span
                                     style={{ cursor: "pointer", color: "#5C79FF" }}
-                                    onClick={open}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // prevent root re-trigger
+                                        open();
+                                    }}
                                 >
                                     browse
                                 </span>
