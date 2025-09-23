@@ -9,7 +9,8 @@ export const Only_RoomValidationSchema = {
         ac_available: "no",
         deposit_duration: "monthly",
         aminities: [],
-        room_image_url: null,
+        // room_image_url: null,
+        room_images: [] as { room_image_url: string; room_image_id: string }[],
         attached_bathroom: "yes",
       },
     ],
@@ -27,8 +28,13 @@ export const Only_RoomValidationSchema = {
           .required("Please specify if AC is available in the room"),
         attached_bathroom: Yup.string()
           .required("Please specify if the room has an attached bathroom"),
-        room_image_url: Yup.mixed()
-          .nullable().required("Room Image is required"),
+        // room_image_url: Yup.mixed()
+        //   .nullable().required("Room Image is required"),
+        room_images: Yup.array().of(
+          Yup.object().shape({
+            room_image_url: Yup.string().required("Room Image URL is required"),
+            room_image_id: Yup.string().required("Public ID is required"),
+          }))
       })
     ),
   }),

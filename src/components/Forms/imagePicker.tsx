@@ -23,6 +23,8 @@ interface IProps {
     values?: any;
     setFieldValue?: any;
     imageKey?: string;
+    room?: any;
+    index?: number;
 }
 
 interface ImageInfo {
@@ -30,16 +32,20 @@ interface ImageInfo {
     public_id: string,
 }
 
-const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
+const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) => {
     const [images, setImages] = useState<{ [key: string]: string, public_id: string }[]>([]);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const selectedImageIndex = useRef<number>(-1);
 
     useEffect(() => {
         if (values?.pg_images && imageKey === "pg_image_url") {
-            setImages(values.pg_images);
+            setImages(values.pg_images.map((img: { pg_image_url: string; pg_image_id: string }) => ({ pg_image_url: img.pg_image_url, public_id: img.pg_image_url })));
         }
-    }, [values.pg_images, imageKey]);
+        if (room?.room_images && imageKey === "room_image_url") {
+            console.log("room images:", room?.room_images);
+            setImages(room.room_images.map((img: { room_image_url: string; room_image_id: string }) => ({ room_image_url: img.room_image_url, public_id: img.room_image_url })));
+        }
+    }, [values?.pg_images, imageKey, room?.room_images]);
 
     const onDrop = useCallback(
         async (acceptedFiles: any) => {
@@ -97,7 +103,11 @@ const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
                 }
 
                 setImages(newImages);
-                imageKey === "pg_image_url" ? setFieldValue("pg_images", newImages) : setFieldValue("room_image_url", newImages);
+                imageKey === "pg_image_url" ? setFieldValue("pg_images", newImages.map((img : any)=>{
+                    return {pg_image_url: img['pg_image_url'], pg_image_id: img['public_id']}
+                })) : setFieldValue(`rooms[${index}].room_images`, newImages.map((img : any)=>{
+                    return {room_image_url: img['room_image_url'], room_image_id: img['public_id']}
+                }));
 
                 selectedImageIndex.current = -1;
             } catch (error: any) {
@@ -137,7 +147,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
         if (res?.success) {
             const updatedImages = [...images].toSpliced(index, 1);
             setImages(updatedImages);
-            imageKey === "pg_image_url" ? setFieldValue("pg_images", updatedImages) : setFieldValue("room_image_url", updatedImages);
+            imageKey === "pg_image_url" ? setFieldValue("pg_images", updatedImages) : setFieldValue(`rooms[${index}].room_images`, updatedImages);
             toast.success(res?.message || "Image deleted successfully");
         } else {
             toast.error(res?.message || "Image deletion failed");
@@ -147,7 +157,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
     const editImage = (index: number) => {
         selectedImageIndex.current = index;
         console.log("Selected Image Index for Edit:", selectedImageIndex.current);
-        open();
+        setTimeout(() => open(), 0);
     };
 
     return (
@@ -163,14 +173,26 @@ const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
                                 <div className={`${imageActions} ${imageActions}`}>
                                     <div className="flex gap-3">
                                         <button
+                                            type="button"
                                             className={imageActionsBtn}
-                                            onClick={() => editImage(index)}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                e.nativeEvent.stopImmediatePropagation();
+                                                editImage(index)
+                                            }}
                                         >
                                             <PencilSimple size={20} color="rgb(0,0,0)" />
                                         </button>
                                         <button
+                                            type="button"
                                             className={imageActionsBtn}
-                                            onClick={() => deleteImage(index)}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                e.nativeEvent.stopImmediatePropagation();
+                                                deleteImage(index)
+                                            }}
                                         >
                                             <Trash size={20} color="rgb(0,0,0)" />
                                         </button>
@@ -179,8 +201,10 @@ const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
                             </div>
                         ))}
 
-                    <div {...getRootProps()} className={uploadCellBlank}>
-                        <input {...getInputProps()} />
+                    <div {...getRootProps({ onClick: (e) => {e.preventDefault(); e.stopPropagation();} })} className={uploadCellBlank}>
+                        <input {...getInputProps({
+                            type: "file",
+                        })} />
                         {isDragActive ? (
                             <p
                                 style={{
@@ -206,6 +230,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey }: IProps) => {
                                 <span
                                     style={{ cursor: "pointer", color: "#5C79FF" }}
                                     onClick={(e) => {
+                                        e.preventDefault();
                                         e.stopPropagation(); // prevent root re-trigger
                                         open();
                                     }}

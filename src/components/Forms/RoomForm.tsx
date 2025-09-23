@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import Select from "react-select";
 import Tooltip from "./Tooltip";
+import ImagePicker from "./imagePicker";
 
 type RoomFormValues = {
   _id?: string;
@@ -24,7 +25,7 @@ type RoomFormValues = {
   attached_bathroom: string;
   ac_available: string;
   deposit_duration: string;
-  room_image_url: any;
+  room_images: { room_image_url: string; room_image_id: string }[];
   aminities?: string[];
 };
 
@@ -290,12 +291,13 @@ export default function RoomForm({
                 </div>
 
                 {/* Image Upload */}
-                <RoomImageUploader
+                {/* <RoomImageUploader
                   key={index}
                   index={index}
                   values={values}
                   setFieldValue={setFieldValue}
-                />
+                /> */}
+                <ImagePicker imageKey="room_image_url" {...{ setFieldValue, room, index }} />
                 <ErrorMessage
                   name={`rooms[${index}].room_image_url`}
                   component="div"

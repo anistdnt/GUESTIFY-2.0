@@ -16,22 +16,6 @@ export default function PGForm({
 }) {
   const { setFieldValue, values } = useFormikContext<any>();
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      "image/*": [],
-    },
-    onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFieldValue("pg_image_url", reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    },
-  });
-
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
