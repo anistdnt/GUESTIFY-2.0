@@ -91,7 +91,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
             <div className="lg:col-span-2">
               <div className="relative group overflow-hidden rounded-2xl shadow-2xl">
                 <img
-                  src={pginfo.pg_image_url}
+                  src={pginfo?.pg_images[0]?.pg_image_url}
                   alt="PG Image"
                   className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -125,10 +125,10 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                   //   }
                   // }}
                 >
-                  {[pginfo.pg_image_url, pginfo.pg_image_url, pginfo.pg_image_url, pginfo.pg_image_url, pginfo.pg_image_url, pginfo.pg_image_url]?.map((img, idx) => (
+                  {pginfo?.pg_images?.slice(1)?.map((img, idx) => (
                     <SwiperSlide key={idx}>
                       <img
-                        src={img}
+                        src={img?.pg_image_url}
                         alt={`PG Carousel ${idx + 1}`}
                         className="w-full h-[300px] object-cover rounded-2xl"
                       />
@@ -282,7 +282,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                   foodIncluded={pginfo.food_available === "yes"}
                   roomsAvailable={10}
                   depositDuration={room.deposit_duration}
-                  imageUrls={[room.room_image_url]}
+                  imageUrls={room.room_images}
                   amenities={aminities}
                   wifidetails={pginfo.wifi_available === "yes" ? { available: "yes", speed: `${pginfo.wifi_speed} Mbps`, cost: pginfo.additional_wifi_charges, duration: pginfo.charge_duration } : { available: "no", speed: "", cost: 0, duration: "" }}
                   attachedBathroom={room.attached_bathroom}

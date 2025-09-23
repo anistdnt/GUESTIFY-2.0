@@ -52,23 +52,9 @@ export default function RoomDetailsEdit() {
   }, [isDeleted]);
 
   const handleSubmit = async (values: any) => {
-    const formData = new FormData();
-
-    // ✅ Add rooms array with their files
-    values.rooms.forEach((room: any, index: number) => {
-      Object.entries(room).forEach(([key, value]) => {
-        if (key === "room_image_url" && value) {
-          if (typeof value === "string" && value.startsWith("data:image/")) {
-            const file = base64ToFile(value, `Room-Image-${Date.now()}`);
-            formData.append(`rooms[${index}][${key}]`, file);
-          } else {
-            formData.append(`rooms[${index}][${key}]`, value as File);
-          }
-        } else if (key !== "room_image_url") {
-          formData.append(`rooms[${index}][${key}]`, (value as string) ?? "");
-        }
-      });
-    });
+    const payload = {
+      ...values,
+    };
 
     // console.log("Submitted values Formadata:", values);
     dispatch(setLoading({ loading: true }));
@@ -76,7 +62,7 @@ export default function RoomDetailsEdit() {
     const res: ApiReturn<any> = await api_caller<any>(
       "PUT",
       `${API.ROOM.UPDATE}/${paying_guestID}/room-details`,
-      formData
+      payload
     );
     if (res.success) {
       dispatch(setLoading({ loading: false }));
@@ -98,7 +84,10 @@ export default function RoomDetailsEdit() {
         enableReinitialize={true}
         onSubmit={handleSubmit}
       >
-        {({ dirty }) => (
+        {({ dirty, errors, values }) => {
+          console.log("Formik errors:", errors);
+          console.log("Formik values:", values);
+          return(
           <Form>
             <RoomForm hasAddBtn={false} caption="Update Room Details" />
             <div className="flex justify-between w-full items-center">
@@ -133,7 +122,7 @@ export default function RoomDetailsEdit() {
               </button>
             </div>
           </Form>
-        )}
+        )}}
       </Formik>
     </div>
   );
