@@ -15,61 +15,56 @@ type Props = {
   number_of_stars: number;
 };
 
-// {
-//             "pginfo": {
-//                 "location": {
-//                     "type": "Point",
-//                     "coordinates": [
-//                         88.38587425,
-//                         22.57642717
-//                     ]
-//                 },
-//                 "_id": "684d2dbf8b6f0ba2101965cd",
-//                 "user_id": "68012da9a9b2f3a9a37b3638",
-//                 "pg_name": "Test PG XYZ",
-//                 "district": "kolkata",
-//                 "street_name": "Dhan Devi Khanna Road",
-//                 "house_no": 62,
-//                 "state": "West Bengal",
-//                 "pincode": 700040,
-//                 "address": "62, Dhan Devi Khanna Road, Kolkata, 700040",
-//                 "wifi_available": "yes",
-//                 "food_available": "no",
-//                 "rules": "No Rules here",
-//                 "pg_image_url": "http://guestify-2-0-backend.onrender.com/user-assets/1749888447303-Screenshot 2024-10-26 114420.png",
-//                 "createdAt": "2025-06-14T08:07:27.983Z",
-//                 "updatedAt": "2025-06-14T08:07:27.983Z",
-//                 "__v": 0
-//             },
-//             "rooms": [
-//                 {
-//                     "_id": "684d2dc08b6f0ba2101965cf",
-//                     "room_type": "single",
-//                     "room_image_url": "https://example.com/images/room1.jpg",
-//                     "room_rent": 5000,
-//                     "ac_available": "yes",
-//                     "attached_bathroom": "yes",
-//                     "deposit_duration": "monthly",
-//                     "pg_id": "684d2dbf8b6f0ba2101965cd",
-//                     "createdAt": "2025-06-14T08:07:28.214Z",
-//                     "updatedAt": "2025-06-14T08:07:28.214Z",
-//                     "__v": 0
-//                 },
-//                 {
-//                     "_id": "684d2dc08b6f0ba2101965d1",
-//                     "room_type": "double",
-//                     "room_image_url": "https://example.com/images/room2.jpg",
-//                     "room_rent": 7000,
-//                     "ac_available": "no",
-//                     "attached_bathroom": "yes",
-//                     "deposit_duration": "halfyearly",
-//                     "pg_id": "684d2dbf8b6f0ba2101965cd",
-//                     "createdAt": "2025-06-14T08:07:28.437Z",
-//                     "updatedAt": "2025-06-14T08:07:28.437Z",
-//                     "__v": 0
-//                 }
-//             ]
-//         }
+type ImageProps = {
+  images?: { pg_image_url: string; pg_image_id: string }[];
+};
+
+function FadedImageSlider({ images }: ImageProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!images || images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 3000); // Change every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [images]);
+
+  if (!images || images.length === 0) {
+    return (
+      <Image
+        src="/assets/sample1.jpg"
+        alt="PG Image"
+        className="w-full h-60 object-cover rounded-t-xl"
+        width={500}
+        height={500}
+      />
+    );
+  }
+
+  return (
+    <div className="relative h-60 w-full overflow-hidden rounded-t-xl">
+      {images.map((img, idx) => (
+        <div
+          key={idx}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            idx === currentIndex ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Image
+            src={img.pg_image_url}
+            alt={`PG Image ${idx + 1}`}
+            className="w-full h-full object-cover rounded-t-xl"
+            width={500}
+            height={500}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function DisplayCard({ item, number_of_stars }: Props) {
   const router = useRouter();
@@ -90,17 +85,8 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
     <>
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <div className="relative">
-          <Image
-            className="w-full h-60 object-cover"
-            src={
-              pginfo?.pg_image_url
-                ? pginfo?.pg_image_url
-                : "/assets/sample1.jpg"
-            }
-            alt="PG Image"
-            width={500}
-            height={500}
-          />
+          <FadedImageSlider images={pginfo?.pg_images} />
+          {/* PG Type Badge */}
           <span
             className={`absolute top-2 right-2 ${
               pginfo?.pg_type === "girls" && "bg-pink-500"
@@ -114,6 +100,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
             )}
           </span>
         </div>
+
         <div className="p-4">
           <div className="flex justify-between items-center">
             <div>
@@ -147,7 +134,9 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               WiFi Available
             </span>
             <div className="flex items-center gap-1">
-              {number_of_stars && number_of_stars!==0 && <Rating no_of_star={number_of_stars} />}
+              {number_of_stars && number_of_stars !== 0 && (
+                <Rating no_of_star={number_of_stars} />
+              )}
             </div>
           </div>
 

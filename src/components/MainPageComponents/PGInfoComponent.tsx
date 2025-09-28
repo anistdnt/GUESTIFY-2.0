@@ -1,62 +1,98 @@
-"use client"
+"use client";
 
-import RoomCard from '@/components/DisplayCard/RoomCard';
-import 'leaflet/dist/leaflet.css';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import RoomCard from "@/components/DisplayCard/RoomCard";
+import "leaflet/dist/leaflet.css";
+import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import SwiperCore from "swiper";
 import { Navigation, Pagination } from "swiper/modules";
-import { ForkKnife, WifiHigh, ThermometerCold, ArrowLeft, ArrowRight, X, MapPin, Star, Shield, Phone, CaretLeft, CaretRight } from '@phosphor-icons/react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { PGInfo, Room } from '@/types/pg_type';
-import 'swiper/css';
-import { Review } from '@/app/(sharedlayout)/pg/[id]/page';
-import type { LatLngTuple } from 'leaflet';
+import {
+  ForkKnife,
+  WifiHigh,
+  ThermometerCold,
+  ArrowLeft,
+  ArrowRight,
+  X,
+  MapPin,
+  Star,
+  Shield,
+  Phone,
+  CaretLeft,
+  CaretRight,
+} from "@phosphor-icons/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { PGInfo, Room } from "@/types/pg_type";
+import "swiper/css";
+import { Review } from "@/app/(sharedlayout)/pg/[id]/page";
+import type { LatLngTuple } from "leaflet";
 import dynamic from "next/dynamic";
-import { getAmenityLabel } from '@/data/countryPhone';
+import { getAmenityLabel } from "@/data/countryPhone";
+import { useDispatch } from "react-redux";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
 
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
-const Feedback = lazy(() => import('@/components/Feedback/Feedback'))
-const SimilerPgs = lazy(() => import("@/components/MainPageComponents/SimilerPgs"));
+const Feedback = lazy(() => import("@/components/Feedback/Feedback"));
+const SimilerPgs = lazy(
+  () => import("@/components/MainPageComponents/SimilerPgs")
+);
 
 interface Iprops {
-  id: string,
-  pginfo: PGInfo,
-  rooms: Room[],
-  reviewData: Review[],
-  clg_coords?: string,
-  clg_name?: string,
-  clg_addr?: string,
-  clg_pin?: string
+  id: string;
+  pginfo: PGInfo;
+  rooms: Room[];
+  reviewData: Review[];
+  clg_coords?: string;
+  clg_name?: string;
+  clg_addr?: string;
+  clg_pin?: string;
   clg_id?: string;
 }
 
 // SwiperCore.use([Navigation, Pagination]);
 
-const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, clg_addr, clg_pin, clg_id }: Iprops) => {
+const PGInfoComponent = ({
+  pginfo,
+  rooms,
+  reviewData,
+  id,
+  clg_coords,
+  clg_name,
+  clg_addr,
+  clg_pin,
+  clg_id,
+}: Iprops) => {
   console.log("pginfo", pginfo);
 
   const formRef = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
   // const paginationRef = useRef<HTMLDivElement>(null);
-  const college_coords = clg_coords.split(",").map(coord => Number(coord)).reverse() as [number, number];
+  const college_coords = clg_coords
+    .split(",")
+    .map((coord) => Number(coord))
+    .reverse() as [number, number];
 
-  useEffect(() => { console.log(reviewData) }, [reviewData])
-  const router = useRouter()
+  useEffect(() => {
+    console.log(reviewData);
+  }, [reviewData]);
+  const router = useRouter();
 
-  const position: LatLngTuple =
-    pginfo?.location
-      ? [pginfo.location.coordinates[1], pginfo.location.coordinates[0]] :
-      [28.6139, 77.2090];
+  const position: LatLngTuple = pginfo?.location
+    ? [pginfo.location.coordinates[1], pginfo.location.coordinates[0]]
+    : [28.6139, 77.209];
 
   const getPGTypeColor = (type: string) => {
     switch (type) {
-      case 'girls': return 'bg-gradient-to-r from-pink-500 to-rose-500';
-      case 'boys': return 'bg-gradient-to-r from-blue-500 to-indigo-500';
-      case 'both': return 'bg-gradient-to-r from-amber-500 to-orange-500';
-      default: return 'bg-gradient-to-r from-gray-500 to-gray-600';
+      case "girls":
+        return "bg-gradient-to-r from-pink-500 to-rose-500";
+      case "boys":
+        return "bg-gradient-to-r from-blue-500 to-indigo-500";
+      case "both":
+        return "bg-gradient-to-r from-amber-500 to-orange-500";
+      default:
+        return "bg-gradient-to-r from-gray-500 to-gray-600";
     }
   };
 
@@ -77,7 +113,10 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
             onClick={() => router.back()}
             className="flex items-center gap-2 text-gray-700 hover:text-headingCol transition-colors duration-200 group"
           >
-            <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform duration-200" />
+            <ArrowLeft
+              size={24}
+              className="group-hover:-translate-x-1 transition-transform duration-200"
+            />
             <span className="font-medium">Back</span>
           </button>
         </div>
@@ -153,19 +192,33 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                 <div className="space-y-6">
                   {/* PG Name and Type */}
                   <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">{pginfo.pg_name}</h1>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                      {pginfo.pg_name}
+                    </h1>
                     <div className="flex items-center gap-3 mb-4">
-                      <span className={`${getPGTypeColor(pginfo?.pg_type)} text-white text-sm font-semibold px-4 py-2 rounded-full shadow-lg`}>
+                      <span
+                        className={`${getPGTypeColor(
+                          pginfo?.pg_type
+                        )} text-white text-sm font-semibold px-4 py-2 rounded-full shadow-lg`}
+                      >
                         {pginfo?.pg_type?.replace(
                           pginfo?.pg_type[0],
                           pginfo?.pg_type[0]?.toUpperCase()
-                        )} Only
+                        )}{" "}
+                        Only
                       </span>
                       {reviewData && reviewData.length > 0 && (
                         <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
-                          <Star size={16} className="text-yellow-500 fill-yellow-500" />
-                          <span className="text-sm font-semibold text-gray-700">{getAverageRating()}</span>
-                          <span className="text-xs text-gray-500">({reviewData.length} reviews)</span>
+                          <Star
+                            size={16}
+                            className="text-yellow-500 fill-yellow-500"
+                          />
+                          <span className="text-sm font-semibold text-gray-700">
+                            {getAverageRating()}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({reviewData.length} reviews)
+                          </span>
                         </div>
                       )}
                     </div>
@@ -174,7 +227,9 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                   {/* Rent Section */}
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
                     <p className="text-sm text-gray-600 mb-1">Starting from</p>
-                    <p className="text-4xl font-bold text-green-600">₹{pginfo?.minRent}</p>
+                    <p className="text-4xl font-bold text-green-600">
+                      ₹{pginfo?.minRent}
+                    </p>
                     <p className="text-sm text-gray-500">per month</p>
                   </div>
 
@@ -190,8 +245,14 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                           <WifiHigh size={20} className="text-blue-600" />
                         </div>
                         <div>
-                          <span className="font-medium text-gray-800">WiFi</span>
-                          <p className="text-sm text-gray-500">{pginfo.wifi_available === "yes" ? "High-speed internet" : "Not Available"}</p>
+                          <span className="font-medium text-gray-800">
+                            WiFi
+                          </span>
+                          <p className="text-sm text-gray-500">
+                            {pginfo.wifi_available === "yes"
+                              ? "High-speed internet"
+                              : "Not Available"}
+                          </p>
                         </div>
                       </div>
 
@@ -200,8 +261,14 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                           <ForkKnife size={20} className="text-orange-600" />
                         </div>
                         <div>
-                          <span className="font-medium text-gray-800">Food</span>
-                          <p className="text-sm text-gray-500">{pginfo.food_available === "yes" ? "Homely meals included" : "Not Provided"}</p>
+                          <span className="font-medium text-gray-800">
+                            Food
+                          </span>
+                          <p className="text-sm text-gray-500">
+                            {pginfo.food_available === "yes"
+                              ? "Homely meals included"
+                              : "Not Provided"}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -215,12 +282,28 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                     </h3>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <p className="text-gray-700 mb-1">{pginfo.address}</p>
-                      <p className="text-sm text-gray-500">Pincode: {pginfo.pincode}</p>
+                      <p className="text-sm text-gray-500">
+                        Pincode: {pginfo.pincode}
+                      </p>
                     </div>
                   </div>
 
                   {/* Contact Button */}
-                  <button className="w-full bg-buttons hover:bg-buttonsHover text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+                  <button
+                    className="w-full bg-buttons hover:bg-buttonsHover text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      dispatch(
+                        setModalVisibility({
+                          open: true,
+                          type: "ownerinfo",
+                          modalData: {
+                            text: pginfo?.pg_name as string,
+                            rowid: pginfo?._id as string,
+                          },
+                        })
+                      );
+                    }}
+                  >
                     <Phone size={20} />
                     Get Contact Details
                   </button>
@@ -238,8 +321,12 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                 <Shield size={24} className="text-yellow-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">House Rules & Guidelines</h3>
-                <p className="text-gray-700 leading-relaxed text-lg">{pginfo.rules}</p>
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                  House Rules & Guidelines
+                </h3>
+                <p className="text-gray-700 leading-relaxed text-lg">
+                  {pginfo.rules}
+                </p>
               </div>
             </div>
           </div>
@@ -250,12 +337,18 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="text-center sm:text-left">
-                <h3 className="text-2xl font-bold mb-2">Share Your Experience</h3>
-                <p className="text-blue-100">Help others by sharing your thoughts about this PG</p>
+                <h3 className="text-2xl font-bold mb-2">
+                  Share Your Experience
+                </h3>
+                <p className="text-blue-100">
+                  Help others by sharing your thoughts about this PG
+                </p>
               </div>
               <button
                 className="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-3 px-8 rounded-xl transition duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg"
-                onClick={() => { formRef.current?.scrollIntoView({ behavior: 'smooth' }) }}
+                onClick={() => {
+                  formRef.current?.scrollIntoView({ behavior: "smooth" });
+                }}
               >
                 Write a Review
                 <ArrowRight size={18} />
@@ -267,36 +360,66 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
         {/* Available Rooms Section */}
         <div className="animate-slideUp mb-12">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Available Rooms</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              Available Rooms
+            </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-            {rooms && rooms.map((room, index) => {
-              // Getting room amenities labels 
-              const aminities = room?.aminities?.map((item: string)=> getAmenityLabel(item));
-              return <div key={room._id} className="animate-fadeIn" style={{ animationDelay: `${index * 0.1}s` }}>
-                <RoomCard
-                  title={`${room.room_type[0].toUpperCase() + room.room_type.slice(1)} Room`}
-                  rent={room.room_rent}
-                  foodIncluded={pginfo.food_available === "yes"}
-                  roomsAvailable={10}
-                  depositDuration={room.deposit_duration}
-                  imageUrls={room.room_images}
-                  amenities={aminities}
-                  wifidetails={pginfo.wifi_available === "yes" ? { available: "yes", speed: `${pginfo.wifi_speed} Mbps`, cost: pginfo.additional_wifi_charges, duration: pginfo.charge_duration } : { available: "no", speed: "", cost: 0, duration: "" }}
-                  attachedBathroom={room.attached_bathroom}
-                  airconditioned={room.ac_available}
-                />
-              </div>
-            })}
+          <div className="flex flex-wrap gap-6 justify-items-center">
+            {rooms &&
+              rooms.map((room, index) => {
+                // Getting room amenities labels
+                const aminities = room?.aminities?.map((item: string) =>
+                  getAmenityLabel(item)
+                );
+                return (
+                  <div
+                    key={room._id}
+                    className="animate-fadeIn"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <RoomCard
+                      title={`${
+                        room.room_type[0].toUpperCase() +
+                        room.room_type.slice(1)
+                      } Room`}
+                      rent={room.room_rent}
+                      foodIncluded={pginfo.food_available === "yes"}
+                      roomsAvailable={10}
+                      depositDuration={room.deposit_duration}
+                      imageUrls={room.room_images}
+                      amenities={aminities}
+                      wifidetails={
+                        pginfo.wifi_available === "yes"
+                          ? {
+                              available: "yes",
+                              speed: `${pginfo.wifi_speed} Mbps`,
+                              cost: pginfo.additional_wifi_charges,
+                              duration: pginfo.charge_duration,
+                            }
+                          : {
+                              available: "no",
+                              speed: "",
+                              cost: 0,
+                              duration: "",
+                            }
+                      }
+                      attachedBathroom={room.attached_bathroom}
+                      airconditioned={room.ac_available}
+                    />
+                  </div>
+                );
+              })}
           </div>
         </div>
 
         {/* Map Section */}
         <div className="animate-slideUp mb-20">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Location & Nearby</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              Location & Nearby
+            </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
           </div>
 
@@ -308,7 +431,7 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
                   position: position as [number, number],
                   name: pginfo.pg_name,
                   address: pginfo.address,
-                  pg_idno: pginfo._id
+                  pg_idno: pginfo._id,
                 }}
                 {...{ clg_name, clg_addr, clg_pin, clg_id }}
               />
@@ -319,7 +442,10 @@ const PGInfoComponent = ({ pginfo, rooms, reviewData, id, clg_coords, clg_name, 
         {/* Similar PGs Section */}
         <div className="animate-slideUp mb-12">
           <Suspense fallback={<SimilarPGsSkeleton />}>
-            <SimilerPgs current_pgid={pginfo?._id} current_pg_cords={pginfo?.location?.coordinates} />
+            <SimilerPgs
+              current_pgid={pginfo?._id}
+              current_pg_cords={pginfo?.location?.coordinates}
+            />
           </Suspense>
         </div>
 
@@ -345,7 +471,10 @@ const SimilarPGsSkeleton = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+          <div
+            key={i}
+            className="bg-white rounded-xl shadow-lg p-6 animate-pulse"
+          >
             <div className="w-full h-48 bg-gray-200 rounded-lg mb-4" />
             <div className="space-y-3">
               <div className="h-6 bg-gray-200 rounded w-3/4" />
