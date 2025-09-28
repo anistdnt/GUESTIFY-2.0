@@ -25,105 +25,153 @@ export default function PGFormWrapper() {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  // const handleSubmit = async (values: any) => {
+  //   const formData = new FormData();
+
+  //   delete values.contact_details.is_phone_verified;
+  //   delete values.contact_details.is_email_verified;
+
+  //   // Add top-level fields
+  //   Object.entries(values).forEach(([key, value]) => {
+  //     if (key === "rooms") return; // skip for now
+
+  //     // Special handling for contact_details
+  //     if (
+  //       key === "contact_details" &&
+  //       typeof value === "object" &&
+  //       value !== null
+  //     ) {
+  //       Object.entries(value).forEach(([subKey, subValue]) => {
+  //         formData.append(
+  //           `contact_details[${subKey}]`,
+  //           (subValue as string) ?? ""
+  //         );
+  //       });
+  //       formData.append(
+  //         "contact_details[is_phone_verified]",
+  //         reduxAuthVerification?.isPhoneVerified ? "true" : "false"
+  //       );
+  //       formData.append(
+  //         "contact_details[is_email_verified]",
+  //         reduxAuthVerification?.isEmailVerified ? "true" : "false"
+  //       );
+  //       formData.append(
+  //         "contact_details[image_url]",
+  //         reduxUserData?.image_url || ""
+  //       );
+  //       formData.append(
+  //         "contact_details[owner_name]",
+  //         `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
+  //       );
+  //       return;
+  //     }
+
+  //     if (key === "pg_image_url" && value) {
+  //       if (typeof value === "string" && value.startsWith("data:image/")) {
+  //         const file = base64ToFile(value, `PG-Image-${Date.now()}`);
+  //         formData.append("pg_image_url", file);
+  //       } else {
+  //         formData.append("pg_image_url", value as File);
+  //       }
+  //     } else if (key !== "pg_image_url") {
+  //       formData.append(key, (value as string) ?? "");
+  //     }
+  //   });
+
+  //   // Add rooms array with their files
+  //   values.rooms.forEach((room: any, index: number) => {
+  //     Object.entries(room).forEach(([key, value]) => {
+  //       if (key === "room_image_url" && value) {
+  //         if (typeof value === "string" && value.startsWith("data:image/")) {
+  //           const file = base64ToFile(value, `Room-Image-${Date.now()}`);
+  //           formData.append(`rooms[${index}][${key}]`, file);
+  //         } else {
+  //           formData.append(`rooms[${index}][${key}]`, value as File);
+  //         }
+  //       } else if (key !== "room_image_url") {
+  //         formData.append(`rooms[${index}][${key}]`, (value as string) ?? "");
+  //       }
+  //     });
+  //   });
+
+  //   console.log("Submitted values Formadata:", values);
+  //   dispatch(setLoading({ loading: true }));
+
+  //   const res: ApiReturn<any> = await api_caller<any>(
+  //     "POST",
+  //     API.PG.ADD,
+  //     formData
+  //   );
+  //   if (res.success) {
+  //     dispatch(setLoading({ loading: false }));
+  //     router?.push(`/profile/${reduxUserData?._id}/mypg`);
+  //     toast.success(res.message || "Save In successfully");
+  //   } else {
+  //     dispatch(setLoading({ loading: false }));
+  //     toast.error(`${res.message} : ${res.error}`);
+  //   }
+
+  //   // alert("Form submitted successfully!");
+  // };
+
   const handleSubmit = async (values: any) => {
-    const formData = new FormData();
+    // clone values to avoid mutating the form state directly
+    const payload: any = { ...values };
 
-    delete values.contact_details.is_phone_verified;
-    delete values.contact_details.is_email_verified;
+    // Remove unwanted fields from contact_details
+    if (payload.contact_details) {
+      delete payload.contact_details.is_phone_verified;
+      delete payload.contact_details.is_email_verified;
 
-    // Add top-level fields
-    Object.entries(values).forEach(([key, value]) => {
-      if (key === "rooms") return; // skip for now
+      // Override with redux values
+      payload.contact_details.is_phone_verified =
+        reduxAuthVerification?.isPhoneVerified ?? false;
+      payload.contact_details.is_email_verified =
+        reduxAuthVerification?.isEmailVerified ?? false;
+      payload.contact_details.image_url = reduxUserData?.image_url || "";
+      payload.contact_details.owner_name =
+        `${reduxUserData?.first_name} ${reduxUserData?.last_name}`.trim() || "";
+    }
 
-      // Special handling for contact_details
-      if (
-        key === "contact_details" &&
-        typeof value === "object" &&
-        value !== null
-      ) {
-        Object.entries(value).forEach(([subKey, subValue]) => {
-          formData.append(
-            `contact_details[${subKey}]`,
-            (subValue as string) ?? ""
-          );
-        });
-        formData.append(
-          "contact_details[is_phone_verified]",
-          reduxAuthVerification?.isPhoneVerified ? "true" : "false"
-        );
-        formData.append(
-          "contact_details[is_email_verified]",
-          reduxAuthVerification?.isEmailVerified ? "true" : "false"
-        );
-        formData.append(
-          "contact_details[image_url]",
-          reduxUserData?.image_url || ""
-        );
-        formData.append(
-          "contact_details[owner_name]",
-          `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
-        );
-        return;
-      }
+    payload.pg_images = values.pg_images;
 
-      if (key === "pg_image_url" && value) {
-        if (typeof value === "string" && value.startsWith("data:image/")) {
-          const file = base64ToFile(value, `PG-Image-${Date.now()}`);
-          formData.append("pg_image_url", file);
-        } else {
-          formData.append("pg_image_url", value as File);
-        }
-      } else if (key !== "pg_image_url") {
-        formData.append(key, (value as string) ?? "");
-      }
-    });
+    // Ensure rooms array is in correct format
+    payload.rooms = Array.isArray(values.rooms)
+      ? values.rooms.map((room: any) => ({
+        ...room,
+        room_images: room.room_images,
+      })) : [];
 
-    // Add rooms array with their files
-    values.rooms.forEach((room: any, index: number) => {
-      Object.entries(room).forEach(([key, value]) => {
-        if (key === "room_image_url" && value) {
-          if (typeof value === "string" && value.startsWith("data:image/")) {
-            const file = base64ToFile(value, `Room-Image-${Date.now()}`);
-            formData.append(`rooms[${index}][${key}]`, file);
-          } else {
-            formData.append(`rooms[${index}][${key}]`, value as File);
-          }
-        } else if (key !== "room_image_url") {
-          formData.append(`rooms[${index}][${key}]`, (value as string) ?? "");
-        }
-      });
-    });
-
-    console.log("Submitted values Formadata:", values);
+    console.log("Submitted values JSON:", payload);
     dispatch(setLoading({ loading: true }));
 
     const res: ApiReturn<any> = await api_caller<any>(
       "POST",
       API.PG.ADD,
-      formData
+      payload // send JSON instead of FormData
     );
+
     if (res.success) {
       dispatch(setLoading({ loading: false }));
       router?.push(`/profile/${reduxUserData?._id}/mypg`);
-      toast.success(res.message || "Save In successfully");
+      toast.success(res.message || "Saved successfully");
     } else {
       dispatch(setLoading({ loading: false }));
       toast.error(`${res.message} : ${res.error}`);
     }
-
-    // alert("Form submitted successfully!");
   };
+
 
   return (
     <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
-      <HeaderSection/>
+      <HeaderSection />
       <hr className="my-4 border-gray-200" />
       <Formik
         initialValues={PGValidationSchema?.initials}
         validationSchema={PGValidationSchema?.validation}
         onSubmit={handleSubmit}
       >
-        {({ validateForm, errors, touched, setTouched, submitForm }) => (
+        {({ validateForm, errors, touched, setTouched, submitForm, values }) => (
           <Stepper
             steps={[
               { label: "Contact Details", content: <ContactDetails /> },

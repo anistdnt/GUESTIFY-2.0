@@ -19,7 +19,7 @@ export interface PGInfo {
   wifi_available: "yes" | "no";
   food_available: "yes" | "no";
   rules: string;
-  pg_image_url: string;
+  pg_images: { pg_image_url: string; pg_image_id: string }[];
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -32,7 +32,7 @@ export interface Room {
   aminities: string[];
   _id: string;
   room_type: "single" | "double" | string;
-  room_image_url: string;
+  room_images: { room_image_url: string; room_image_id: string }[];
   room_rent: number;
   ac_available: "yes" | "no";
   attached_bathroom: "yes" | "no";

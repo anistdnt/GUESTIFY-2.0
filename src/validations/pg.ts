@@ -15,7 +15,8 @@ export const PGValidationSchema = {
     charge_duration: "quarterly",
     food_available: "",
     rules: "",
-    pg_image_url: null,
+    // pg_image_url: null,
+    pg_images: [] as { pg_image_url: string; pg_image_id: string }[],
     rooms: [
       {
         room_type: "single",
@@ -23,7 +24,8 @@ export const PGValidationSchema = {
         ac_available: "no",
         deposit_duration: "monthly",
         aminities: [],
-        room_image_url: null,
+        // room_image_url: null,
+        room_images: [] as { room_image_url: string; room_image_id: string }[],
         attached_bathroom: "yes",
       },
     ],
@@ -56,8 +58,8 @@ export const PGValidationSchema = {
     wifi_speed: Yup.string().when("wifi_available", (wifi_available, schema) =>
       (wifi_available as unknown) === "yes"
         ? schema
-            .matches(/^\d+$/, "Wi-Fi speed must be a number")
-            .required("Please enter the Wi-Fi speed")
+          .matches(/^\d+$/, "Wi-Fi speed must be a number")
+          .required("Please enter the Wi-Fi speed")
         : schema.notRequired()
     ),
 
@@ -66,15 +68,21 @@ export const PGValidationSchema = {
       (wifi_available, schema) =>
         (wifi_available as unknown) === "yes"
           ? schema
-              .matches(/^\d+$/, "Wi-Fi charges must be a number")
-              .required("Please enter additional Wi-Fi charges")
+            .matches(/^\d+$/, "Wi-Fi charges must be a number")
+            .required("Please enter additional Wi-Fi charges")
           : schema.notRequired()
     ),
     food_available: Yup.string().required(
       "Please specify if food is available"
     ),
     rules: Yup.string().required("Please enter the PG rules"),
-    pg_image_url: Yup.mixed().nullable().required("PG Image is required"),
+    // pg_image_url: Yup.mixed().nullable().required("PG Image is required"),
+    pg_images: Yup.array().of(
+      Yup.object().shape({
+        pg_image_url: Yup.string().required("PG Image URL is required"),
+        pg_image_id: Yup.string().required("Public ID is required"),
+      })
+    ),
     rooms: Yup.array().of(
       Yup.object().shape({
         room_type: Yup.string().required("Please enter the room type"),
@@ -88,9 +96,14 @@ export const PGValidationSchema = {
         attached_bathroom: Yup.string().required(
           "Please specify if the room has an attached bathroom"
         ),
-        room_image_url: Yup.mixed()
-          .nullable()
-          .required("Room Image is required"),
+        // room_image_url: Yup.mixed()
+        //   .nullable()
+        //   .required("Room Image is required"),
+        room_images: Yup.array().of(
+          Yup.object().shape({
+            room_image_url: Yup.string().required("Room Image URL is required"),
+            room_image_id: Yup.string().required("Public ID is required"),
+          }))
       })
     ),
     contact_details: Yup.object({

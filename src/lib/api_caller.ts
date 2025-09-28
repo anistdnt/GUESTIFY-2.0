@@ -62,10 +62,18 @@ const handleApiRequest = async <T>(
 
 // the api caller
 export const api_caller = async <T, R = unknown>(
-  method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH",
-  url: string,
-  data?: R
+    method: "POST" | "GET" | "PUT" | "DELETE" | "PATCH",
+    url: string,
+    data?: R,
+    headers?: Record<string, string>
+    
 ): Promise<ApiReturn<T>> => {
+    const result = await handleApiRequest<T>({
+        method,
+        url,
+        data,
+        headers
+    });
   
   // Check if the Cookie is valid or not for non exempted urls
   if (!shouldSkipAuthCheck(url)) {
@@ -79,12 +87,6 @@ export const api_caller = async <T, R = unknown>(
       }
     }
   }
-
-  const result = await handleApiRequest<T>({
-    method,
-    url,
-    data,
-  });
 
   if (result.success) {
     // console.log("Success:", result.data);

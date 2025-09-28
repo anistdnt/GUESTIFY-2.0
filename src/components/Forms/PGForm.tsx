@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import Select from "react-select";
 import { yesNoOptions, PGType, districtOptions, stateOptions, depositOptions } from "@/data/countryPhone";
 import Tooltip from "./Tooltip";
+import ImagePicker from "./imagePicker";
 
 export default function PGForm({
   caption,
@@ -14,22 +15,6 @@ export default function PGForm({
   disabledField?: string[];
 }) {
   const { setFieldValue, values } = useFormikContext<any>();
-
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      "image/*": [],
-    },
-    onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFieldValue("pg_image_url", reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    },
-  });
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -288,7 +273,15 @@ export default function PGForm({
           />
         </div>
 
-        <div className="">
+        <div>
+          <label className="block mb-1 font-medium">
+            PG Image
+            <span className="text-red-600 font-semibold ms-1">*</span>
+          </label>
+          <ImagePicker imageKey="pg_image_url" {...{ setFieldValue, values }} />
+        </div>
+
+        {/* <div className="">
           <label className="block mb-1 font-medium">
             PG Image
             <span className="text-red-600 font-semibold ms-1">*</span>
@@ -312,7 +305,7 @@ export default function PGForm({
                   className="max-w-[300px] max-h-[200px] object-contain rounded-md"
                 />
 
-                {/* Overlay */}
+                
                 <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <button
                     type="button"
@@ -338,7 +331,7 @@ export default function PGForm({
             component="div"
             className="text-red-500 text-sm"
           />
-        </div>
+        </div> */}
       </div>
     </>
   );

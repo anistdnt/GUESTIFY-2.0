@@ -22,7 +22,7 @@ type Props = {
     };
     attachedBathroom?: string;
     airconditioned?: string;
-    imageUrls: string[];
+    imageUrls: {room_image_url : string , room_image_id : string}[];
     amenities: string[];
 };
 
@@ -72,10 +72,10 @@ const RoomCard = ({
             loop
             className="h-full w-full custom-swiper"
           >
-            {imageUrls.map((url, idx) => (
+            {imageUrls.map((img, idx) => (
               <SwiperSlide key={idx}>
                 <Image
-                  src={url}
+                  src={img?.room_image_url}
                   alt={`Room image ${idx + 1}`}
                   layout="fill"
                   objectFit="cover"
