@@ -5,6 +5,7 @@ import { CurrencyInr, MapPin } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PGData } from "@/types/pg_type";
 import { House } from "@phosphor-icons/react/dist/ssr";
+import FadedImageSlider from "./FadedImageSlider";
 
 type Props = {
   item?: PGData;
@@ -24,20 +25,13 @@ export default function SliderPGCard({ item, number_of_stars }: Props) {
   return (
     <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
       <div className="relative">
-        <Image
-          className="w-full h-60 object-cover"
-          src={pginfo?.pg_image_url || "/assets/sample1.jpg"}
-          alt="PG Image"
-          width={500}
-          height={500}
-        />
+        <FadedImageSlider images={pginfo?.pg_images} />
+        {/* PG Type Badge */}
         <span
           className={`absolute top-2 right-2 ${
-            pginfo?.pg_type === "girls"
-              ? "bg-pink-500"
-              : pginfo?.pg_type === "boys"
-              ? "bg-blue-500"
-              : "bg-yellow-700"
+            pginfo?.pg_type === "girls" && "bg-pink-500"
+          } ${pginfo?.pg_type === "boys" && "bg-blue-500"} ${
+            pginfo?.pg_type === "both" && "bg-yellow-700"
           } text-white text-xs px-2 py-1 rounded`}
         >
           {pginfo?.pg_type?.replace(
