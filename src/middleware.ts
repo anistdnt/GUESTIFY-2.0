@@ -23,12 +23,24 @@ export function middleware(req: NextRequest) {
   //protected routes
 
   const authToken = req.cookies.get("authToken");
-  console.log("Auth Token in Middleware:", authToken);
+  const pathname = req.nextUrl.pathname;
+  // console.log("Auth Token in Middleware:", authToken);
 
-  if (!authToken) {
-    console.log("Redirecting to login page");
-    console.log("Request URL:", req.url);
+  if (
+    !authToken &&
+    ["/pg", "/profile"].some((route) => pathname.startsWith(route))
+  ) {
+    // console.log("Redirecting to login page");
     return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  // Prevent logged-in users from visiting login/signup
+  if (
+    authToken &&
+    (pathname.startsWith("/login") || pathname.startsWith("/signup"))
+  ) {
+    // console.log("User already logged in → redirecting to homepage");
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return res;
@@ -36,9 +48,9 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/pg/:path*/add-room",
-    "/pg/edit/:path*",
-    "/pg/new/:path*",
+    "/pg/:path*",
     "/profile/:path*",
+    "/login",
+    "/signup",
   ],
 };
