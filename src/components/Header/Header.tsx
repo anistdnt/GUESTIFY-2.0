@@ -115,6 +115,7 @@ export default function Header() {
     else {
       setisLoggedIn(false);
     }
+    dispatch(setLoading({ loading: false }));
   }, [isLoggedIn, pathname, reduxUserData]);
 
   return (

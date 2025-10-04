@@ -2,6 +2,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { setLoading } from "@/redux/slices/loaderSlice";
 import { hideModal } from "@/redux/slices/modalSlice";
+import { setUserData } from "@/redux/slices/userSlice";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { deleteCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
@@ -33,6 +34,7 @@ function ConfirmationModal({ setshowModal }: ModalType) {
       );
       if (res.success) {
         deleteCookie("authToken");
+        dispatch(setUserData({}));
         dispatch(hideModal(false));
         dispatch(setLoading({ loading: false }));
         router.push("/");
