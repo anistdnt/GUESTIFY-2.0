@@ -1,12 +1,18 @@
 "use client";
 import Image from "next/image";
 import Rating from "../Rating/Rating";
-import { CurrencyInr, MapPin, Pencil, Trash } from "@phosphor-icons/react/dist/ssr";
+import {
+  CurrencyInr,
+  MapPin,
+  Pencil,
+  Trash,
+} from "@phosphor-icons/react/dist/ssr";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
 import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { formatDate } from "@/lib/utils/utilities";
+import FadedImageSlider from "./FadedImageSlider";
 
 type Props = {
   item?: PGData;
@@ -69,28 +75,17 @@ type Props = {
 //             ]
 //         }
 
-
 export default function ProfilePGCard({ item, number_of_stars }: Props) {
   const dispatch = useDispatch();
 
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
 
-
   return (
     <>
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <div className="relative">
-          <Image
-            className="w-full h-60 object-cover"
-            src={
-              pginfo?.pg_image_url
-                ? pginfo?.pg_image_url
-                : "/assets/sample1.jpg"
-            }
-            alt="PG Image"
-            width={500}
-            height={500}
-          />
+          <FadedImageSlider images={pginfo?.pg_images} />
+          {/* PG Type Badge */}
           <span
             className={`absolute top-2 right-2 ${
               pginfo?.pg_type === "girls" && "bg-pink-500"
@@ -137,7 +132,9 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
               WiFi Available
             </span>
             <div className="flex items-center gap-1">
-              {number_of_stars && number_of_stars!==0 && <Rating no_of_star={number_of_stars} />}
+              {number_of_stars && number_of_stars !== 0 && (
+                <Rating no_of_star={number_of_stars} />
+              )}
             </div>
           </div>
 
@@ -181,7 +178,9 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
               {/* <span>
                 <MapPin size={18} weight="fill" />
               </span>{" "} */}
-              <span>Created At : {formatDate(pginfo?.createdAt as string)}</span>
+              <span>
+                Created At : {formatDate(pginfo?.createdAt as string)}
+              </span>
             </p>
             <div className="flex gap-4">
               <button
