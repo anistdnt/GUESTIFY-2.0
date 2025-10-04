@@ -63,11 +63,10 @@ const RoomImageUploader = ({
     <div
       {...getRootProps()}
       className={`relative cursor-pointer group border-2 border-dashed rounded-md p-1 w-full h-[250px] flex justify-center
-      ${
-        values?.rooms[index].room_image_url
+      ${values?.rooms[index].room_image_url
           ? "border-transparent"
           : "border-gray-400 hover:border-gray-600"
-      }`}
+        }`}
     >
       <input {...getInputProps()} />
 
@@ -297,6 +296,10 @@ export default function RoomForm({
                   values={values}
                   setFieldValue={setFieldValue}
                 /> */}
+                <label className="block mb-1 font-medium">
+                  Room Images{" "}
+                  <span className="text-red-600 font-semibold">*</span>
+                </label>
                 <ImagePicker imageKey="room_image_url" {...{ setFieldValue, room, index }} />
                 <ErrorMessage
                   name={`rooms[${index}].room_image_url`}
@@ -336,7 +339,7 @@ export default function RoomForm({
                   disabled={hasAddBtn && values?.rooms?.length < 2}
                   className="absolute top-4 right-4 text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <Trash size={20} weight="bold" data-tooltip="Remove Room"/>
+                  <Trash size={20} weight="bold" data-tooltip="Remove Room" />
                 </button>
               </div>
             ))}
