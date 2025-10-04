@@ -3,16 +3,10 @@ import { api_caller } from "@/lib/api_caller";
 import {
     imageActions,
     imageActionsBtn,
-    uploadCell,
     uploadCellBlank,
     uploadedCell,
-    uploadImageWrapper,
-    actionBlock,
 } from "../../app/global_styles";
-import {
-    PencilSimple,
-    Trash,
-} from "@phosphor-icons/react";
+import { PencilSimple, Trash, CircleNotch } from "@phosphor-icons/react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -28,227 +22,271 @@ interface IProps {
 }
 
 interface ImageInfo {
-    url: string,
-    public_id: string,
+    url: string;
+    public_id: string;
+    loading?: boolean;
+    deleting?: boolean;
+    editing?: boolean;
 }
 
 const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) => {
-    const [images, setImages] = useState<{ [key: string]: string, public_id: string }[]>([]);
+    const [images, setImages] = useState<ImageInfo[]>([]);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const selectedImageIndex = useRef<number>(-1);
+    const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
 
+    // Load existing images
     useEffect(() => {
         if (values?.pg_images && imageKey === "pg_image_url") {
-            setImages(values.pg_images.map((img: { pg_image_url: string; pg_image_id: string }) => ({ pg_image_url: img.pg_image_url, public_id: img.pg_image_url })));
+            setImages(
+                values.pg_images.map(
+                    (img: { pg_image_url: string; pg_image_id: string }) => ({
+                        url: img.pg_image_url,
+                        public_id: img.pg_image_id,
+                    })
+                )
+            );
         }
         if (room?.room_images && imageKey === "room_image_url") {
-            console.log("room images:", room?.room_images);
-            setImages(room.room_images.map((img: { room_image_url: string; room_image_id: string }) => ({ room_image_url: img.room_image_url, public_id: img.room_image_url })));
+            setImages(
+                room.room_images.map(
+                    (img: { room_image_url: string; room_image_id: string }) => ({
+                        url: img.room_image_url,
+                        public_id: img.room_image_id,
+                    })
+                )
+            );
         }
     }, [values?.pg_images, imageKey, room?.room_images]);
 
+    // Upload function
+    const uploadImage = async (file: File) => {
+        const tempId = `${file.name}-${Date.now()}`;
+        setImages((prev) => [...prev, { url: URL.createObjectURL(file), public_id: tempId, loading: true }]);
+
+        const formData = new FormData();
+        formData.append("pg_image_url", file);
+
+        const headers = { "Content-Type": "multipart/form-data" };
+
+        try {
+            const res = await api_caller<ImageInfo>("POST", API.IMAGE.UPLOAD, formData, headers);
+            if (res?.success) {
+                setImages((prev) =>
+                    prev.map((img) =>
+                        img.public_id === tempId
+                            ? { url: res.data?.url, public_id: res.data?.public_id }
+                            : img
+                    )
+                );
+                return { url: res.data?.url, public_id: res.data?.public_id };
+            } else {
+                throw new Error(res?.message || "Image upload failed");
+            }
+        } catch (error: any) {
+            toast.error(error?.message || "Upload failed");
+            setImages((prev) => prev.filter((img) => img.public_id !== tempId));
+            return null;
+        }
+    };
+
+    // On drop
     const onDrop = useCallback(
         async (acceptedFiles: any) => {
-            let previousImages = images;
             try {
-                const uploadImage = async (file: File) => {
-                    const formData = new FormData();
-                    formData.append("pg_image_url", file);
-
-                    const headers = {
-                        "Content-Type": "multipart/form-data",
-                    };
-
-                    const res = await api_caller<ImageInfo>(
-                        "POST",
-                        API.IMAGE.UPLOAD,
-                        formData,
-                        headers
+                if (selectedImageIndex.current !== -1) {
+                    // Edit (replace)
+                    const idx = selectedImageIndex.current;
+                    setImages((prev) =>
+                        prev.map((img, i) => (i === idx ? { ...img, editing: true } : img))
                     );
 
-                    if (res?.success) {
-                        return { [imageKey]: res.data?.url, public_id: res.data?.public_id };
-                    } else {
-                        throw new Error(res?.message || "Image upload failed");
-                    }
-                };
-
-                let newImages: any[] = [];
-
-                console.log("Selected Image Index:", selectedImageIndex.current);
-
-                if (selectedImageIndex.current !== -1) {
                     const replacement = await uploadImage(acceptedFiles[0]);
-                    if (!replacement) throw new Error("Image upload failed");
+                    if (!replacement) return;
 
-                    const payload = { public_id: images[selectedImageIndex.current]?.public_id };
+                    const payload = { public_id: images[idx]?.public_id };
                     const res = await api_caller<any>("DELETE", API.IMAGE.DELETE, payload);
 
                     if (res?.success) {
-                        newImages = previousImages.toSpliced(
-                            selectedImageIndex.current,
-                            1,
-                            replacement
-                        );
+                        const newImages = images.toSpliced(idx, 1, replacement);
+                        setImages(newImages);
+                        updateFormik(newImages);
+                        toast.success("Image replaced successfully");
                     } else {
                         toast.error(res?.message || "Previous image deletion failed");
-                        return;
                     }
+
+                    setImages((prev) =>
+                        prev.map((img, i) => (i === idx ? { ...img, editing: false } : img))
+                    );
+                    selectedImageIndex.current = -1;
                 } else {
+                    // Upload new
                     const uploadedImages = await Promise.all(
                         acceptedFiles.map((file: File) => uploadImage(file))
                     );
-
-                    newImages = [...previousImages, ...uploadedImages];
+                    const valid = uploadedImages.filter(Boolean) as ImageInfo[];
+                    const newImages = [...images, ...valid];
+                    setImages(newImages);
+                    updateFormik(newImages);
                 }
-
-                setImages(newImages);
-                imageKey === "pg_image_url" ? setFieldValue("pg_images", newImages.map((img : any)=>{
-                    return {pg_image_url: img['pg_image_url'], pg_image_id: img['public_id']}
-                })) : setFieldValue(`rooms[${index}].room_images`, newImages.map((img : any)=>{
-                    return {room_image_url: img['room_image_url'], room_image_id: img['public_id']}
-                }));
-
-                selectedImageIndex.current = -1;
             } catch (error: any) {
                 toast.error(error?.message || "Image upload failed");
                 console.error("Error uploading images:", error);
             }
         },
-        [images, values, selectedImageIndex]
+        [images]
     );
 
-    const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
-        onDrop,
-        accept: {
-            "image/jpeg": [],
-            "image/jpg": [],
-            "image/png": [],
-        },
-        multiple: selectedImageIndex.current === -1,
-        maxFiles: selectedImageIndex.current !== -1 ? 1 : undefined,
-        onDropAccepted: () => {
-            setUploadError(null);
-        },
-        onDropRejected: (fileRejections) => {
-            const rejectedFile = fileRejections[0];
-            if (rejectedFile?.file) {
-                setUploadError(`File type not allowed: ${rejectedFile.file.type}`);
-            } else {
-                setUploadError("Unsupported file format.");
-            }
-        },
-    });
-
-    const deleteImage = async (index: number) => {
-        const payload = { public_id: images[index]?.public_id };
-        const res = await api_caller<any>("DELETE", API.IMAGE.DELETE, payload);
-
-        if (res?.success) {
-            const updatedImages = [...images].toSpliced(index, 1);
-            setImages(updatedImages);
-            imageKey === "pg_image_url" ? setFieldValue("pg_images", updatedImages) : setFieldValue(`rooms[${index}].room_images`, updatedImages);
-            toast.success(res?.message || "Image deleted successfully");
+    // Update Formik state helper
+    const updateFormik = (newImages: ImageInfo[]) => {
+        if (imageKey === "pg_image_url") {
+            setFieldValue(
+                "pg_images",
+                newImages.map((img) => ({
+                    pg_image_url: img.url,
+                    pg_image_id: img.public_id,
+                }))
+            );
         } else {
-            toast.error(res?.message || "Image deletion failed");
+            setFieldValue(
+                `rooms[${index}].room_images`,
+                newImages.map((img) => ({
+                    room_image_url: img.url,
+                    room_image_id: img.public_id,
+                }))
+            );
         }
     };
 
-    const editImage = (index: number) => {
-        selectedImageIndex.current = index;
-        console.log("Selected Image Index for Edit:", selectedImageIndex.current);
+    // Dropzone config
+    const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+        onDrop,
+        accept: { "image/jpeg": [], "image/jpg": [], "image/png": [] },
+        multiple: selectedImageIndex.current === -1,
+        maxFiles: selectedImageIndex.current !== -1 ? 1 : undefined,
+    });
+
+    // Delete function
+    const deleteImage = async (idx: number) => {
+        setImages((prev) =>
+            prev.map((img, i) => (i === idx ? { ...img, deleting: true } : img))
+        );
+
+        const payload = { public_id: images[idx]?.public_id };
+        const res = await api_caller<any>("DELETE", API.IMAGE.DELETE, payload);
+
+        if (res?.success) {
+            const updatedImages = images.toSpliced(idx, 1);
+            setImages(updatedImages);
+            updateFormik(updatedImages);
+            toast.success("Image deleted successfully");
+        } else {
+            toast.error(res?.message || "Image deletion failed");
+            setImages((prev) =>
+                prev.map((img, i) => (i === idx ? { ...img, deleting: false } : img))
+            );
+        }
+    };
+
+    const editImage = (idx: number) => {
+        selectedImageIndex.current = idx;
         setTimeout(() => open(), 0);
     };
 
     return (
-        <>
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-7">
-                    {images &&
-                        images.map((img, index) => (
-                            <div key={`${index}-${img[imageKey]}`} className="relative">
-                                <div className={uploadedCell}>
-                                    <Image height={160} width={160} src={img[imageKey]} alt="product" />
-                                </div>
-                                <div className={`${imageActions} ${imageActions}`}>
-                                    <div className="flex gap-3">
-                                        <button
-                                            type="button"
-                                            className={imageActionsBtn}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                e.nativeEvent.stopImmediatePropagation();
-                                                editImage(index)
-                                            }}
-                                        >
-                                            <PencilSimple size={20} color="rgb(0,0,0)" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className={imageActionsBtn}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                e.nativeEvent.stopImmediatePropagation();
-                                                deleteImage(index)
-                                            }}
-                                        >
-                                            <Trash size={20} color="rgb(0,0,0)" />
-                                        </button>
+        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+            <div className="flex flex-wrap gap-6 justify-start">
+                {images.map((img, idx) => {
+                    const isProcessing = img.loading || img.deleting || img.editing;
+
+                    return (
+                        <div key={`${idx}-${img.url}`} className={`${uploadedCell} group shadow-md w-32 h-32 relative`}>
+                            <div className="w-full h-32 flex items-center justify-center bg-white relative">
+                                {/* Loader overlay while processing OR image not loaded */}
+                                {(isProcessing || !loadedImages[img.public_id]) && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-10">
+                                        <CircleNotch size={32} weight="bold" className="text-white animate-spin" />
                                     </div>
-                                </div>
+                                )}
+
+                                <Image
+                                    src={img.url}
+                                    alt="product"
+                                    width={160}
+                                    height={160}
+                                    className="max-w-full max-h-full object-contain"
+                                    onLoadingComplete={() =>
+                                        setLoadedImages((prev) => ({ ...prev, [img.public_id]: true }))
+                                    }
+                                />
                             </div>
-                        ))}
 
-                    <div {...getRootProps({ onClick: (e) => {e.preventDefault(); e.stopPropagation();} })} className={uploadCellBlank}>
-                        <input {...getInputProps({
-                            type: "file",
-                        })} />
-                        {isDragActive ? (
-                            <p
-                                style={{
-                                    fontSize: "14px",
-                                    color: "#5F6368",
-                                    lineHeight: 1,
-                                    textAlign: "center",
+                            {/* Actions (only when not processing) */}
+                            {!isProcessing && loadedImages[img.public_id] && (
+                                <div className={`${imageActions}`}>
+                                    <button
+                                        type="button"
+                                        className={`${imageActionsBtn}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            editImage(idx);
+                                        }}
+                                    >
+                                        <PencilSimple size={20} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`${imageActionsBtn}`}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            deleteImage(idx);
+                                        }}
+                                    >
+                                        <Trash size={20} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+
+
+                {/* Upload cell */}
+                <div
+                    {...getRootProps({
+                        onClick: (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        },
+                    })}
+                    className={`${uploadCellBlank} w-32 h-32`}
+                >
+                    <input {...getInputProps({ type: "file" })} />
+                    {isDragActive ? (
+                        <p className="text-sm text-gray-500 text-center">Drop image(s) here</p>
+                    ) : (
+                        <p className="max-w-[120px] text-sm text-gray-500 text-center">
+                            Drag & drop or{" "}
+                            <span
+                                className="cursor-pointer text-indigo-500"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    open();
                                 }}
                             >
-                                Drop the image(s) here
-                            </p>
-                        ) : (
-                            <p
-                                style={{
-                                    maxWidth: "120px",
-                                    fontSize: "14px",
-                                    color: "#5F6368",
-                                    lineHeight: 1,
-                                    textAlign: "center",
-                                }}
-                            >
-                                Drag and drop image or{" "}
-                                <span
-                                    style={{ cursor: "pointer", color: "#5C79FF" }}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation(); // prevent root re-trigger
-                                        open();
-                                    }}
-                                >
-                                    browse
-                                </span>
-                            </p>
-                        )}
-                    </div>
-
-                    {uploadError && (
-                        <p style={{ fontSize: "14px", color: "red", marginTop: "4px" }}>
-                            {uploadError}
+                                browse
+                            </span>
                         </p>
                     )}
                 </div>
             </div>
-        </>
+
+            {uploadError && <p className="text-sm text-red-500 mt-2">{uploadError}</p>}
+        </div>
     );
 };
 
