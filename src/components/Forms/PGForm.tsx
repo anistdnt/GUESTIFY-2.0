@@ -3,9 +3,17 @@ import { Field, ErrorMessage, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import Select from "react-select";
-import { yesNoOptions, PGType, districtOptions, stateOptions, depositOptions } from "@/data/countryPhone";
+import {
+  yesNoOptions,
+  PGType,
+  districtOptions,
+  stateOptions,
+  depositOptions,
+} from "@/data/countryPhone";
 import Tooltip from "./Tooltip";
 import ImagePicker from "./imagePicker";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 export default function PGForm({
   caption,
@@ -259,12 +267,24 @@ export default function PGForm({
             Mention any Instruction or Rules for PG{" "}
             <span className="text-red-600 font-semibold">*</span>
           </label>
-          <Field
-            as="textarea"
-            name="rules"
-            rows={10}
-            placeholder="eg : Not allowed within PG after 10 P.M"
-            className="p-2 border rounded w-full"
+          <CKEditor
+            editor={ClassicEditor as any}
+            data={values.rules || ""}
+            onChange={(event, editor) => {
+              const data = editor.getData();
+              setFieldValue("rules", data);
+            }}
+            config={{
+              placeholder: "e.g. Not allowed within PG after 10 P.M",
+            }}
+            onReady={(editor) => {
+              editor.editing.view.change((writer) => {
+                const editableElement = editor.editing.view.document.getRoot();
+                writer.setStyle("min-height", "140px", editableElement);
+                writer.setStyle("max-height", "140px", editableElement);
+                writer.setStyle("overflow-y", "auto", editableElement);
+              });
+            }}
           />
           <ErrorMessage
             name="rules"
