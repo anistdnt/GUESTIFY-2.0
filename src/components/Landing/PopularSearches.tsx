@@ -12,8 +12,6 @@ export default async function PopularSearches() {
       `${API.COLLEGE.LIST}?popular=true`
     );
 
-    console.log("Popular Colleges Data:", resData);
-
     if (resData.success && resData.data) {
       const colleges = resData.data.colleges;
       return (
