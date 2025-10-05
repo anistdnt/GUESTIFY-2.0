@@ -35,6 +35,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
     const selectedImageIndex = useRef<number>(-1);
     const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
 
+
     // Load existing images
     useEffect(() => {
         if (values?.pg_images && imageKey === "pg_image_url") {
@@ -238,7 +239,9 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                                     </button>
                                     <button
                                         type="button"
-                                        className={`${imageActionsBtn}`}
+                                        className={`${imageActionsBtn} ${images.some((i) => i.deleting) ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                                            }`}
+                                        disabled={images.some((i) => i.deleting)}
                                         onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
