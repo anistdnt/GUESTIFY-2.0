@@ -35,7 +35,7 @@ export default function BasicDetailsEdit() {
       );
       if (res.success) {
         setInitialFieldData({
-            contact_details: res?.data
+          contact_details: res?.data
         });
       } else {
         toast.error(`${res.message} : ${res.error}`);
@@ -46,11 +46,11 @@ export default function BasicDetailsEdit() {
 
   const handleSubmit = async (values: any) => {
 
-    if(!reduxAuthVerification?.isPhoneVerified){
+    if (!reduxAuthVerification?.isPhoneVerified) {
       toast.error("Please verify your phone number before proceeding.");
       return;
     }
-    if(!reduxAuthVerification?.isEmailVerified){
+    if (!reduxAuthVerification?.isEmailVerified) {
       toast.error("Please verify your email address before proceeding.");
       return;
     }
@@ -60,9 +60,9 @@ export default function BasicDetailsEdit() {
 
     const payload = {
       ...values.contact_details,
-      same_as_phone: values.contact_details.same_as_phone ? "true" : "false",
-      is_phone_verified: reduxAuthVerification?.isPhoneVerified ? "true" : "false",
-      is_email_verified: reduxAuthVerification?.isEmailVerified ? "true" : "false",
+      same_as_phone: values.contact_details.same_as_phone ? true : false,
+      is_phone_verified: reduxAuthVerification?.isPhoneVerified ? true : false,
+      is_email_verified: reduxAuthVerification?.isEmailVerified ? true : false,
       image_url: reduxUserData?.image_url || "",
       owner_name: `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
     }
@@ -97,17 +97,27 @@ export default function BasicDetailsEdit() {
         {({ dirty }) => (
           <Form>
             <ContactDetails caption="Update Contact Details" />
-            <button
-              type="submit"
-              disabled={!dirty} // ✅ disables if nothing changed
-              className={`mt-5 ml-auto px-6 py-2 rounded transition ${
-                dirty
-                  ? "bg-yellow-600 hover:bg-yellow-700 text-white"
-                  : "bg-gray-400 cursor-not-allowed text-white"
-              }`}
-            >
-              Update Details
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                type="submit"
+                disabled={!dirty} // ✅ disables if nothing changed
+                className={`mt-5 px-6 py-2 rounded transition ${dirty
+                    ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                    : "bg-gray-400 cursor-not-allowed text-white"
+                  }`}
+              >
+                Update Details
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  router.back();
+                }}
+                className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition mt-5"
+              >
+                Cancel
+              </button>
+            </div>
           </Form>
         )}
       </Formik>
