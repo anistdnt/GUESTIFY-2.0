@@ -21,8 +21,8 @@ const navigation: {
   name: string;
   href: string;
 }[] = [
-    { name: "My Home", href: "/" },
-    { name: "About", href: "/about" },
+    { name: "Home", href: "/" },
+    { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
     { name: "Terms & Services", href: "/terms-and-services" },
   ];
