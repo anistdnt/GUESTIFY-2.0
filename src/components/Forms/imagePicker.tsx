@@ -34,6 +34,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
     const [uploadError, setUploadError] = useState<string | null>(null);
     const selectedImageIndex = useRef<number>(-1);
     const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
+    
 
     // Load existing images
     useEffect(() => {
@@ -239,6 +240,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                                     <button
                                         type="button"
                                         className={`${imageActionsBtn}`}
+                                        disabled={images.some((i) => i.deleting)}
                                         onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
