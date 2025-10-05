@@ -44,10 +44,10 @@ export default function Profile() {
             </p>
           </div>
           <div className="flex items-center space-x-4">
-            <i
+            {/* <i
               onClick={handleModal}
               className="fa-solid fa-magnifying-glass text-black/50 sm:mr-4 cursor-pointer"
-            ></i>
+            ></i> */}
             <div className="relative w-12 h-12">
               <Image
                 src={
