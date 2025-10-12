@@ -55,6 +55,7 @@ export default function Header() {
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // const [isloading,setisloading] = useState<boolean>(false);
 
@@ -92,6 +93,24 @@ export default function Header() {
       toast.error(`${res.message} : ${res.error}`);
     }
   };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      // If dropdown is open and click is outside dropdownRef
+      if (
+        showProfileDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setshowProfileDropdown(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
   useEffect(() => {
     if (hasCookie("authToken")) {
@@ -172,6 +191,7 @@ export default function Header() {
                 {isLoggedIn ? (
                   <div>
                     {userInfo === null ? <Skeleton /> : <div
+                      ref={dropdownRef}
                       className="flex flex-row justify-center items-center gap-3 cursor-pointer"
                       onClick={() => {
                         setshowProfileDropdown((prev) => !prev);

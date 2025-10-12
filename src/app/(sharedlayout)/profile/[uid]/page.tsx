@@ -100,6 +100,14 @@ export default function Profile() {
           >
             Statistics
           </Link>}
+
+          {!profile_info?.is_admin && <Link
+            href={`/profile/${uid}/wishlist`}
+            className={linkClass(`/profile/${uid}/wishlist`)}
+            >
+              Wishlist
+            </Link>
+          }
           
         </div>
 

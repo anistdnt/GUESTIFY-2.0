@@ -8,6 +8,7 @@ import { Room } from "@/types/pg_type";
 import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import FadedImageSlider from "./FadedImageSlider";
+import { Heart } from "@phosphor-icons/react/dist/ssr";
 
 type Props = {
   item?: PGData;
@@ -21,6 +22,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
   // Utility to extract coordinates from query string
   const [college_longitude, setLongitude] = useState<number | null>(null);
   const [college_latitude, setLatitude] = useState<number | null>(null);
+  const [wishlisted, setWishlisted] = useState(false);
 
   const params = useSearchParams();
   const clg_coords = params.get("coordinates");
@@ -33,6 +35,13 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
     <>
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <div className="relative">
+          <button
+            className="absolute top-2 left-2 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-30"
+            onClick={() => {setWishlisted(!wishlisted); console.log("Clickeddddddddddddddd")}}
+            aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            <Heart size={22} weight={wishlisted ? "fill" : "regular"} color={wishlisted ? "#e0245e" : "#888"} />
+          </button>
           <FadedImageSlider images={pginfo?.pg_images} />
           {/* PG Type Badge */}
           <span
