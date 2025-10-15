@@ -9,6 +9,9 @@ import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import FadedImageSlider from "./FadedImageSlider";
 import { Heart } from "@phosphor-icons/react/dist/ssr";
+import { api_caller } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import toast from "react-hot-toast";
 
 type Props = {
   item?: PGData;
@@ -19,6 +22,7 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
+  console.log(pginfo, "pginfo");
   // Utility to extract coordinates from query string
   const [college_longitude, setLongitude] = useState<number | null>(null);
   const [college_latitude, setLatitude] = useState<number | null>(null);
@@ -31,16 +35,51 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
   const clg_pin = params.get("clg_pin");
   const clg_id = params.get("clg_id") || "";
 
+  const addToWishlist = async (pgId: string) => {
+    const prevState = wishlisted;
+    const newState = !prevState;
+
+    // Optimistic UI update
+    setWishlisted(newState);
+
+    try {
+      // Determine endpoint and payload
+      const endpoint = newState
+        ? API.WISHLIST.ADD
+        : `${API.WISHLIST.DELETE}/${pgId}`;
+      const method = newState ? "POST" : "DELETE";
+
+      const payload = newState ? { pg_id: pgId } : undefined;
+
+      const response = await api_caller(method, endpoint, payload);
+
+      if (!response.success) {
+        // Revert UI on failure
+        setWishlisted(prevState);
+        toast.error(response.error || "Something went wrong. Please try again.");
+      } else {
+        toast.success(response.message)
+      }
+    } catch (err) {
+      setWishlisted(prevState);
+      toast.error("Unable to update wishlist. Try again later.");
+    }
+  };
+
   return (
     <>
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <div className="relative">
           <button
             className="absolute top-2 left-2 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-30"
-            onClick={() => {setWishlisted(!wishlisted); console.log("Clickeddddddddddddddd")}}
+            onClick={() => addToWishlist(pginfo?._id)}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
-            <Heart size={22} weight={wishlisted ? "fill" : "regular"} color={wishlisted ? "#e0245e" : "#888"} />
+            <Heart
+              size={22}
+              weight={wishlisted ? "fill" : "regular"}
+              color={wishlisted ? "#e0245e" : "#888"}
+            />
           </button>
           <FadedImageSlider images={pginfo?.pg_images} />
           {/* PG Type Badge */}
