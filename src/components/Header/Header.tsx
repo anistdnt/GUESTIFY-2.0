@@ -55,7 +55,7 @@ export default function Header() {
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   // const [isloading,setisloading] = useState<boolean>(false);
 
@@ -95,20 +95,19 @@ export default function Header() {
   };
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      // If dropdown is open and click is outside dropdownRef
-      if (
-        showProfileDropdown &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+    function handleClickOutside(event: MouseEvent | PointerEvent) {
+      // Only run if dropdown is open
+      if (!showProfileDropdown) return;
+
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setshowProfileDropdown(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    // pointerdown handles mouse + touch better
+    document.addEventListener("pointerdown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("pointerdown", handleClickOutside);
     };
   }, [showProfileDropdown]);
 
@@ -179,7 +178,7 @@ export default function Header() {
             </div>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {/* Profile dropdown */}
-              <div className="relative ml-3 flex justify-center items-center gap-5">
+              <div ref={dropdownRef} className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
                 
                 
@@ -191,7 +190,6 @@ export default function Header() {
                 {isLoggedIn ? (
                   <div>
                     {userInfo === null ? <Skeleton /> : <div
-                      ref={dropdownRef}
                       className="flex flex-row justify-center items-center gap-3 cursor-pointer"
                       onClick={() => {
                         setshowProfileDropdown((prev) => !prev);

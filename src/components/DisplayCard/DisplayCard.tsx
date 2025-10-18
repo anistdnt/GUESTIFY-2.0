@@ -2,31 +2,45 @@
 import Rating from "../Rating/Rating";
 import { CurrencyInr, MapPin, UserPlus } from "@phosphor-icons/react/dist/ssr";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
-import { useDispatch } from "react-redux";
+import { ProfileType } from "@/types/profile_type";
+import { useDispatch, useSelector } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import FadedImageSlider from "./FadedImageSlider";
 import { Heart } from "@phosphor-icons/react/dist/ssr";
 import { api_caller } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import toast from "react-hot-toast";
+import { RootState } from "@/redux/store";
 
 type Props = {
   item?: PGData;
   number_of_stars: number;
+  profile?: ProfileType;
 };
 
-export default function DisplayCard({ item, number_of_stars }: Props) {
+export default function DisplayCard({ item, number_of_stars, profile }: Props) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
   console.log(pginfo, "pginfo");
+  const profile_info = useSelector(
+    (state: RootState) => state.user_slice.userData
+  );
+  console.log(profile_info, "profile")
   // Utility to extract coordinates from query string
   const [college_longitude, setLongitude] = useState<number | null>(null);
   const [college_latitude, setLatitude] = useState<number | null>(null);
   const [wishlisted, setWishlisted] = useState(false);
+
+  useEffect(() => {
+  if (profile_info && Array.isArray(profile_info.wishlist) && pginfo?._id) {
+    const isWishlisted = profile_info.wishlist.includes(pginfo._id);
+    setWishlisted(isWishlisted);
+  }
+}, [profile_info, pginfo?._id]);
 
   const params = useSearchParams();
   const clg_coords = params.get("coordinates");
