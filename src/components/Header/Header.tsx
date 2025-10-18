@@ -87,7 +87,7 @@ export default function Header() {
       `${API.USER.INFO}/${uid}`
     );
     if (res.success) {
-      dispatch(setUserData(res?.data[0]));
+      dispatch(setUserData(res?.data));
       // console.log(res?.data)
     } else {
       toast.error(`${res.message} : ${res.error}`);
