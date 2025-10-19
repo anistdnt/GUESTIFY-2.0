@@ -3,6 +3,8 @@ export interface NavItemsType {
     path: string;
     icon: string;
     disabled?: boolean; 
+    onClick?: () => void | Promise<void>;
+    class?: string;
 }
 
 interface UserInfo {
