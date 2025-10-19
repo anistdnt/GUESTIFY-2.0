@@ -61,6 +61,21 @@ const Page = () => {
     }
   };
 
+  const formatDate = (isodate: string) => {
+    const currentDate = new Date(isodate);
+    const date = currentDate.toLocaleDateString("en-GB", {
+      weekday: "short", // 'Tue'
+      day: "2-digit", // '07'
+      month: "long", // 'June'
+      year: "numeric", // '2022'
+    });
+
+    const [weekday, day, month, year] = date.split(" ");
+    const formattedDate = `${weekday}, ${day} ${month} ${year}`;
+
+    return formattedDate;
+  };
+
   const formik = useFormik({
     initialValues: {
       first_name: reduxUserData?.first_name ?? "",
@@ -129,6 +144,14 @@ const Page = () => {
   } else {
     return (
       <div className="flex flex-col gap-8 p-6">
+        <div>
+          <h1 className=" text-xl sm:text-3xl font-semibold text-gray-800">
+            Welcome, {reduxUserData?.first_name} {reduxUserData?.last_name}
+          </h1>
+          <p className="text-gray-500 mt-1 max-sm:text-sm">
+            Created At : {formatDate(reduxUserData?.createdAt as string)}
+          </p>
+        </div>
         <form className="flex flex-col" onSubmit={formik.handleSubmit}>
           {/* up Section */}
           <div className="w-full flex flex-row justify-between mb-10">
