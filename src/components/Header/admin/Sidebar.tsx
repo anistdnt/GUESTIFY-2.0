@@ -72,7 +72,7 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
       {Object.keys(NAVITEMS).map((sectionKey) => {
         const section = NAVITEMS[sectionKey];
         return (
-          <div key={sectionKey} className="flex flex-col gap-1">
+          <div key={sectionKey} className="flex flex-col gap-1 mb-2">
             {section.length > 0 && (
               <span className="text-gray-400 font-bold text-xs uppercase mb-2 block">
                 {sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1)}

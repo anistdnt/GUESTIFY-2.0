@@ -60,7 +60,11 @@ const Login = () => {
       });
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
       dispatch(setLoading({loading:false}))
-      router.push("/");
+      if(res?.data?.is_admin){
+        router.push(`/admin/${res?.data?.user_id}/dashboard`);
+      }else{
+        router.push("/");
+      }
       toast.success(res.message || "Loggged In successfully");
     } else {
       dispatch(setLoading({loading:false}))

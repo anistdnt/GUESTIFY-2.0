@@ -33,52 +33,42 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user }: Props) {
                 {/* <Notification/> */}
                 {userInfo?.user_id && <Noti user_id={userInfo?.user_id} />}
 
-                {isLoggedIn ? (
-                  <div>
-                    {userInfo === null ? (
-                      <Skeleton />
-                    ) : (
-                      <div
-                        className="flex flex-row justify-center items-center gap-3 cursor-pointer"
-                        onClick={() => {
-                          setshowProfileDropdown((prev) => !prev);
-                        }}
-                      >
-                        <span className="text-gray-700 text-sm hidden sm:block font-semibold">
-                          {userInfo?.full_name}
-                          <br />
-                          <span className="text-xs text-gray-500 float-end">
-                            ADMIN
-                          </span>
+                <div>
+                  {userInfo === null ? (
+                    <Skeleton />
+                  ) : (
+                    <div
+                      className="flex flex-row justify-center items-center gap-3 cursor-pointer"
+                      onClick={() => {
+                        setshowProfileDropdown((prev) => !prev);
+                      }}
+                    >
+                      <span className="text-gray-700 text-sm hidden sm:block font-semibold">
+                        {userInfo?.full_name}
+                        <br />
+                        <span className="text-xs text-gray-500 float-end">
+                          ADMIN
                         </span>
-                        <button
-                          className="relative flex rounded-full text-sm border border-gray-500 h-10 w-10"
-                          aria-label="Open user menu"
-                        >
-                          <Image
-                            src={
-                              userInfo?.image_url
-                                ? userInfo?.image_url
-                                : "/assets/profile.png"
-                            }
-                            alt="Profile Avatar"
-                            className="rounded-full"
-                            fill
-                            objectFit="cover"
-                          />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="hidden sm:block">
-                    <Link href="/login">
-                      <button className="bg-buttons hover:bg-buttonsHover text-white font-semibold text-sm px-4 py-2 rounded-lg">
-                        Login/Sign-Up
+                      </span>
+                      <button
+                        className="relative flex rounded-full text-sm border border-gray-500 h-10 w-10"
+                        aria-label="Open user menu"
+                      >
+                        <Image
+                          src={
+                            userInfo?.image_url
+                              ? userInfo?.image_url
+                              : "/assets/profile.png"
+                          }
+                          alt="Profile Avatar"
+                          className="rounded-full"
+                          fill
+                          objectFit="cover"
+                        />
                       </button>
-                    </Link>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
 
                 {/* Dropdown  */}
                 {showProfileDropdown && (
@@ -88,7 +78,7 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user }: Props) {
                       <span className="font-bold">{userInfo?.full_name}</span>
                     </div>
                     <Link
-                      href={`/profile/${userInfo?.user_id}`}
+                      href={`/admin/${userInfo?.user_id}/profile`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
                         setshowProfileDropdown((prev) => !prev);
