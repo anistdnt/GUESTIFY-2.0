@@ -89,7 +89,7 @@ function FilterModal({ setshowModal }: ModalType) {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-10"
+      className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50"
       onClick={() => setshowModal(false)}
     >
       <div
