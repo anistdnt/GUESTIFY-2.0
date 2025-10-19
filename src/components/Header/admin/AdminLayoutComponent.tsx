@@ -16,7 +16,8 @@ import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { UserInfo } from "@/types/admin";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import path from "path";
 
 type Props = {
   children: React.ReactNode;
@@ -34,6 +35,7 @@ export default function AdminLayoutComponent({ children }: Props) {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
+  const tabValue = pathname.split("/")[3];
 
   //Sign-out function
   const logout_user = async () => {
@@ -118,6 +120,7 @@ export default function AdminLayoutComponent({ children }: Props) {
           userInfo={userInfo}
           isLoggedIn={isLoggedIn}
           logout_user={logout_user}
+          tabValue={tabValue}
         />
 
         {/* Page Content */}

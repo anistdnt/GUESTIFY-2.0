@@ -69,8 +69,7 @@ const PGInfoComponent = ({
   const formRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
   // const paginationRef = useRef<HTMLDivElement>(null);
-  const college_coords = clg_coords
-    .split(",")
+  const college_coords = clg_coords?.split(",")
     .map((coord) => Number(coord))
     .reverse() as [number, number];
 

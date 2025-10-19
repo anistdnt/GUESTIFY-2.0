@@ -4,6 +4,7 @@ import { API } from "@/lib/api_const";
 import React from "react";
 import { notFound } from "next/navigation";
 import toast from "react-hot-toast";
+import { PGInfo, Room } from "@/types/pg_type";
 
 interface Iprops {
   params: {
@@ -21,45 +22,6 @@ interface Iprops {
 interface PGDetailsResponse {
   pginfo: PGInfo;
   rooms: Room[];
-}
-
-export interface PGInfo {
-  location: {
-    type: "Point";
-    coordinates: [number, number];
-  };
-  _id: string;
-  user_id: string;
-  pg_name: string;
-  district: string;
-  street_name: string;
-  house_no: number;
-  state: string;
-  pincode: number;
-  address: string;
-  wifi_available: "yes" | "no";
-  food_available: "yes" | "no";
-  rules: string;
-  pg_image_url: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-  pg_type: "boys" | "girls" | "unisex";
-}
-
-export interface Room {
-  _id: string;
-  room_type: "single" | "double" | "triple";
-  room_image_url: string;
-  room_rent: number;
-  ac_available: "yes" | "no";
-  attached_bathroom: "yes" | "no";
-  deposit_duration: "monthly" | "quarterly" | "halfyearly" | "yearly";
-  aminities: string[];
-  pg_id: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
 }
 
 export interface Review {

@@ -15,7 +15,7 @@ import Loadercomp from '../Loader/Loadercomp';
 import toast from 'react-hot-toast';
 
 interface MapProps {
-  clg_coords?: [number, number];
+  clg_coords?: [number, number] | undefined;
   pgInfo?: pgInfo | pgInfo[];
   clg_name?: string;
   clg_addr?: string;

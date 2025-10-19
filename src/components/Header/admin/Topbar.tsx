@@ -11,21 +11,24 @@ interface Props {
   userInfo: UserInfo;
   isLoggedIn: boolean;
   logout_user: () => Promise<void>;
+  tabValue: string;
 }
 
-export default function Topbar({ userInfo, isLoggedIn, logout_user }: Props) {
+export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: Props) {
   // for handling profile dropdown
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
 
   const dispatch = useDispatch();
+  const tabHeading = tabValue === "dashboard" ? "Dashboard" :
+    tabValue === "profile" ? "My Profile" : "My Enlisted PGs"
 
   return (
     <header className="sticky z-40 top-0">
       <nav className="bg-[#f8f4f3] shadow-md shadow-black/5">
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
-            <h3 className="text-gray-700 font-semibold">Dashboard</h3>
+            <h3 className="text-gray-700 font-semibold">{tabHeading}</h3>
 
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {/* Profile dropdown */}
