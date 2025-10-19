@@ -1,6 +1,7 @@
+"use client";
 import { hideModal } from "@/redux/slices/modalSlice";
 import { X } from "@phosphor-icons/react/dist/ssr";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
@@ -21,28 +22,30 @@ function PGEditModal({ setshowModal, modalData }: ModalType) {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  const params = useParams();
+
   const editOptions: EditOptionType[] = [
     {
       title: "Basic Details",
-      path: `/pg/edit/basic-details/${modalData?.rowid}`,
+      path: `/admin/${params?.uid}/pg/edit/basic-details/${modalData?.rowid}`,
       svg_d: "M5 4h14a2 2 0 012 2v2H3V6a2 2 0 012-2zm0 4h14v10a2 2 0 01-2 2H7a2 2 0 01-2-2V8zm3 4h4m-4 4h6",
       class: ""
     },
     {
       title: "Room Details",
-      path: `/pg/edit/room-details/${modalData?.rowid}`,
+      path: `/admin/${params?.uid}/pg/edit/room-details/${modalData?.rowid}`,
       svg_d: "M3 12h18M6 12V7a1 1 0 011-1h10a1 1 0 011 1v5m-1 4h-2a2 2 0 00-2 2v2H9v-2a2 2 0 00-2-2H4v-4h16v4h-3z",
       class: ""
     },
     {
       title: "Contact Details",
-      path: `/pg/edit/contact-details/${modalData?.rowid}`,
+      path: `/admin/${params?.uid}/pg/edit/contact-details/${modalData?.rowid}`,
       svg_d: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 3h6v4H9V3zM9 12h6M9 16h6",
       class: ""
     },
     {
       title: "Add Rooms",
-      path: `/pg/${modalData?.rowid}/add-room`,
+      path: `/admin/${params?.uid}/pg/${modalData?.rowid}/add-room`,
       svg_d: "M12 4v16m8-8H4",
       class: ""
     },
@@ -50,7 +53,7 @@ function PGEditModal({ setshowModal, modalData }: ModalType) {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-10"
+      className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50"
       onClick={() => setshowModal(false)}
     >
       <div

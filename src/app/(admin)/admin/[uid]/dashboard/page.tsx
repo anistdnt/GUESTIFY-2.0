@@ -31,17 +31,20 @@ type StatsResponse = {
   pgsByMonth: PGByMonth[];
 };
 
-export default function Stats() {
+export default function Dashboard() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
   const param = useParams();
+
+  const userid = param?.uid as string;
 
   useEffect(() => {
     const fetchStats_ByUser = async () => {
       setLoading(true);
       const res: ApiReturn<any> = await api_caller<any>(
         "GET",
-        `${API.USER.GET_STATS}/${param?.uid}`
+        `${API.USER.GET_STATS}/${userid}`
       );
       if (res.success) {
         setStats(res?.data);
@@ -52,8 +55,10 @@ export default function Stats() {
       setLoading(false);
     };
 
-    fetchStats_ByUser();
-  }, []);
+    if(userid){
+      fetchStats_ByUser();
+    }
+  }, [userid]);
 
   // Skeleton Loader Component
   const SkeletonLoader = () => (

@@ -83,7 +83,7 @@ export function PinPopup({
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 border rounded-full flex-shrink-0">
               <Image
-                src={data?.image_url || data?.pginfo?.pg_image_url || "/assets/new_logo.png"}
+                src={data?.image_url || data?.pginfo?.pg_images[0].pg_image_url || "/assets/new_logo.png"}
                 alt={data?.college_name || data?.pginfo?.pg_name || "Logo"}
                 fill
                 className="object-cover rounded-full"

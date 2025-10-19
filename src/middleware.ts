@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 export function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
-  // Check if 'device_token' cookie is already set or not
+  // Assign a persistent device token if not already set
   const existingDeviceToken = req.cookies.get("device_token");
-
   if (!existingDeviceToken) {
     const deviceToken = crypto.randomUUID();
-
     const oneYearInSeconds = 60 * 60 * 24 * 365;
 
     res.cookies.set("device_token", deviceToken, {
@@ -20,27 +19,56 @@ export function middleware(req: NextRequest) {
     });
   }
 
-  //protected routes
-
   const authToken = req.cookies.get("authToken");
   const pathname = req.nextUrl.pathname;
-  // console.log("Auth Token in Middleware:", authToken);
 
+  // 🧩 If no token and visiting protected or admin routes → redirect to login
   if (
     !authToken &&
-    ["/pg", "/profile"].some((route) => pathname.startsWith(route))
+    ["/pg", "/profile", "/admin"].some((route) => pathname.startsWith(route))
   ) {
-    // console.log("Redirecting to login page");
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Prevent logged-in users from visiting login/signup
-  if (
-    authToken &&
-    (pathname.startsWith("/login") || pathname.startsWith("/signup"))
-  ) {
-    // console.log("User already logged in → redirecting to homepage");
-    return NextResponse.redirect(new URL("/", req.url));
+  // ✅ If token exists, decode it
+  if (authToken) {
+    try {
+      const decoded: any = jwt.decode(authToken.value);
+
+      // Handle login/signup redirection
+      if (pathname.startsWith("/login") || pathname.startsWith("/signup")) {
+        if (decoded?.is_admin) {
+          return NextResponse.redirect(
+            new URL(`/admin/${decoded?.user_id}/dashboard`, req.url)
+          );
+        } else {
+          return NextResponse.redirect(new URL("/", req.url));
+        }
+      }
+
+      // 🔒 Admin Access Control
+      if (decoded?.is_admin) {
+        // Redirect admin visiting `/` or non-admin routes to dashboard
+        if (
+          pathname === "/" ||
+          (!pathname.startsWith("/admin") &&
+            !pathname.startsWith("/login") &&
+            !pathname.startsWith("/signup"))
+        ) {
+          return NextResponse.redirect(
+            new URL(`/admin/${decoded?.user_id}/dashboard`, req.url)
+          );
+        }
+      } else {
+        // 🚫 Non-admin users cannot access `/admin/*`
+        if (pathname.startsWith("/admin")) {
+          return NextResponse.redirect(new URL("/", req.url));
+        }
+      }
+    } catch (err) {
+      console.error("JWT decode error:", err);
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   }
 
   return res;
@@ -48,9 +76,11 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
     "/pg/:path*",
     "/profile/:path*",
     "/login",
     "/signup",
+    "/admin/:path*",
   ],
 };
