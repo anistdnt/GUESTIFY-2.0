@@ -86,18 +86,21 @@ export default function Profile() {
           >
             Profile
           </Link>
-          <Link
+          
+          {profile_info?.is_admin && <Link
             href={`/profile/${uid}/mypg`}
             className={linkClass(`/profile/${uid}/mypg`)}
           >
             My Enlisted PGs
-          </Link>
-          <Link
+          </Link>}
+
+          {profile_info?.is_admin && <Link
             href={`/profile/${uid}/stats`}
             className={linkClass(`/profile/${uid}/stats`)}
           >
             Statistics
-          </Link>
+          </Link>}
+          
         </div>
 
         {isModalOpen && (
