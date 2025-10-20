@@ -47,6 +47,7 @@ export default function WishlistPage() {
       setLoading(false);
     }
   };
+  
 
   // Remove from wishlist
   const removeFromWishlist = async (pgId: string) => {
