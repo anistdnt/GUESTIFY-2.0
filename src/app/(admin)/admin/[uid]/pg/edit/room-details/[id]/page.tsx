@@ -116,7 +116,7 @@ export default function RoomDetailsEdit() {
               <button
                 type="button"
                 className="px-6 py-2 rounded transition bg-buttonsSecondary hover:bg-buttonsHover text-white"
-                onClick={() => router.push(`/pg/${paying_guestID}/add-room`)}
+                onClick={() => router.push(`/admin/${params?.uid}/pg/${paying_guestID}/add-room`)}
               >
                 Enlist New Rooms
               </button>

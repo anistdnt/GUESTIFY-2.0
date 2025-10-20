@@ -31,17 +31,36 @@ type StatsResponse = {
   pgsByMonth: PGByMonth[];
 };
 
-export default function Stats() {
+// Skeleton Loader Component
+const SkeletonLoader = () => (
+  <div className="space-y-8 animate-pulse">
+    {/* Stat boxes skeleton */}
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {Array(4)
+        .fill(0)
+        .map((_, idx) => (
+          <div key={idx} className="rounded-2xl bg-gray-200 h-32"></div>
+        ))}
+    </div>
+    {/* Chart skeleton */}
+    <div className="bg-gray-200 rounded-2xl h-80 w-full"></div>
+  </div>
+);
+
+export default function Dashboard() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
   const param = useParams();
+
+  const userid = param?.uid as string;
 
   useEffect(() => {
     const fetchStats_ByUser = async () => {
       setLoading(true);
       const res: ApiReturn<any> = await api_caller<any>(
         "GET",
-        `${API.USER.GET_STATS}/${param?.uid}`
+        `${API.USER.GET_STATS}/${userid}`
       );
       if (res.success) {
         setStats(res?.data);
@@ -52,24 +71,10 @@ export default function Stats() {
       setLoading(false);
     };
 
-    fetchStats_ByUser();
-  }, []);
-
-  // Skeleton Loader Component
-  const SkeletonLoader = () => (
-    <div className="space-y-8 animate-pulse">
-      {/* Stat boxes skeleton */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {Array(4)
-          .fill(0)
-          .map((_, idx) => (
-            <div key={idx} className="rounded-2xl bg-gray-200 h-32"></div>
-          ))}
-      </div>
-      {/* Chart skeleton */}
-      <div className="bg-gray-200 rounded-2xl h-80 w-full"></div>
-    </div>
-  );
+    if (userid) {
+      fetchStats_ByUser();
+    }
+  }, [userid]);
 
   if (loading) {
     return <SkeletonLoader />;
@@ -84,10 +89,28 @@ export default function Stats() {
         label: "Average Rooms / Paying Guest House",
         value: stats.avgRoomsPerPG,
       },
+      { label: "Monthly Earnings / Revenue", value: "6532"},
+      { label: "Total Tenants / Occupants", value: "12458"},
+      { label: "Booking Percentage", value: "85%"},
+      { label: "Pending Requests", value: "23"},
     ];
 
     return (
       <div className="p-6 space-y-8">
+        <div>
+          <h1 className="text-gray-500">
+            <span>Welcome to your</span> <br />{" "}
+            <span className="text-4xl font-semibold text-gray-700">
+              Admin <span className="text-yellow-700">Dashboard</span>
+            </span>
+          </h1>
+          <p className="text-gray-500 mt-2">
+            manage your Paying Guest listings, monitor tenant activities, and
+            keep everything <br />
+            running smoothly in one place.
+          </p>
+        </div>
+
         {/* Stat Boxes */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {boxes.map((box, idx) => (
@@ -137,8 +160,7 @@ export default function Stats() {
                       return (
                         <div className="bg-white p-4 rounded-lg shadow-md min-w-[220px]">
                           <p className="font-semibold mb-2 text-gray-500">
-                            Enlisted{" "}
-                            {data.count} PG
+                            Enlisted {data.count} PG
                             {data.count > 1 ? "s" : ""}
                           </p>
                           <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">

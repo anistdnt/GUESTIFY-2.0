@@ -227,3 +227,9 @@ textarea[aria-invalid="true"] {
   background-color: #d0a400 !important;
   transform: scale(1.4); /* slightly bigger active dot */
 }
+
+label.required::after {
+  content: " *";
+  color: red;
+  font-weight: bold;
+}
