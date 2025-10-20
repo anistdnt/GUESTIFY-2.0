@@ -1,7 +1,8 @@
 export interface NavItemsType {
     title: string;
     path: string;
-    icon: string;
+    icon?: string;
+    iconEle?: any;
     disabled?: boolean; 
     onClick?: () => void | Promise<void>;
     class?: string;

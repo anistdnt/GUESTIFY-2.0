@@ -96,9 +96,9 @@ export default function AdminLayoutComponent({ children }: Props) {
     <div>
       {/* Sidebar - Always visible */}
       <div className="fixed left-0 top-0 w-64 h-full bg-[#f8f4f3] p-4 z-40 shadow-md shadow-black/5">
-        <Link href="/admin/dashboard" className="flex shrink-0 items-center">
+        <Link href="/" className="flex shrink-0 items-center">
           <Image
-            src={"/assets/new_logo.png"}
+            src={"/assets/logo-bg-removed.png"}
             alt="Logo"
             width={130}
             height={50}

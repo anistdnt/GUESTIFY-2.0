@@ -14,27 +14,38 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 function MyPGHeader() {
+  const [boxes, setboxes] = useState<{ label: string; value: number }[]>([
+    { label: "Total Paying Guest Enlisted", value: 0 },
+    { label: "Occupied Rooms", value: 0 },
+    { label: "Vacant Rooms", value: 0 },
+    { label: "Average Rating", value: 0 },
+  ]);
   return (
     <div className="mb-8">
-      <h1 className="text-2xl font-bold text-gray-800">My Enlisted PGs 🏠</h1>
-      <p className="text-gray-500 mt-2 text-sm">
-        Here you can manage all the Paying Guest houses you’ve added. You can
-        view details, edit listings, or add new PGs anytime.
-      </p>
+      <div>
+        <h1 className="text-gray-500">
+          <span className="text-gray-500 text-2xl">Manage Your</span> <br />
+          <span className="text-4xl font-semibold text-gray-700">
+            <span className="text-yellow-700">Paying Guest</span> Properties
+          </span>
+        </h1>
+        <p className="text-gray-500 mt-2">
+          Manage all your listed Paying Guest properties here — <br />
+          update details, monitor occupancy, and keep your PGs performing at
+          their best.
+        </p>
+      </div>
 
-      <div className="mt-5 grid sm:grid-cols-3 gap-4">
-        <div className="bg-yellow-50 border rounded-xl p-4">
-          <p className="text-sm text-gray-600">Total PGs</p>
-          <h3 className="text-2xl font-bold text-yellow-700">8</h3>
-        </div>
-        <div className="bg-yellow-50 border rounded-xl p-4">
-          <p className="text-sm text-gray-600">Active Rooms</p>
-          <h3 className="text-2xl font-bold text-yellow-700">120</h3>
-        </div>
-        <div className="bg-yellow-50 border rounded-xl p-4">
-          <p className="text-sm text-gray-600">Vacant Rooms</p>
-          <h3 className="text-2xl font-bold text-yellow-700">42</h3>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+        {boxes.map((box, idx) => (
+          <div
+            key={idx}
+            className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center"
+          >
+            <p className="text-gray-500 text-sm">{box.label}</p>
+            <p className="text-5xl font-bold">{box.value}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -94,7 +105,7 @@ const Page = () => {
     );
   } else {
     return (
-      <>
+      <div className="p-6">
         <MyPGHeader />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 justify-items-center">
           {cards?.map((item: any, index: number) => (
@@ -118,7 +129,7 @@ const Page = () => {
             </div>
           </button>
         </div>
-      </>
+      </div>
     );
   }
 };
