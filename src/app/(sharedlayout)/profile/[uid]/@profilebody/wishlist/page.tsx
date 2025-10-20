@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { api_caller } from "@/lib/api_caller";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { CurrencyInr, Heart } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
@@ -21,7 +21,7 @@ type PGItem = {
   state: string;
   district: string;
   pg_type: string;
-  pg_images: { pg_image_url: string }[];
+  pg_images: { pg_image_url: string; pg_image_id: string }[];
   food_available: string;
   wifi_available: string;
   rooms: Room[];
@@ -35,7 +35,7 @@ export default function WishlistPage() {
   // Fetch wishlist
   const getWishlist = async () => {
     try {
-      const response = await api_caller("GET", `${API.WISHLIST.VIEW}/${params.uid}`);
+      const response: ApiReturn<any> = await api_caller<any>("GET", `${API.WISHLIST.VIEW}/${params.uid}`);
       if (response.success) {
         setWishlist(response.data || []);
       } else {
@@ -170,7 +170,7 @@ export default function WishlistPage() {
 
               <Link
                 href={`/pg/${item.pg_id}`}
-                className="mt-5 inline-flex items-center justify-center rounded-md border border-transparent bg-gray-800 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-900 transition"
+                className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
               >
                 View Details
               </Link>
