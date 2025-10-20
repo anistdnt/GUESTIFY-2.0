@@ -146,290 +146,297 @@ const Page = () => {
       <div className="flex flex-col gap-8 p-6">
         <div>
           <h1 className=" text-xl sm:text-3xl font-semibold text-gray-800">
-            Welcome, {reduxUserData?.first_name} {reduxUserData?.last_name}
+            <span className="text-gray-700 text-xl">Welcome</span>, <span className="text-yellow-700">{reduxUserData?.first_name} {reduxUserData?.last_name}</span>
           </h1>
           <p className="text-gray-500 mt-1 max-sm:text-sm">
             Created At : {formatDate(reduxUserData?.createdAt as string)}
           </p>
         </div>
-        <form className="flex flex-col" onSubmit={formik.handleSubmit}>
-          {/* up Section */}
-          <div className="w-full flex flex-row justify-between mb-10">
-            <div>
-              <div className="relative w-28 h-28 mb-4">
-                <Image
-                  src={image || "/assets/profile.png"}
-                  alt="Profile Image"
-                  className="rounded-full"
-                  fill
-                  objectFit="cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("fileInput")?.click()}
-                  className={
-                    isEditing
-                      ? "absolute h-9 w-9 bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
-                      : "hidden"
-                  }
-                >
-                  <i className="fas fa-pencil-alt  text-gray-700"></i>
-                </button>
-                {/* delete button will be implemented with api */}
+        <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white p-6">
+          <form className="flex flex-col" onSubmit={formik.handleSubmit}>
+            {/* up Section */}
+            <div className="w-full flex flex-row justify-between mb-10">
+              <div>
+                <div className="relative w-28 h-28 mb-4">
+                  <Image
+                    src={image || "/assets/profile.png"}
+                    alt="Profile Image"
+                    className="rounded-full"
+                    fill
+                    objectFit="cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      document.getElementById("fileInput")?.click()
+                    }
+                    className={
+                      isEditing
+                        ? "absolute h-9 w-9 bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
+                        : "hidden"
+                    }
+                  >
+                    <i className="fas fa-pencil-alt  text-gray-700"></i>
+                  </button>
+                  {/* delete button will be implemented with api */}
 
-                <input
-                  id="fileInput"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </div>
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  {reduxUserData?.first_name} {reduxUserData?.last_name}
+                </h2>
+                <p className="text-gray-600">{reduxUserData?.email}</p>
               </div>
-              <h2 className="text-2xl font-semibold text-gray-800">
-                {reduxUserData?.first_name} {reduxUserData?.last_name}
-              </h2>
-              <p className="text-gray-600">{reduxUserData?.email}</p>
-            </div>
-            <div>
-              {isEditing ? (
-                <div className="flex flex-row justify-center items-center gap-5">
+              <div>
+                {isEditing ? (
+                  <div className="flex flex-row justify-center items-center gap-5">
+                    <button
+                      className="mt-6 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-2"
+                      type="submit"
+                    >
+                      <FloppyDisk size={25} color="#ffffff" weight="fill" />
+                      <span>Save</span>
+                    </button>
+                    <button
+                      className="mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80 flex justify-center items-center gap-2"
+                      onClick={() => {
+                        formik.resetForm();
+                        setIsEditing(false);
+                      }}
+                    >
+                      <XCircle size={25} color="#ffffff" weight="fill" />
+                      <span>Cancel</span>
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    className="mt-6 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-2"
-                    type="submit"
+                    className="flex items-center justify-center gap-2 mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80"
+                    onClick={() => setIsEditing(true)}
                   >
-                    <FloppyDisk size={25} color="#ffffff" weight="fill" />
-                    <span>Save</span>
+                    <Pencil size={25} color="#ffffff" weight="fill" />
+                    <span>Edit</span>
                   </button>
-                  <button
-                    className="mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80 flex justify-center items-center gap-2"
-                    onClick={() => {
-                      formik.resetForm();
-                      setIsEditing(false);
-                    }}
-                  >
-                    <XCircle size={25} color="#ffffff" weight="fill" />
-                    <span>Cancel</span>
-                  </button>
-                </div>
-              ) : (
-                <button
-                  className="flex items-center justify-center gap-2 mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80"
-                  onClick={() => setIsEditing(true)}
-                >
-                  <Pencil size={25} color="#ffffff" weight="fill" />
-                  <span>Edit</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* down Section */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <label className="block text-gray-700 font-medium">
-                First Name
-              </label>
-              <input
-                type="text"
-                placeholder="Your Full Name"
-                name="first_name"
-                value={formik.values.first_name}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.first_name && formik.errors.first_name
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.first_name && formik.errors.first_name ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.first_name}
-                </div>
-              ) : null}
+                )}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">
-                Last Name
-              </label>
-              <input
-                type="text"
-                placeholder="Your Full Name"
-                name="last_name"
-                value={formik.values.last_name}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.last_name && formik.errors.last_name
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.last_name && formik.errors.last_name ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.last_name}
-                </div>
-              ) : null}
-            </div>
+            {/* down Section */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label className="block text-gray-700 font-medium required">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Your Full Name"
+                  name="first_name"
+                  value={formik.values.first_name}
+                  onChange={formik.handleChange}
+                  className={`w-full mt-2 p-3 border ${
+                    formik.touched.first_name && formik.errors.first_name
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
+                  readOnly={!isEditing}
+                />
+                {formik.touched.first_name && formik.errors.first_name ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.first_name}
+                  </div>
+                ) : null}
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">Email</label>
-              <input
-                type="email"
-                placeholder="Your Email Address"
-                name="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.email && formik.errors.email
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                disabled={true}
-              />
-              {formik.touched.email && formik.errors.email ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.email}
-                </div>
-              ) : null}
-            </div>
+              <div>
+                <label className="block text-gray-700 font-medium required">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Your Full Name"
+                  name="last_name"
+                  value={formik.values.last_name}
+                  onChange={formik.handleChange}
+                  className={`w-full mt-2 p-3 border ${
+                    formik.touched.last_name && formik.errors.last_name
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
+                  readOnly={!isEditing}
+                />
+                {formik.touched.last_name && formik.errors.last_name ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.last_name}
+                  </div>
+                ) : null}
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">Gender</label>
-              <Select
-                className="mt-2"
-                isDisabled={!isEditing}
-                name="gender"
-                options={genderOptions}
-                value={
-                  genderOptions.find(
-                    (option) => option.value === formik.values.gender
-                  ) || null
-                }
-                onChange={(option) =>
-                  formik.setFieldValue("gender", option?.value)
-                }
-                onBlur={() => formik.setFieldTouched("gender", true)}
-                placeholder="Select Gender"
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    borderRadius: "0.5rem", // rounded-lg
-                    padding: "6px",
-                    borderColor:
-                      formik.touched.gender && formik.errors.gender
-                        ? "#ef4444" // Tailwind red-500
-                        : "#d1d5db", // Tailwind gray-300
-                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // Tailwind gray-600 focus ring
-                    "&:hover": {
+              <div>
+                <label className="block text-gray-700 font-medium required">Email</label>
+                <input
+                  type="email"
+                  placeholder="Your Email Address"
+                  name="email"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  className={`w-full mt-2 p-3 border ${
+                    formik.touched.email && formik.errors.email
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
+                  disabled={true}
+                />
+                {formik.touched.email && formik.errors.email ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.email}
+                  </div>
+                ) : null}
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium required">
+                  Gender
+                </label>
+                <Select
+                  className="mt-2"
+                  isDisabled={!isEditing}
+                  name="gender"
+                  options={genderOptions}
+                  value={
+                    genderOptions.find(
+                      (option) => option.value === formik.values.gender
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    formik.setFieldValue("gender", option?.value)
+                  }
+                  onBlur={() => formik.setFieldTouched("gender", true)}
+                  placeholder="Select Gender"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: "0.5rem", // rounded-lg
+                      padding: "6px",
                       borderColor:
                         formik.touched.gender && formik.errors.gender
-                          ? "#ef4444"
-                          : "#9ca3af", // Tailwind gray-400
-                    },
-                  }),
-                }}
-              />
-              {formik.touched.gender && formik.errors.gender ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.gender}
-                </div>
-              ) : null}
-            </div>
+                          ? "#ef4444" // Tailwind red-500
+                          : "#d1d5db", // Tailwind gray-300
+                      boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // Tailwind gray-600 focus ring
+                      "&:hover": {
+                        borderColor:
+                          formik.touched.gender && formik.errors.gender
+                            ? "#ef4444"
+                            : "#9ca3af", // Tailwind gray-400
+                      },
+                    }),
+                  }}
+                />
+                {formik.touched.gender && formik.errors.gender ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.gender}
+                  </div>
+                ) : null}
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">Country</label>
-              <Select
-                className="mt-2 w-full"
-                isDisabled={!isEditing}
-                name="district"
-                options={districtOptions}
-                value={
-                  districtOptions.find(
-                    (option) => option.value === formik.values.district
-                  ) || null
-                }
-                onChange={(option) =>
-                  formik.setFieldValue("district", option?.value)
-                }
-                onBlur={() => formik.setFieldTouched("district", true)}
-                placeholder="Select Country"
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    borderRadius: "0.5rem", // rounded-lg
-                    padding: "6px",
-                    borderColor:
-                      formik.touched.district && formik.errors.district
-                        ? "#ef4444" // red-500
-                        : "#d1d5db", // gray-300
-                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
-                    "&:hover": {
+              <div>
+                <label className="block text-gray-700 font-medium required">
+                  Country
+                </label>
+                <Select
+                  className="mt-2 w-full"
+                  isDisabled={!isEditing}
+                  name="district"
+                  options={districtOptions}
+                  value={
+                    districtOptions.find(
+                      (option) => option.value === formik.values.district
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    formik.setFieldValue("district", option?.value)
+                  }
+                  onBlur={() => formik.setFieldTouched("district", true)}
+                  placeholder="Select Country"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: "0.5rem", // rounded-lg
+                      padding: "6px",
                       borderColor:
                         formik.touched.district && formik.errors.district
-                          ? "#ef4444"
-                          : "#9ca3af", // gray-400
-                    },
-                  }),
-                }}
-              />
-              {formik.touched.district && formik.errors.district ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.district}
-                </div>
-              ) : null}
-            </div>
+                          ? "#ef4444" // red-500
+                          : "#d1d5db", // gray-300
+                      boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
+                      "&:hover": {
+                        borderColor:
+                          formik.touched.district && formik.errors.district
+                            ? "#ef4444"
+                            : "#9ca3af", // gray-400
+                      },
+                    }),
+                  }}
+                />
+                {formik.touched.district && formik.errors.district ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.district}
+                  </div>
+                ) : null}
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">
-                Language
-              </label>
-              <Select
-                className="mt-2 w-full"
-                isDisabled={!isEditing}
-                name="mother_tongue"
-                options={languageOptions}
-                value={
-                  languageOptions.find(
-                    (option) => option.value === formik.values.mother_tongue
-                  ) || null
-                }
-                onChange={(option) =>
-                  formik.setFieldValue("mother_tongue", option?.value)
-                }
-                onBlur={() => formik.setFieldTouched("mother_tongue", true)}
-                placeholder="Select Language"
-                isSearchable // 🔎 makes it searchable
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    borderRadius: "0.5rem", // rounded-lg
-                    padding: "6px",
-                    borderColor:
-                      formik.touched.mother_tongue &&
-                      formik.errors.mother_tongue
-                        ? "#ef4444" // red-500
-                        : "#d1d5db", // gray-300
-                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
-                    "&:hover": {
+              <div>
+                <label className="block text-gray-700 font-medium required">
+                  Language
+                </label>
+                <Select
+                  className="mt-2 w-full"
+                  isDisabled={!isEditing}
+                  name="mother_tongue"
+                  options={languageOptions}
+                  value={
+                    languageOptions.find(
+                      (option) => option.value === formik.values.mother_tongue
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    formik.setFieldValue("mother_tongue", option?.value)
+                  }
+                  onBlur={() => formik.setFieldTouched("mother_tongue", true)}
+                  placeholder="Select Language"
+                  isSearchable // 🔎 makes it searchable
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: "0.5rem", // rounded-lg
+                      padding: "6px",
                       borderColor:
                         formik.touched.mother_tongue &&
                         formik.errors.mother_tongue
-                          ? "#ef4444"
-                          : "#9ca3af", // gray-400
-                    },
-                  }),
-                }}
-              />
-              {formik.touched.mother_tongue && formik.errors.mother_tongue ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.mother_tongue}
-                </div>
-              ) : null}
-            </div>
+                          ? "#ef4444" // red-500
+                          : "#d1d5db", // gray-300
+                      boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
+                      "&:hover": {
+                        borderColor:
+                          formik.touched.mother_tongue &&
+                          formik.errors.mother_tongue
+                            ? "#ef4444"
+                            : "#9ca3af", // gray-400
+                      },
+                    }),
+                  }}
+                />
+                {formik.touched.mother_tongue && formik.errors.mother_tongue ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.mother_tongue}
+                  </div>
+                ) : null}
+              </div>
 
-            {/* <div>
+              {/* <div>
               <label className="block text-gray-700 font-medium">
                 Time Zone
               </label>
@@ -455,75 +462,80 @@ const Page = () => {
               ) : null}
             </div> */}
 
-            <div>
-              <label className="block text-gray-700 font-medium">Address</label>
-              <input
-                type="text"
-                placeholder="Your Full Address"
-                name="address"
-                value={formik.values.address}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.address && formik.errors.address
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.address && formik.errors.address ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.address}
-                </div>
-              ) : null}
-            </div>
+              <div>
+                <label className="block text-gray-700 font-medium required">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  placeholder="Your Full Address"
+                  name="address"
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  className={`w-full mt-2 p-3 border ${
+                    formik.touched.address && formik.errors.address
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
+                  readOnly={!isEditing}
+                />
+                {formik.touched.address && formik.errors.address ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.address}
+                  </div>
+                ) : null}
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">Pincode</label>
-              <input
-                type="text"
-                placeholder="Your Pincode"
-                name="pincode"
-                value={formik.values.pincode}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.pincode && formik.errors.pincode
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.address && formik.errors.pincode ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.pincode}
-                </div>
-              ) : null}
+              <div>
+                <label className="block text-gray-700 font-medium required">
+                  Pincode
+                </label>
+                <input
+                  type="text"
+                  placeholder="Your Pincode"
+                  name="pincode"
+                  value={formik.values.pincode}
+                  onChange={formik.handleChange}
+                  className={`w-full mt-2 p-3 border ${
+                    formik.touched.pincode && formik.errors.pincode
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
+                  readOnly={!isEditing}
+                />
+                {formik.touched.address && formik.errors.pincode ? (
+                  <div className="text-red-500 text-sm mt-1">
+                    {formik.errors.pincode}
+                  </div>
+                ) : null}
+              </div>
             </div>
+          </form>
+          <div className="flex items-center gap-5 mt-8">
+            <button
+              className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              onClick={() => {
+                toast.success("You are redirecting to the Reset Password Page");
+                setTimeout(() => {
+                  window?.open(
+                    `/reset-password/${getCookie("authToken")}`,
+                    "_blank"
+                  );
+                }, 2000);
+              }}
+            >
+              Change Password
+            </button>
+            <button
+              className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+              onClick={() => {
+                dispatch(setModalVisibility({ open: true, type: "delete" }));
+              }}
+            >
+              <Trash size={20} />
+              <p>Delete Account</p>
+            </button>
           </div>
-        </form>
-        <div className="flex items-center gap-5">
-          <button
-            className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-            onClick={() => {
-              toast.success("You are redirecting to the Reset Password Page");
-              setTimeout(() => {
-                window?.open(
-                  `/reset-password/${getCookie("authToken")}`,
-                  "_blank"
-                );
-              }, 2000);
-            }}
-          >
-            Change Password
-          </button>
-          <button
-            className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
-            onClick={() => {
-              dispatch(setModalVisibility({ open: true, type: "delete" }));
-            }}
-          >
-            <Trash size={20} />
-            <p>Delete Account</p>
-          </button>
         </div>
       </div>
     );
