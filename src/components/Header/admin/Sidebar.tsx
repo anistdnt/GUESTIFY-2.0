@@ -42,6 +42,11 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
         path: `/admin/${userInfo.user_id}/mypg`,
         iconEle: <BuildingApartment size={20} className="me-2" />,
       },
+      {
+        title: "Bookings",
+        path: `/admin/${userInfo.user_id}/bookings`,
+        iconEle: <BuildingApartment size={20} className="me-2" />,
+      },
     ],
     account: [
       {
