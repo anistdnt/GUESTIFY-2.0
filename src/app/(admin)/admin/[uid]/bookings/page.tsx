@@ -12,6 +12,7 @@ import {
     CaretRight,
 } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -24,6 +25,7 @@ export interface Booking {
     status: BookingStatus;
     email?: string;
     phone?: string;
+    personCount?: number;
 }
 
 const SkeletonRow = () => (
@@ -67,11 +69,12 @@ export default function BookingList() {
         setTimeout(() => {
             const mockBookings: Booking[] = Array.from({ length: 22 }).map((_, i) => ({
                 id: `${i + 1}`,
-                image: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200",
+                image: "",
                 name: `User ${i + 1}`,
                 pgName: ["Sunrise PG", "Royal Stay", "Comfort Zone", "Paradise PG"][i % 4],
                 dateOfBooking: `2025-10-${(i % 28) + 1}`,
                 status: ["pending", "accepted", "declined"][i % 3] as BookingStatus,
+                personCount: Math.floor(Math.random() * 4) + 1,
             }));
             setBookings(mockBookings);
             setLoading(false);
@@ -218,8 +221,8 @@ export default function BookingList() {
                                                     setDropdownOpen(false);
                                                 }}
                                                 className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${s === filterStatus
-                                                        ? "bg-yellow-100 font-medium text-yellow-800"
-                                                        : "hover:bg-yellow-50"
+                                                    ? "bg-yellow-100 font-medium text-yellow-800"
+                                                    : "hover:bg-yellow-50"
                                                     }`}
                                             >
                                                 {s === "all"
@@ -252,58 +255,104 @@ export default function BookingList() {
                                 className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
                             >
                                 <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                                    <img
-                                        src={b.image}
+                                    <Image
+                                        src={b.image || "/assets/profile.png"}
                                         alt={b.name}
-                                        className="w-16 h-16 rounded-lg object-cover"
+                                        width={68}
+                                        height={68}
+                                        className="rounded-lg object-cover w-17 h-17"
+                                        priority={false}
                                     />
+
                                     <div className="flex-1">
-                                        <div className="flex items-start justify-between gap-4">
+                                        <div className="flex items-start gap-4">
                                             <div>
-                                                <h3 className="text-lg font-semibold text-gray-800">
-                                                    {b.name}
-                                                </h3>
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="text-lg font-semibold text-gray-800">
+                                                        {b.name}
+                                                    </h3>
+                                                    {/* 👇 Light gray badge for person count */}
+                                                    <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-200">
+                                                        {b.personCount || 1} Person{(b.personCount || 1) > 1 ? "s" : ""}
+                                                    </span>
+                                                </div>
+
                                                 <p className="text-sm text-gray-600 mt-1">{b.pgName}</p>
                                                 <p className="text-sm text-gray-500 mt-1">
                                                     Booking Date: {formatDate(b.dateOfBooking)}
                                                 </p>
                                             </div>
+
                                             <div>{getStatusBadge(b.status)}</div>
                                         </div>
                                     </div>
 
+                                    {/* 👇 Button logic based on status */}
                                     <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handleAccept(b.id)}
-                                            disabled={b.status !== "pending"}
-                                            className={`p-2 rounded-md transition-all ${b.status === "pending"
-                                                ? "bg-green-500 hover:bg-green-600 text-white"
-                                                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                                }`}
-                                            title="Accept"
-                                        >
-                                            <Check size={18} weight="bold" />
-                                        </button>
+                                        {b.status === "pending" && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleAccept(b.id)}
+                                                    className="p-2 rounded-md bg-green-500 hover:bg-green-600 text-white transition-all"
+                                                    title="Accept"
+                                                >
+                                                    <Check size={18} weight="bold" />
+                                                </button>
 
-                                        <button
-                                            onClick={() => handleDecline(b.id)}
-                                            disabled={b.status !== "pending"}
-                                            className={`p-2 rounded-md transition-all ${b.status === "pending"
-                                                ? "bg-red-500 hover:bg-red-600 text-white"
-                                                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                                }`}
-                                            title="Decline"
-                                        >
-                                            <X size={18} weight="bold" />
-                                        </button>
+                                                <button
+                                                    onClick={() => handleDecline(b.id)}
+                                                    className="p-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition-all"
+                                                    title="Decline"
+                                                >
+                                                    <X size={18} weight="bold" />
+                                                </button>
 
-                                        <button
-                                            onClick={() => handleDownload(b)}
-                                            className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                                            title="Download"
-                                        >
-                                            <DownloadSimple size={18} weight="bold" />
-                                        </button>
+                                                <button
+                                                    onClick={() => handleDownload(b)}
+                                                    className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
+                                                    title="Download"
+                                                >
+                                                    <DownloadSimple size={18} weight="bold" />
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {b.status === "accepted" && (
+                                            <>
+                                                <button
+                                                    onClick={() =>
+                                                        setBookings((prev) =>
+                                                            prev.map((bk) =>
+                                                                bk.id === b.id
+                                                                    ? { ...bk, status: "pending" }
+                                                                    : bk
+                                                            )
+                                                        )
+                                                    }
+                                                    className="p-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-all"
+                                                    title="Return to pending"
+                                                >
+                                                    ↩
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDownload(b)}
+                                                    className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
+                                                    title="Download"
+                                                >
+                                                    <DownloadSimple size={18} weight="bold" />
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {b.status === "declined" && (
+                                            <button
+                                                onClick={() => handleDownload(b)}
+                                                className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
+                                                title="Download"
+                                            >
+                                                <DownloadSimple size={18} weight="bold" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
