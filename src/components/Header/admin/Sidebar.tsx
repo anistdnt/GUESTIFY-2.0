@@ -1,10 +1,19 @@
 "use client";
-
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { NavItemsType, UserInfo } from "@/types/admin";
-import { BuildingApartment, HouseLine, SignOut, Trash, UserCircle } from "@phosphor-icons/react/dist/ssr";
+import {
+  BuildingApartment,
+  CaretDown,
+  Compass,
+  HouseLine,
+  PlusCircle,
+  SignOut,
+  Trash,
+  UserCircle,
+} from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 
 interface Props {
@@ -16,6 +25,12 @@ interface Props {
 export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
   const pathname = usePathname();
   const dispatch = useDispatch();
+
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+
+  const toggleAccordion = (title: string) => {
+    setOpenAccordion(openAccordion === title ? null : title);
+  };
 
   if (!userInfo) {
     return <SidebarSkeleton />;
@@ -30,17 +45,23 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
       {
         title: "Dashboard",
         path: `/admin/${userInfo.user_id}/dashboard`,
-        iconEle: <HouseLine size={20} className="me-2"/>,
+        iconEle: <HouseLine size={20} className="me-2" />,
       },
       {
-        title: "My Profile",
-        path: `/admin/${userInfo.user_id}/profile`,
-        iconEle: <UserCircle size={22} className="me-2"/>,
-      },
-      {
-        title: "My Enlisted PGs",
-        path: `/admin/${userInfo.user_id}/mypg`,
-        iconEle: <BuildingApartment size={20} className="me-2" />,
+        title: "Discovered PGs",
+        iconEle: <Compass size={22} className="me-2" />,
+        children: [
+          {
+            title: "My Enlisted PGs",
+            path: `/admin/${userInfo.user_id}/mypg`,
+            iconEle: <BuildingApartment size={20} className="me-2" />,
+          },
+          {
+            title: "Add New PG",
+            path: `/admin/${userInfo.user_id}/pg/new`,
+            iconEle: <PlusCircle size={20} className="me-2"/>,
+          },
+        ],
       },
       {
         title: "Bookings",
@@ -50,25 +71,20 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
     ],
     account: [
       {
+        title: "My Profile",
+        path: `/admin/${userInfo.user_id}/profile`,
+        iconEle: <UserCircle size={22} className="me-2" />,
+      },
+      {
         title: "Sign Out",
-        path: "", // No path, handled by onClick
-        iconEle: <SignOut size={20} className="me-2"/>,
+        iconEle: <SignOut size={20} className="me-2" />,
         onClick: logout_user,
       },
       {
         title: "Delete Account",
-        path: "", // No path, handled by onClick
-        iconEle: <Trash size={20} className="me-2"/>,
+        iconEle: <Trash size={20} className="me-2" />,
         onClick: handleDeleteAccount,
         class: "text-red-500 hover:text-red-600",
-      },
-    ],
-    extensions: [
-      {
-        title: "Coming Soon",
-        path: "#",
-        icon: "fas fa-puzzle-piece",
-        disabled: true,
       },
     ],
   };
@@ -85,34 +101,80 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
               </span>
             )}
 
-            <hr className="border-gray-400"/>
+            <hr className="border-gray-400" />
 
             {section.map((item, idx) => (
               <li key={idx} className="mb-1">
-                {item.disabled ? (
-                  <div className="flex justify-start font-semibold items-center py-2 px-4 text-gray-400 cursor-not-allowed rounded-md">
-                    <i className={`${item.icon} text-base mr-3`}></i>
-                    <span className="text-sm">{item.title}</span>
+                {item.children ? (
+                  <div>
+                    <button
+                      onClick={() => toggleAccordion(item.title)}
+                      className="flex justify-between items-center w-full py-2 px-4 rounded-md font-semibold text-gray-600 hover:text-yellow-600"
+                    >
+                      <div className="flex items-center">
+                        {item.iconEle && item.iconEle}
+                        <span className="ml-2 text-sm">{item.title}</span>
+                      </div>
+                      <span
+                        className={`transition-transform ${
+                          openAccordion === item.title ? "rotate-180" : ""
+                        }`}
+                      >
+                        <CaretDown size={14} weight="bold" />
+                      </span>
+                    </button>
+
+                    {openAccordion === item.title && (
+                      <ul className="pl-8 mt-2 flex flex-col gap-1">
+                        {item.children.map((child, cidx) =>
+                          child.path ? (
+                            <Link
+                              key={cidx}
+                              href={child.path}
+                              className={`flex items-center py-2 px-4 rounded-md text-gray-600 ${
+                                pathname === child.path
+                                  ? "bg-yellow-600 text-white"
+                                  : "hover:text-yellow-600"
+                              }`}
+                            >
+                              {child?.iconEle && child.iconEle}
+                              <span className="text-sm">{child.title}</span>
+                            </Link>
+                          ) : (
+                            <button
+                              key={cidx}
+                              onClick={child.onClick}
+                              className="flex items-center py-2 px-4 rounded-md text-gray-600 hover:text-yellow-600"
+                            >
+                              {child?.iconEle && child.iconEle}
+                              <span className="text-sm">{child.title}</span>
+                            </button>
+                          )
+                        )}
+                      </ul>
+                    )}
                   </div>
                 ) : item.onClick ? (
                   <button
                     onClick={item.onClick}
-                    className={`flex font-semibold items-center w-full py-2 px-4 rounded-md transition-all text-gray-600 hover:text-yellow-600 ${item?.class ? item?.class : ''}`}
+                    className={`flex font-semibold items-center w-full py-2 px-4 rounded-md transition-all text-gray-600 hover:text-yellow-600 ${
+                      item?.class || ""
+                    }`}
                   >
-                    {item?.iconEle ? item.iconEle : <i className={`${item.icon} text-base mr-3`}></i>}
-                    <span className="text-sm">{item.title}</span>
+                    {item?.iconEle && item.iconEle}
+                    <span className="ml-2 text-sm">{item.title}</span>
                   </button>
                 ) : (
                   <Link
-                    href={item.path}
-                    className={`flex font-semibold items-center py-2 px-4 rounded-md transition-all text-gray-600 ${item?.class ? item?.class : ''} ${
-                      pathname === item?.path
+                    href={item.path!}
+                    className={`flex font-semibold items-center py-2 px-4 rounded-md transition-all text-gray-600 ${
+                      pathname === item.path
                         ? "bg-yellow-600 text-white"
-                        : `hover:text-yellow-600`
+                        : "hover:text-yellow-600"
                     }`}
                   >
-                    {item?.iconEle ? item.iconEle : <i className={`${item.icon} text-base mr-3`}></i>}
-                    <span className="text-sm">{item.title}</span>
+                    {item?.iconEle && item.iconEle}
+                    <span className="ml-2 text-sm">{item.title}</span>
                   </Link>
                 )}
               </li>
