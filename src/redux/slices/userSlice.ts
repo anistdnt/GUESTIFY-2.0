@@ -16,11 +16,17 @@ const userSlice = createSlice({
     setUserData: (state, action) => {
       state.userData = action.payload;
     },
+    setWishlistData: (state, action) => {
+      state.userData.wishlist = [...state?.userData?.wishlist, action.payload];
+    },
+    removeWishlistData:(state, action) => {
+      state.userData.wishlist = state?.userData?.wishlist?.filter((i) => i !== action.payload);
+    },
     setToken: (state, action) => {
       state.token = getCookie(action.payload) as string;
     },
   },
 });
 
-export const { setUserData, setToken } = userSlice.actions;
+export const { setUserData, setWishlistData, removeWishlistData, setToken } = userSlice.actions;
 export default userSlice.reducer;
