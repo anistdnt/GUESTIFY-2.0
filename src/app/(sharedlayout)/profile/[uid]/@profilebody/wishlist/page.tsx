@@ -8,6 +8,9 @@ import { CurrencyInr, Heart } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import FadedImageSlider from "@/components/DisplayCard/FadedImageSlider";
+import { useDispatch, useSelector } from "react-redux";
+import { removeWishlistData } from "@/redux/slices/userSlice";
+import { RootState } from "@/redux/store";
 
 type Room = {
   room_type: string;
@@ -31,6 +34,11 @@ export default function WishlistPage() {
   const [wishlist, setWishlist] = useState<PGItem[]>([]);
   const [loading, setLoading] = useState(true);
   const params = useParams();
+  const dispatch = useDispatch();
+
+  const profile_info = useSelector(
+    (state: RootState) => state.user_slice.userData
+  );
 
   // Fetch wishlist
   const getWishlist = async () => {
@@ -61,6 +69,7 @@ export default function WishlistPage() {
         setWishlist(prev); // rollback
         toast.error(response.error || "Failed to remove");
       } else {
+        dispatch(removeWishlistData(pgId));
         toast.success(response.message || "Removed from wishlist");
       }
     } catch {
@@ -84,10 +93,10 @@ export default function WishlistPage() {
   if (wishlist.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-600">
-        <p className="text-lg font-semibold">Your wishlist is empty 🏠</p>
+        <p className="text-lg font-semibold">Your wishlist is empty</p>
         <Link
-          href="/explore"
-          className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
+          href="/"
+          className="mt-4 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
         >
           Explore PGs
         </Link>
@@ -109,10 +118,12 @@ export default function WishlistPage() {
                 e.preventDefault();
                 removeFromWishlist(item.pg_id);
               }}
-              className="absolute top-3 left-3 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-20"
+              className={`absolute top-3 left-3 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-20 ${
+                          profile_info?.wishlist?.includes(item?.pg_id) ? "heart-animate" : ""
+                        }`}
               aria-label="Remove from wishlist"
             >
-              <Heart size={20} weight="fill" color="#e0245e" />
+              <Heart size={20} weight="fill" color="#e0245e" className="transition-all duration-300" />
             </button>
 
             {/* Image */}

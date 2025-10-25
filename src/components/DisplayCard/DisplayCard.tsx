@@ -14,6 +14,7 @@ import { api_caller } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import toast from "react-hot-toast";
 import { RootState } from "@/redux/store";
+import { setWishlistData, removeWishlistData } from "@/redux/slices/userSlice";
 
 type Props = {
   item?: PGData;
@@ -33,14 +34,6 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
   // Utility to extract coordinates from query string
   const [college_longitude, setLongitude] = useState<number | null>(null);
   const [college_latitude, setLatitude] = useState<number | null>(null);
-  const [wishlisted, setWishlisted] = useState(false);
-
-  useEffect(() => {
-  if (profile_info && Array.isArray(profile_info.wishlist) && pginfo?._id) {
-    const isWishlisted = profile_info.wishlist.includes(pginfo._id);
-    setWishlisted(isWishlisted);
-  }
-}, [profile_info, pginfo?._id]);
 
   const params = useSearchParams();
   const clg_coords = params.get("coordinates");
@@ -50,32 +43,37 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
   const clg_id = params.get("clg_id") || "";
 
   const addToWishlist = async (pgId: string) => {
-    const prevState = wishlisted;
-    const newState = !prevState;
 
-    // Optimistic UI update
-    setWishlisted(newState);
+    const isNotAddToWishlistPg = profile_info?.wishlist?.includes(pginfo?._id);
+
+    if (isNotAddToWishlistPg) {
+      dispatch(removeWishlistData(pgId));
+    } else {
+      dispatch(setWishlistData(pgId));
+    }
 
     try {
       // Determine endpoint and payload
-      const endpoint = newState
+      const endpoint = !isNotAddToWishlistPg
         ? API.WISHLIST.ADD
         : `${API.WISHLIST.DELETE}/${pgId}`;
-      const method = newState ? "POST" : "DELETE";
+      const method = !isNotAddToWishlistPg ? "POST" : "DELETE";
 
-      const payload = newState ? { pg_id: pgId } : undefined;
+      const payload = !isNotAddToWishlistPg ? { pg_id: pgId } : undefined;
 
       const response = await api_caller(method, endpoint, payload);
 
       if (!response.success) {
-        // Revert UI on failure
-        setWishlisted(prevState);
+        if(isNotAddToWishlistPg) {
+          dispatch(setWishlistData(pgId));
+        } else {
+          dispatch(removeWishlistData(pgId));
+        }
         toast.error(response.error || "Something went wrong. Please try again.");
       } else {
         toast.success(response.message)
       }
     } catch (err) {
-      setWishlisted(prevState);
       toast.error("Unable to update wishlist. Try again later.");
     }
   };
@@ -85,14 +83,16 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <div className="relative">
           <button
-            className="absolute top-2 left-2 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-30"
+            className={`absolute top-2 left-2 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-30 ${
+                        profile_info?.wishlist?.includes(pginfo?._id) ? "heart-animate" : ""}`}
             onClick={() => addToWishlist(pginfo?._id)}
-            aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={profile_info?.wishlist?.includes(pginfo?._id) ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart
               size={22}
-              weight={wishlisted ? "fill" : "regular"}
-              color={wishlisted ? "#e0245e" : "#888"}
+              weight={profile_info?.wishlist?.includes(pginfo?._id) ? "fill" : "regular"}
+              color={profile_info?.wishlist?.includes(pginfo?._id) ? "#e0245e" : "#888"}
+              className="transition-all duration-300"
             />
           </button>
           <FadedImageSlider images={pginfo?.pg_images} />
