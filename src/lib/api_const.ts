@@ -62,5 +62,10 @@ export const API = {
     IMAGE: {
         UPLOAD: "/uploadImage",
         DELETE: "/deleteImage"
+    },
+    WISHLIST: {
+        ADD: "/wishlist/add",
+        VIEW: "/wishlist",
+        DELETE: "/wishlist/remove"
     }
 }
