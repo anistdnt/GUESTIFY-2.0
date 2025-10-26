@@ -13,6 +13,9 @@ import {
 } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
+import { set } from "mongoose";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -20,12 +23,12 @@ export interface Booking {
     id: string;
     image: string;
     name: string;
-    pgName: string;
+    address: string;
     dateOfBooking: string;
     status: BookingStatus;
     email?: string;
     phone?: string;
-    personCount?: number;
+    personCount: number;
 }
 
 const SkeletonRow = () => (
@@ -53,32 +56,53 @@ export default function BookingList() {
     const [filterStatus, setFilterStatus] = useState<BookingStatus | "all">("all");
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showPerPageMenu, setShowPerPageMenu] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [perPage, setPerPage] = useState(5);
+    const [perPage, setPerPage] = useState(10);
 
     const filterDropdownRef = useRef<HTMLDivElement>(null);
     const perPageDropdownRef = useRef<HTMLDivElement>(null);
 
+    function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => setDebouncedValue(value), delay);
+        return () => clearTimeout(handler);
+    }, [value, delay]);
+
+    return debouncedValue;
+}
+    const debouncedSearch = useDebounce(searchTerm, 500);
+
     useEffect(() => {
         fetchBookings();
-    }, []);
+    }, [ currentPage, perPage, filterStatus, debouncedSearch]);
 
     const fetchBookings = async () => {
         setLoading(true);
-        setTimeout(() => {
-            const mockBookings: Booking[] = Array.from({ length: 22 }).map((_, i) => ({
-                id: `${i + 1}`,
-                image: "",
-                name: `User ${i + 1}`,
-                pgName: ["Sunrise PG", "Royal Stay", "Comfort Zone", "Paradise PG"][i % 4],
-                dateOfBooking: `2025-10-${(i % 28) + 1}`,
-                status: ["pending", "accepted", "declined"][i % 3] as BookingStatus,
-                personCount: Math.floor(Math.random() * 4) + 1,
-            }));
-            setBookings(mockBookings);
+        try{
+            const res : ApiReturn<any> = await api_caller<any>("GET",`${API.ADMIN.BOOKING.LIST}?page=${currentPage}&show=${perPage}&filter=${filterStatus}&search=${debouncedSearch}`);
+            if(res.success){
+                setBookings(res.data.bookings.map((b: any) => ({
+                    id: b?.booking_id,
+                    name: b?.user_name,
+                    address: b?.user_address,
+                    dateOfBooking: b?.booking_date?.slice(0, 10),
+                    status: b?.status,
+                    image: b?.user_image,
+                    personCount: b?.person_number || 0,
+                })));
+                setTotalPages(res.data.total_pages);
+            }else{
+                toast.error(res.message || "Failed to fetch bookings");
+            }
+        }catch{
+
+        }finally{
             setLoading(false);
-        }, 800);
+        }
     };
 
     const handleAccept = (id: string) => {
@@ -108,27 +132,6 @@ export default function BookingList() {
         URL.revokeObjectURL(url);
         toast.success("Booking details downloaded");
     };
-
-    const filteredBookings = bookings.filter((b) => {
-        const matchesSearch =
-            b.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            b.pgName.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filterStatus === "all" || b.status === filterStatus;
-        return matchesSearch && matchesFilter;
-    });
-
-    const totalPages = Math.ceil(filteredBookings.length / perPage);
-    const paginatedBookings = filteredBookings.slice(
-        (currentPage - 1) * perPage,
-        currentPage * perPage
-    );
-
-    const formatDate = (date: string) =>
-        new Date(date).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
 
     const getStatusBadge = (status: BookingStatus) => {
         const styles = {
@@ -185,7 +188,7 @@ export default function BookingList() {
                         <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <input
                             type="text"
-                            placeholder="Search by name or PG..."
+                            placeholder="Search by name or address..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
@@ -244,12 +247,12 @@ export default function BookingList() {
                         Array(5)
                             .fill(0)
                             .map((_, i) => <SkeletonRow key={i} />)
-                    ) : paginatedBookings.length === 0 ? (
+                    ) : bookings.length === 0 ? (
                         <div className="text-center py-12 text-gray-500">
                             <p className="text-lg">No bookings found</p>
                         </div>
                     ) : (
-                        paginatedBookings.map((b) => (
+                        bookings.map((b) => (
                             <div
                                 key={b.id}
                                 className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
@@ -277,9 +280,9 @@ export default function BookingList() {
                                                     </span>
                                                 </div>
 
-                                                <p className="text-sm text-gray-600 mt-1">{b.pgName}</p>
+                                                <p className="text-sm text-gray-600 mt-1">{b.address}</p>
                                                 <p className="text-sm text-gray-500 mt-1">
-                                                    Booking Date: {formatDate(b.dateOfBooking)}
+                                                    Booking Date: {b.dateOfBooking}
                                                 </p>
                                             </div>
 
@@ -361,7 +364,7 @@ export default function BookingList() {
                 </div>
 
                 {/* Pagination Footer */}
-                {!loading && filteredBookings.length > 0 && (
+                {!loading && bookings.length > 0 && (
                     <div className="mt-6 pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-600 gap-3">
                         {/* Per page dropdown */}
                         <div className="relative" ref={perPageDropdownRef}>
