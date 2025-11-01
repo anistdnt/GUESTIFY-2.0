@@ -19,6 +19,7 @@ interface IProps {
     imageKey?: string;
     room?: any;
     index?: number;
+    single?: boolean;
 }
 
 interface ImageInfo {
@@ -29,12 +30,12 @@ interface ImageInfo {
     editing?: boolean;
 }
 
-const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) => {
+const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = false }: IProps) => {
     const [images, setImages] = useState<ImageInfo[]>([]);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const selectedImageIndex = useRef<number>(-1);
     const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
-
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     // Load existing images
     useEffect(() => {
@@ -60,10 +61,17 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
         }
     }, [values?.pg_images, imageKey, room?.room_images]);
 
-    // Upload function
-    const uploadImage = async (file: File) => {
-        const tempId = `${file.name}-${Date.now()}`;
-        setImages((prev) => [...prev, { url: URL.createObjectURL(file), public_id: tempId, loading: true }]);
+    // Upload function (✅ fixed: skip adding temp preview if editing)
+    const uploadImage = async (file: File, isEditing = false) => {
+        let tempId: string | null = null;
+
+        if (!isEditing) {
+            tempId = `${file.name}-${Date.now()}`;
+            setImages((prev) => [
+                ...prev,
+                { url: URL.createObjectURL(file), public_id: tempId, loading: true },
+            ]);
+        }
 
         const formData = new FormData();
         formData.append("pg_image_url", file);
@@ -73,20 +81,25 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
         try {
             const res = await api_caller<ImageInfo>("POST", API.IMAGE.UPLOAD, formData, headers);
             if (res?.success) {
-                setImages((prev) =>
-                    prev.map((img) =>
-                        img.public_id === tempId
-                            ? { url: res.data?.url, public_id: res.data?.public_id }
-                            : img
-                    )
-                );
+                if (tempId) {
+                    // Replace the temp preview
+                    setImages((prev) =>
+                        prev.map((img) =>
+                            img.public_id === tempId
+                                ? { url: res.data?.url, public_id: res.data?.public_id }
+                                : img
+                        )
+                    );
+                }
                 return { url: res.data?.url, public_id: res.data?.public_id };
             } else {
                 throw new Error(res?.message || "Image upload failed");
             }
         } catch (error: any) {
             toast.error(error?.message || "Upload failed");
-            setImages((prev) => prev.filter((img) => img.public_id !== tempId));
+            if (tempId) {
+                setImages((prev) => prev.filter((img) => img.public_id !== tempId));
+            }
             return null;
         }
     };
@@ -96,13 +109,13 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
         async (acceptedFiles: any) => {
             try {
                 if (selectedImageIndex.current !== -1) {
-                    // Edit (replace)
+                    // ✅ Edit (replace): show spinner only on existing image
                     const idx = selectedImageIndex.current;
                     setImages((prev) =>
                         prev.map((img, i) => (i === idx ? { ...img, editing: true } : img))
                     );
 
-                    const replacement = await uploadImage(acceptedFiles[0]);
+                    const replacement = await uploadImage(acceptedFiles[0], true);
                     if (!replacement) return;
 
                     const payload = { public_id: images[idx]?.public_id };
@@ -122,12 +135,13 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                     );
                     selectedImageIndex.current = -1;
                 } else {
-                    // Upload new
+                    // Upload new (respect single mode)
+                    const filesToUpload = single ? acceptedFiles.slice(0, 1) : acceptedFiles;
                     const uploadedImages = await Promise.all(
-                        acceptedFiles.map((file: File) => uploadImage(file))
+                        filesToUpload.map((file: File) => uploadImage(file))
                     );
                     const valid = uploadedImages.filter(Boolean) as ImageInfo[];
-                    const newImages = [...images, ...valid];
+                    const newImages = single ? valid : [...images, ...valid];
                     setImages(newImages);
                     updateFormik(newImages);
                 }
@@ -136,10 +150,10 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                 console.error("Error uploading images:", error);
             }
         },
-        [images]
+        [images, single]
     );
 
-    // Update Formik state helper
+    // Update Formik
     const updateFormik = (newImages: ImageInfo[]) => {
         if (imageKey === "pg_image_url") {
             setFieldValue(
@@ -161,11 +175,13 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
     };
 
     // Dropzone config
-    const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: { "image/jpeg": [], "image/jpg": [], "image/png": [] },
-        multiple: selectedImageIndex.current === -1,
-        maxFiles: selectedImageIndex.current !== -1 ? 1 : undefined,
+        multiple: !single && selectedImageIndex.current === -1,
+        maxFiles: selectedImageIndex.current !== -1 ? 1 : single ? 1 : undefined,
+        noClick: true,
+        noKeyboard: true,
     });
 
     // Delete function
@@ -190,24 +206,45 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
         }
     };
 
+    // Edit handler
     const editImage = (idx: number) => {
         selectedImageIndex.current = idx;
-        setTimeout(() => open(), 0);
+        const el = fileInputRef.current;
+        if (el) {
+            el.value = "";
+            setTimeout(() => el.click(), 0);
+        } else {
+            const fallback = document.querySelector('input[type="file"]') as HTMLInputElement | null;
+            if (fallback) {
+                fallback.value = "";
+                setTimeout(() => fallback.click(), 0);
+            }
+        }
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-            <div className="flex flex-wrap gap-6 justify-start">
+        <div
+            className={`bg-white rounded-xl shadow-md p-6 border border-gray-100 ${
+                single ? "max-w-[180px]" : ""
+            }`}
+        >
+            <div className={`flex ${single ? "justify-center" : "flex-wrap gap-6 justify-start"}`}>
                 {images.map((img, idx) => {
                     const isProcessing = img.loading || img.deleting || img.editing;
 
                     return (
-                        <div key={`${idx}-${img.url}`} className={`${uploadedCell} group shadow-md w-32 h-32 relative`}>
+                        <div
+                            key={`${idx}-${img.url}`}
+                            className={`${uploadedCell} group shadow-md w-32 h-32 relative`}
+                        >
                             <div className="w-full h-32 flex items-center justify-center bg-white relative">
-                                {/* Loader overlay while processing OR image not loaded */}
                                 {(isProcessing || !loadedImages[img.public_id]) && (
                                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-10">
-                                        <CircleNotch size={32} weight="bold" className="text-white animate-spin" />
+                                        <CircleNotch
+                                            size={32}
+                                            weight="bold"
+                                            className="text-white animate-spin"
+                                        />
                                     </div>
                                 )}
 
@@ -218,12 +255,14 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                                     height={160}
                                     className="max-w-full max-h-full object-contain"
                                     onLoadingComplete={() =>
-                                        setLoadedImages((prev) => ({ ...prev, [img.public_id]: true }))
+                                        setLoadedImages((prev) => ({
+                                            ...prev,
+                                            [img.public_id]: true,
+                                        }))
                                     }
                                 />
                             </div>
 
-                            {/* Actions (only when not processing) */}
                             {!isProcessing && loadedImages[img.public_id] && (
                                 <div className={`${imageActions}`}>
                                     <button
@@ -239,8 +278,11 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                                     </button>
                                     <button
                                         type="button"
-                                        className={`${imageActionsBtn} ${images.some((i) => i.deleting) ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-                                            }`}
+                                        className={`${imageActionsBtn} ${
+                                            images.some((i) => i.deleting)
+                                                ? "cursor-not-allowed opacity-50"
+                                                : "cursor-pointer"
+                                        }`}
                                         disabled={images.some((i) => i.deleting)}
                                         onClick={(e) => {
                                             e.preventDefault();
@@ -256,8 +298,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                     );
                 })}
 
-
-                {/* Upload cell */}
+                {/* ✅ Dropzone always mounted, hidden when single & has image */}
                 <div
                     {...getRootProps({
                         onClick: (e) => {
@@ -265,9 +306,11 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                             e.stopPropagation();
                         },
                     })}
-                    className={`${uploadCellBlank} w-32 h-32`}
+                    className={`${uploadCellBlank} w-32 h-32 ${
+                        single && images.length > 0 ? "hidden" : ""
+                    }`}
                 >
-                    <input {...getInputProps({ type: "file" })} />
+                    <input {...getInputProps({ type: "file" })} ref={fileInputRef} />
                     {isDragActive ? (
                         <p className="text-sm text-gray-500 text-center">Drop image(s) here</p>
                     ) : (
@@ -278,7 +321,11 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index }: IProps) =
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    open();
+                                    const el = fileInputRef.current;
+                                    if (el) {
+                                        el.value = "";
+                                        el.click();
+                                    }
                                 }}
                             >
                                 browse
