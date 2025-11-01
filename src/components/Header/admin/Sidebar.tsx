@@ -63,6 +63,11 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
           },
         ],
       },
+      {
+        title: "Bookings",
+        path: `/admin/${userInfo.user_id}/bookings`,
+        iconEle: <BuildingApartment size={20} className="me-2" />,
+      },
     ],
     account: [
       {

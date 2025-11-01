@@ -19,6 +19,12 @@ export const API = {
         GET_PGs : "/getPg/user",
         GET_STATS : "/getStats"
     },
+    ADMIN:{
+        BOOKING:{
+            LIST : "/booking/list",
+            CREATE : "/booking/create",
+        }
+    },
     COLLEGE: {
         LIST : "/getAllColleges",
         GET_BY_ID : "/college",
@@ -56,5 +62,10 @@ export const API = {
     IMAGE: {
         UPLOAD: "/uploadImage",
         DELETE: "/deleteImage"
+    },
+    WISHLIST: {
+        ADD: "/wishlist/add",
+        VIEW: "/wishlist",
+        DELETE: "/wishlist/remove"
     }
 }

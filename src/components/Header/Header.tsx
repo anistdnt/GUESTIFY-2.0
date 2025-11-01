@@ -55,6 +55,7 @@ export default function Header() {
   const [showHamburger, setshowHamburger] = useState<boolean>(false);
   const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
   const [userInfo, setuserInfo] = useState<UserInfo | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   // const [isloading,setisloading] = useState<boolean>(false);
 
@@ -92,6 +93,23 @@ export default function Header() {
       toast.error(`${res.message} : ${res.error}`);
     }
   };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent | PointerEvent) {
+      // Only run if dropdown is open
+      if (!showProfileDropdown) return;
+
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setshowProfileDropdown(false);
+      }
+    }
+
+    // pointerdown handles mouse + touch better
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () => {
+      document.removeEventListener("pointerdown", handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
   useEffect(() => {
     if (hasCookie("authToken")) {
@@ -160,7 +178,7 @@ export default function Header() {
             </div>
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {/* Profile dropdown */}
-              <div className="relative ml-3 flex justify-center items-center gap-5">
+              <div ref={dropdownRef} className="relative ml-3 flex justify-center items-center gap-5">
                 {/* Login or Signup section and Profile Section  */}
                 
                 
@@ -226,22 +244,11 @@ export default function Header() {
                     </Link>
                     <Link
                       href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
                       onClick={logout_user}
                     >
                       Sign out
                     </Link>
-                    <div
-                      className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        setshowProfileDropdown((prev) => !prev);
-                        dispatch(
-                          setModalVisibility({ open: true, type: "delete" })
-                        );
-                      }}
-                    >
-                      Delete Profile
-                    </div>
                   </div>
                 )}
               </div>

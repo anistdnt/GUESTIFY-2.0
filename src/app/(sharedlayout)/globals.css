@@ -233,3 +233,19 @@ label.required::after {
   color: red;
   font-weight: bold;
 }
+
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heart-animate {
+  animation: heartPop 0.25s ease-in-out;
+}
