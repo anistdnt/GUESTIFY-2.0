@@ -56,7 +56,7 @@ const Login = () => {
     );
     if (res.success) {
       let redirectUrl = "";
-      if(res?.data?.is_admin){
+      if (res?.data?.is_admin) {
         redirectUrl = `/admin/${res?.data?.user_id}/dashboard`;
       } else {
         redirectUrl = "/";
@@ -116,23 +116,23 @@ const Login = () => {
                 />
                 {!showPassToggle ? (
                   <span data-tooltip="Password not visible">
-                  <EyeSlash
-                    size={24}
-                    className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-                    onClick={() => {
-                      setshowPassToggle(true);
-                    }}
-                  />
+                    <EyeSlash
+                      size={24}
+                      className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
+                      onClick={() => {
+                        setshowPassToggle(true);
+                      }}
+                    />
                   </span>
                 ) : (
                   <span data-tooltip="Password visible">
-                  <Eye
-                    size={24}
-                    className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-                    onClick={() => {
-                      setshowPassToggle(false);
-                    }}
-                  />
+                    <Eye
+                      size={24}
+                      className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
+                      onClick={() => {
+                        setshowPassToggle(false);
+                      }}
+                    />
                   </span>
                 )}
               </div>
@@ -151,16 +151,25 @@ const Login = () => {
                 />
                 <label htmlFor="rememberMe">Remember Me</label>
               </div>
-              <p className="text-buttons text-sm cursor-pointer" onClick={()=>{dispatch(setModalVisibility({open:true,type:"reset"}));}}>
+              <p
+                className="text-buttons text-sm cursor-pointer"
+                onClick={() => {
+                  if(!loginloading){
+                    dispatch(setModalVisibility({ open: true, type: "reset" }));
+                  }
+                }}
+              >
                 Forgot Password?
               </p>
             </div>
             <button
               type="submit"
-              className="w-full bg-buttons text-white py-2 rounded-lg hover:bg-buttonsHover"
+              className={`w-full bg-buttons text-white py-2 rounded-lg hover:bg-buttonsHover ${
+                loginloading ? "opacity-50" : ""
+              }`}
               disabled={loginloading}
             >
-              {loginloading ? 'Signing In...' : 'Login'}
+              {loginloading ? "Signing In..." : "Login"}
             </button>
           </form>
           <p className="mt-4 text-center text-gray-600">
