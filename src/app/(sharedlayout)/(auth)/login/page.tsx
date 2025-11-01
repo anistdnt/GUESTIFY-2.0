@@ -25,6 +25,7 @@ const Login = () => {
   });
   const [passwordError, setPasswordError] = useState<string>("");
   const [showPassToggle, setshowPassToggle] = useState<boolean>(false);
+  const [loginloading, setLoginLoading] = useState<boolean>(false);
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -47,27 +48,28 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(setLoading({loading:true}))
+    setLoginLoading(true);
     const res: ApiReturn<any> = await api_caller<any>(
       "POST",
       API.USER.LOGIN,
       formData
     );
     if (res.success) {
-      
+      let redirectUrl = "";
+      if(res?.data?.is_admin){
+        redirectUrl = `/admin/${res?.data?.user_id}/dashboard`;
+      } else {
+        redirectUrl = "/";
+      }
       setCookie("authToken", res.data?.token, {
         maxAge: 2 * 60 * 60, //2 hours
       });
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
-      dispatch(setLoading({loading:false}))
-      if(res?.data?.is_admin){
-        router.push(`/admin/${res?.data?.user_id}/dashboard`);
-      }else{
-        router.push("/");
-      }
+      setLoginLoading(false);
+      router?.push(redirectUrl);
       toast.success(res.message || "Loggged In successfully");
     } else {
-      dispatch(setLoading({loading:false}))
+      setLoginLoading(false);
       toast.error(`${res.message} : ${res.error}`);
     }
   };
@@ -156,8 +158,9 @@ const Login = () => {
             <button
               type="submit"
               className="w-full bg-buttons text-white py-2 rounded-lg hover:bg-buttonsHover"
+              disabled={loginloading}
             >
-              Login
+              {loginloading ? 'Signing In...' : 'Login'}
             </button>
           </form>
           <p className="mt-4 text-center text-gray-600">
