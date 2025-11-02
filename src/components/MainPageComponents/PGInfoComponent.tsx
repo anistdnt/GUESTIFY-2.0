@@ -379,6 +379,7 @@ const PGInfoComponent = ({
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <RoomCard
+                      room_id={room._id}
                       title={`${
                         room.room_type[0].toUpperCase() +
                         room.room_type.slice(1)
