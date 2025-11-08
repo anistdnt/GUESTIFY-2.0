@@ -13,6 +13,7 @@ import FilterModal from "./FilterModal";
 import OTPModal from "./ReturnModals/OTPModal";
 import BookingModal from "./BookingModal";
 import ViewModal from "./Booking/ViewModal";
+import AcceptandInitiatePaymentModal from "./Booking/Accept_and_initiatePayment";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -56,6 +57,9 @@ export default function DefaultModal() {
           )}
           {type === "viewbooking" && (
             <ViewModal setshowModal={setshowModal} modalData={modalData} />
+          )}
+          {type === "accept_and_initiatePayment" && (
+            <AcceptandInitiatePaymentModal setshowModal={setshowModal} modalData={modalData}/>
           )}
         </div>
       )}

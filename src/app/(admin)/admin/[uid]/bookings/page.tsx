@@ -2,9 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  Check,
-  X,
-  DownloadSimple,
   MagnifyingGlass,
   FunnelSimple,
   CaretDown,
@@ -12,14 +9,16 @@ import {
   CaretRight,
 } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
-import { set } from "mongoose";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
-import { ArrowClockwise, Download, Eye } from "@phosphor-icons/react/dist/ssr";
-import { useDispatch } from "react-redux";
-import { setModalVisibility } from "@/redux/slices/modalSlice";
+import {
+  ArrowClockwise,
+} from "@phosphor-icons/react/dist/ssr";
+import BookingListBlock from "@/components/Booking/BookingListBlock";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { triggerRefetch } from "@/redux/slices/modalSlice";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -70,20 +69,13 @@ export default function BookingList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  //Loading States for individual actions
-  const [actionLoading, setActionLoading] = useState<{
-    target: string | number | null;
-    accept: boolean;
-    decline: boolean;
-    revolk: boolean;
-    download: boolean;
-  }>({ target: null, accept: false, decline: false, revolk: false, download: false });
-
-  // Dispatch
-  const dispatch = useDispatch();
-
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const perPageDropdownRef = useRef<HTMLDivElement>(null);
+
+  const isRefetch = useSelector(
+    (state: RootState) => state.modal_slice.isRefetch
+  );
+  const dispatch = useDispatch();
 
   function useDebounce<T>(value: T, delay: number): T {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -99,7 +91,8 @@ export default function BookingList() {
 
   useEffect(() => {
     fetchBookings();
-  }, [currentPage, perPage, filterStatus, debouncedSearch]);
+    dispatch(triggerRefetch(false));
+  }, [currentPage, perPage, filterStatus, debouncedSearch, isRefetch]);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -131,57 +124,6 @@ export default function BookingList() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleAccept = (id: string) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: "accepted" } : b))
-    );
-    toast.success("Booking accepted successfully!");
-  };
-
-  const handleDecline = (id: string) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: "declined" } : b))
-    );
-    toast.success("Booking declined");
-  };
-
-  const handleDownload = async (booking_id: string) => {
-    try {
-      setActionLoading((prev) => ({ ...prev, target: booking_id, download: true }));
-      const res = await fetch(`/api/download/${booking_id}`);
-      if (!res.ok) throw new Error("Download failed");
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `booking_${booking_id}.pdf`;
-      link.click();
-
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("PDF download error:", err);
-    } finally {
-      setActionLoading((prev) => ({ ...prev, target: null, download: false }));
-    }
-  };
-
-  const getStatusBadge = (status: BookingStatus) => {
-    const styles = {
-      pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
-      accepted: "bg-green-100 text-green-700 border-green-300",
-      declined: "bg-red-100 text-red-700 border-red-300",
-    };
-    return (
-      <span
-        className={`px-3 py-1 rounded-full text-xs font-medium border ${styles[status]}`}
-      >
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    );
   };
 
   // Close dropdowns on outside click
@@ -241,7 +183,7 @@ export default function BookingList() {
             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search by name or address..."
+              placeholder="Search by PG Name, Name or Address..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
@@ -307,133 +249,7 @@ export default function BookingList() {
             </div>
           ) : (
             bookings.map((b) => (
-              <div
-                key={b.id}
-                className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3"
-              >
-                <div className="">
-                  <div className="flex justify-between items-center">
-                    <div className="flex justify-start gap-3 items-center">
-                      <p className="text-lg font-semibold text-gray-500">
-                        <span>{b.pg_name}</span>{" "}
-                        <span>({b.room_type} bed)</span>
-                      </p>
-                      <button
-                        data-tooltip="View Booking Details"
-                        className="flex justify-center items-center gap-1 text-sm border rounded-md px-2 py-1"
-                        onClick={() => {
-                          dispatch(
-                            setModalVisibility({
-                              open: true,
-                              type: "viewbooking",
-                              modalData: {
-                                caption: "View Booking",
-                                booking_id: b.id,
-                                room_id: b.room_id,
-                              },
-                            })
-                          );
-                        }}
-                      >
-                        <Eye size={18} />
-                        <span>View</span>
-                      </button>
-                    </div>
-                    <div className="flex justify-start gap-6 items-center">
-                      <div>{getStatusBadge(b.status)}</div>
-                      <div
-                        data-tooltip="Download Booking PDF"
-                        className="border rounded-md p-2"
-                        onClick={() => handleDownload(b.id)}
-                      >
-                        {actionLoading.download && actionLoading?.target && actionLoading?.target === b.id ? (
-                          <ArrowClockwise size={17} className="animate-spin" />
-                        ) : (
-                          <Download size={17} />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Booking Date: {b.dateOfBooking}
-                  </p>
-                </div>
-                <hr />
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                  <Image
-                    src={b.image || "/assets/profile.png"}
-                    alt={b.name}
-                    width={68}
-                    height={68}
-                    className="rounded-lg object-fit w-17 h-17"
-                    priority={false}
-                  />
-
-                  <div className="flex-1">
-                    <div className="flex items-start gap-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold text-gray-800">
-                            {b.name}
-                          </h3>
-                          {/* 👇 Light gray badge for person count */}
-                          <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-200">
-                            {b.personCount} Person
-                            {(b.personCount || 1) > 1 ? "s" : ""}
-                          </span>
-                        </div>
-
-                        <p className="text-xs text-gray-600 mt-1">
-                          {b.address}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 👇 Button logic based on status */}
-                  <div className="flex gap-2">
-                    {b.status === "pending" && (
-                      <>
-                        <button
-                          onClick={() => handleAccept(b.id)}
-                          className="p-2 rounded-md bg-green-500 hover:bg-green-600 text-white transition-all"
-                          title="Accept"
-                        >
-                          <Check size={18} weight="bold" />
-                        </button>
-
-                        <button
-                          onClick={() => handleDecline(b.id)}
-                          className="p-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition-all"
-                          title="Decline"
-                        >
-                          <X size={18} weight="bold" />
-                        </button>
-                      </>
-                    )}
-
-                    {b.status === "accepted" && (
-                      <>
-                        <button
-                          onClick={() =>
-                            setBookings((prev) =>
-                              prev.map((bk) =>
-                                bk.id === b.id
-                                  ? { ...bk, status: "pending" }
-                                  : bk
-                              )
-                            )
-                          }
-                          className="p-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-all"
-                          title="Return to pending"
-                        >
-                          ↩
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <BookingListBlock b={b} key={b.id} fetchBookings={fetchBookings}/>
             ))
           )}
         </div>
