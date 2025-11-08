@@ -21,3 +21,21 @@ interface UserInfo {
 export interface GetNotification_Type {
   notification: string
 }
+
+export interface Duration {
+  year: number;
+  month: number;
+}
+
+export interface Person {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  age: number;
+  gender: string;
+  address: string;
+  type_of_identity: string;
+  identity_id: string;
+  image: string;
+  identity_image: string;
+}

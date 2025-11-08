@@ -11,6 +11,8 @@ import DeleteModal from "./DeleteModal";
 import PGEditModal from "./PGEditModal";
 import FilterModal from "./FilterModal";
 import OTPModal from "./ReturnModals/OTPModal";
+import BookingModal from "./BookingModal";
+import ViewModal from "./Booking/ViewModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -48,6 +50,12 @@ export default function DefaultModal() {
           )}
           {type === "otpVerify" && (
             <OTPModal setshowModal={setshowModal} modalData={modalData} {...props}/>
+          )}
+          {type === "roombooking" && (
+            <BookingModal setshowModal={setshowModal} modalData={modalData} />
+          )}
+          {type === "viewbooking" && (
+            <ViewModal setshowModal={setshowModal} modalData={modalData} />
           )}
         </div>
       )}

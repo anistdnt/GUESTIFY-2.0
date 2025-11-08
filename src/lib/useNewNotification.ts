@@ -21,7 +21,7 @@ export const useNewNotification = (user_id: string) => {
   useEffect(() => {
     fetchNotifications();
 
-    const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/sse-listener/${user_id}`;
+    const url = `${process.env.NEXT_PUBLIC_SERVER_URL}sse-listener/${user_id}`;
     const es = new EventSource(url);
 
     es.addEventListener("created", (event) => {
