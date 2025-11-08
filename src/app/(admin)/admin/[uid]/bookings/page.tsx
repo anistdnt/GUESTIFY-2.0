@@ -35,6 +35,7 @@ export interface Booking {
   personCount: number;
   pg_name?: string;
   room_type?: string;
+  room_id?: string;
 }
 
 const SkeletonRow = () => (
@@ -68,6 +69,15 @@ export default function BookingList() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+
+  //Loading States for individual actions
+  const [actionLoading, setActionLoading] = useState<{
+    target: string | number | null;
+    accept: boolean;
+    decline: boolean;
+    revolk: boolean;
+    download: boolean;
+  }>({ target: null, accept: false, decline: false, revolk: false, download: false });
 
   // Dispatch
   const dispatch = useDispatch();
@@ -110,6 +120,7 @@ export default function BookingList() {
             personCount: b?.person_number || 0,
             pg_name: b?.pg_name || "",
             room_type: b?.room_type || "",
+            room_id: b?.room_id || "",
           }))
         );
         setTotalPages(res.data.total_pages);
@@ -136,18 +147,26 @@ export default function BookingList() {
     toast.success("Booking declined");
   };
 
-  const handleDownload = (b: Booking) => {
-    const data = JSON.stringify(b, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `booking-${b.id}-${b.name}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Booking details downloaded");
+  const handleDownload = async (booking_id: string) => {
+    try {
+      setActionLoading((prev) => ({ ...prev, target: booking_id, download: true }));
+      const res = await fetch(`/api/download/${booking_id}`);
+      if (!res.ok) throw new Error("Download failed");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `booking_${booking_id}.pdf`;
+      link.click();
+
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF download error:", err);
+    } finally {
+      setActionLoading((prev) => ({ ...prev, target: null, download: false }));
+    }
   };
 
   const getStatusBadge = (status: BookingStatus) => {
@@ -207,6 +226,7 @@ export default function BookingList() {
           {/* Refresh or Reset Filter Button */}
           <div>
             <button
+              data-tooltip="Reset Filters"
               onClick={() => {
                 setSearchTerm("");
                 setFilterStatus("all");
@@ -299,6 +319,7 @@ export default function BookingList() {
                         <span>({b.room_type} bed)</span>
                       </p>
                       <button
+                        data-tooltip="View Booking Details"
                         className="flex justify-center items-center gap-1 text-sm border rounded-md px-2 py-1"
                         onClick={() => {
                           dispatch(
@@ -308,6 +329,7 @@ export default function BookingList() {
                               modalData: {
                                 caption: "View Booking",
                                 booking_id: b.id,
+                                room_id: b.room_id,
                               },
                             })
                           );
@@ -319,8 +341,16 @@ export default function BookingList() {
                     </div>
                     <div className="flex justify-start gap-6 items-center">
                       <div>{getStatusBadge(b.status)}</div>
-                      <div className="border rounded-md p-2">
-                        <Download size={17} />
+                      <div
+                        data-tooltip="Download Booking PDF"
+                        className="border rounded-md p-2"
+                        onClick={() => handleDownload(b.id)}
+                      >
+                        {actionLoading.download && actionLoading?.target && actionLoading?.target === b.id ? (
+                          <ArrowClockwise size={17} className="animate-spin" />
+                        ) : (
+                          <Download size={17} />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -379,14 +409,6 @@ export default function BookingList() {
                         >
                           <X size={18} weight="bold" />
                         </button>
-
-                        <button
-                          onClick={() => handleDownload(b)}
-                          className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                          title="Download"
-                        >
-                          <DownloadSimple size={18} weight="bold" />
-                        </button>
                       </>
                     )}
 
@@ -407,24 +429,7 @@ export default function BookingList() {
                         >
                           ↩
                         </button>
-                        <button
-                          onClick={() => handleDownload(b)}
-                          className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                          title="Download"
-                        >
-                          <DownloadSimple size={18} weight="bold" />
-                        </button>
                       </>
-                    )}
-
-                    {b.status === "declined" && (
-                      <button
-                        onClick={() => handleDownload(b)}
-                        className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                        title="Download"
-                      >
-                        <DownloadSimple size={18} weight="bold" />
-                      </button>
                     )}
                   </div>
                 </div>
