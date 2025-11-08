@@ -2,9 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  Check,
-  X,
-  DownloadSimple,
   MagnifyingGlass,
   FunnelSimple,
   CaretDown,
@@ -12,11 +9,16 @@ import {
   CaretRight,
 } from "@phosphor-icons/react";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
-import { set } from "mongoose";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
+import {
+  ArrowClockwise,
+} from "@phosphor-icons/react/dist/ssr";
+import BookingListBlock from "@/components/Booking/BookingListBlock";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { deleteSuccess, triggerRefetch } from "@/redux/slices/modalSlice";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -32,6 +34,7 @@ export interface Booking {
   personCount: number;
   pg_name?: string;
   room_type?: string;
+  room_id?: string;
 }
 
 const SkeletonRow = () => (
@@ -69,6 +72,14 @@ export default function BookingList() {
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const perPageDropdownRef = useRef<HTMLDivElement>(null);
 
+  const isRefetch = useSelector(
+    (state: RootState) => state.modal_slice.isRefetch
+  );
+  const isDeleted = useSelector(
+    (state: RootState) => state.modal_slice.isDeleted
+  );
+  const dispatch = useDispatch();
+
   function useDebounce<T>(value: T, delay: number): T {
     const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -83,7 +94,9 @@ export default function BookingList() {
 
   useEffect(() => {
     fetchBookings();
-  }, [currentPage, perPage, filterStatus, debouncedSearch]);
+    dispatch(triggerRefetch(false));
+    dispatch(deleteSuccess(true));
+  }, [currentPage, perPage, filterStatus, debouncedSearch, isRefetch, isDeleted]);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -100,10 +113,13 @@ export default function BookingList() {
             address: b?.user_address,
             dateOfBooking: b?.booking_date?.slice(0, 10),
             status: b?.status,
+            status_timestamp: b?.status_timestamp,
+            reason: b?.reason || "",
             image: b?.user_image,
             personCount: b?.person_number || 0,
             pg_name: b?.pg_name || "",
             room_type: b?.room_type || "",
+            room_id: b?.room_id || "",
           }))
         );
         setTotalPages(res.data.total_pages);
@@ -114,49 +130,6 @@ export default function BookingList() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleAccept = (id: string) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: "accepted" } : b))
-    );
-    toast.success("Booking accepted successfully!");
-  };
-
-  const handleDecline = (id: string) => {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: "declined" } : b))
-    );
-    toast.success("Booking declined");
-  };
-
-  const handleDownload = (b: Booking) => {
-    const data = JSON.stringify(b, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `booking-${b.id}-${b.name}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Booking details downloaded");
-  };
-
-  const getStatusBadge = (status: BookingStatus) => {
-    const styles = {
-      pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
-      accepted: "bg-green-100 text-green-700 border-green-300",
-      declined: "bg-red-100 text-red-700 border-red-300",
-    };
-    return (
-      <span
-        className={`px-3 py-1 rounded-full text-xs font-medium border ${styles[status]}`}
-      >
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
-    );
   };
 
   // Close dropdowns on outside click
@@ -198,11 +171,25 @@ export default function BookingList() {
       <div className="bg-white rounded-xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] p-6">
         {/* Search & Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
+          {/* Refresh or Reset Filter Button */}
+          <div>
+            <button
+              data-tooltip="Reset Filters"
+              onClick={() => {
+                setSearchTerm("");
+                setFilterStatus("all");
+                setCurrentPage(1);
+              }}
+              className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200 transition"
+            >
+              <ArrowClockwise size={16} />
+            </button>
+          </div>
           <div className="flex-1 relative">
             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search by name or address..."
+              placeholder="Search by PG Name, Name or Address..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
@@ -231,7 +218,7 @@ export default function BookingList() {
                   Filter by status
                 </div>
                 <ul className="py-2 text-sm text-gray-700">
-                  {["all", "pending", "accepted", "declined"].map((s) => (
+                  {["all", "pending", "accepted", "declined", "revolked"].map((s) => (
                     <li key={s}>
                       <button
                         onClick={() => {
@@ -268,122 +255,7 @@ export default function BookingList() {
             </div>
           ) : (
             bookings.map((b) => (
-              <div
-                key={b.id}
-                className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3"
-              >
-                <div className="">
-                  <div className="flex justify-start items-center gap-3">
-                    <p className="text-lg font-semibold text-gray-500">
-                      <span>{b.pg_name}</span> <span>({b.room_type} bed)</span>
-                    </p>
-                    <div>{getStatusBadge(b.status)}</div>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Booking Date: {b.dateOfBooking}
-                  </p>
-                </div>
-                <hr />
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                  <Image
-                    src={b.image || "/assets/profile.png"}
-                    alt={b.name}
-                    width={68}
-                    height={68}
-                    className="rounded-lg object-fit w-17 h-17"
-                    priority={false}
-                  />
-
-                  <div className="flex-1">
-                    <div className="flex items-start gap-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold text-gray-800">
-                            {b.name}
-                          </h3>
-                          {/* 👇 Light gray badge for person count */}
-                          <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-200">
-                            {b.personCount || 1} Person
-                            {(b.personCount || 1) > 1 ? "s" : ""}
-                          </span>
-                        </div>
-
-                        <p className="text-xs text-gray-600 mt-1">
-                          {b.address}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 👇 Button logic based on status */}
-                  <div className="flex gap-2">
-                    {b.status === "pending" && (
-                      <>
-                        <button
-                          onClick={() => handleAccept(b.id)}
-                          className="p-2 rounded-md bg-green-500 hover:bg-green-600 text-white transition-all"
-                          title="Accept"
-                        >
-                          <Check size={18} weight="bold" />
-                        </button>
-
-                        <button
-                          onClick={() => handleDecline(b.id)}
-                          className="p-2 rounded-md bg-red-500 hover:bg-red-600 text-white transition-all"
-                          title="Decline"
-                        >
-                          <X size={18} weight="bold" />
-                        </button>
-
-                        <button
-                          onClick={() => handleDownload(b)}
-                          className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                          title="Download"
-                        >
-                          <DownloadSimple size={18} weight="bold" />
-                        </button>
-                      </>
-                    )}
-
-                    {b.status === "accepted" && (
-                      <>
-                        <button
-                          onClick={() =>
-                            setBookings((prev) =>
-                              prev.map((bk) =>
-                                bk.id === b.id
-                                  ? { ...bk, status: "pending" }
-                                  : bk
-                              )
-                            )
-                          }
-                          className="p-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-all"
-                          title="Return to pending"
-                        >
-                          ↩
-                        </button>
-                        <button
-                          onClick={() => handleDownload(b)}
-                          className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                          title="Download"
-                        >
-                          <DownloadSimple size={18} weight="bold" />
-                        </button>
-                      </>
-                    )}
-
-                    {b.status === "declined" && (
-                      <button
-                        onClick={() => handleDownload(b)}
-                        className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                        title="Download"
-                      >
-                        <DownloadSimple size={18} weight="bold" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <BookingListBlock b={b} key={b.id} fetchBookings={fetchBookings}/>
             ))
           )}
         </div>

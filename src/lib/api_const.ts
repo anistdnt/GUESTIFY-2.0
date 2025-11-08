@@ -25,7 +25,10 @@ export const API = {
     ADMIN:{
         BOOKING:{
             LIST : "/booking/list",
-            
+            VIEW: "/booking/:id/details",
+            CHANGE_STATUS: "/booking/:id/status",
+            DELETE: "/booking",
+            CLOSE_PAYMENT_SESSION: "/booking/:id/payment/close"
         }
     },
     COLLEGE: {
@@ -46,7 +49,8 @@ export const API = {
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",
         UPDATE : "/updatePg",
-        DELETE: "/deleteRoom"
+        DELETE: "/deleteRoom",
+        VIEW_ROOM_DETAILS: "/room/:id"
     },
     REVIEW: {
         GET_REVIWS_OF_PG : "/getReviews",
@@ -70,5 +74,9 @@ export const API = {
         ADD: "/wishlist/add",
         VIEW: "/wishlist",
         DELETE: "/wishlist/remove"
+    },
+    BOOKING: {
+        VIEW: "/booking/:id/details",
+        ROOMLIST: "/booking/roomlist"
     }
 }
