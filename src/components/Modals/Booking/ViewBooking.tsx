@@ -15,7 +15,7 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
       setLoading(true);
       const res: ApiReturn<any> = await api_caller(
         "GET",
-        `${API.BOOKING.VIEW}`.replace(":id", booking_id)
+        `${API.ADMIN.BOOKING.VIEW}`.replace(":id", booking_id)
       );
       if (res.success) {
         setData(res.data);
@@ -114,7 +114,7 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
       <div>
         <h2 className="text-lg font-semibold text-gray-800">Person Details</h2>
         <div className="grid gap-4 mt-2">
-          {persons?.map((person) => (
+          {persons?.map((person: any) => (
             <div
               key={person._id}
               className="border rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition"
@@ -130,16 +130,25 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800">
-                    {person.first_name} {person.last_name}
+                    {person.first_name} {person.last_name}{" "}
+                    <span className="text-sm font-medium">
+                      {person.is_primary ? "(Primary)" : ""}
+                    </span>
                   </h3>
                   <p className="text-sm text-gray-600">
                     {person.gender}, {person.age} years
                   </p>
+                  {person.dial_code && person?.contact_number && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Contact No:</span>{" "}
+                      {person.dial_code} {person.contact_number}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="mt-3 text-sm text-gray-700 space-y-1 flex justify-between items-center">
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 w-3/5">
                   <p>
                     <span className="font-medium">Address:</span>{" "}
                     {person.address}
@@ -155,10 +164,10 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
                     {person.identity_id}
                   </p>
                 </div>
-                <div className="mt-2">
+                <div className="w-2/5 flex justify-end">
                   <div className="relative w-40 h-24 rounded-lg overflow-hidden border">
                     <Image
-                      src={person.identity_image}
+                      src={person?.identity_image || ""}
                       alt="Identity"
                       fill
                       className="object-cover"
