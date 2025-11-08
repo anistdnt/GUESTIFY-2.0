@@ -73,4 +73,8 @@ export const API = {
         VIEW: "/wishlist",
         DELETE: "/wishlist/remove"
     },
+    BOOKING: {
+        VIEW: "/booking/:id/details",
+        ROOMLIST: "/booking/roomlist"
+    }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Head from "next/head";
+// import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeSlash } from "@phosphor-icons/react/dist/ssr";
@@ -11,6 +11,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import SlidingSignupForm from "./component/SignUpForm";
 
 type SignUpFormData = {
   first_name: string;
@@ -34,6 +35,7 @@ const SignUp = () => {
   const [passwordError, setPasswordError] = useState<string>("");
   const [confirmpasswordError, setConfirmPasswordError] = useState<string>("");
   const [showPassToggle, setshowPassToggle] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -77,10 +79,16 @@ const SignUp = () => {
     }
 
     dispatch(setLoading({ loading: true }));
+
+    const payload = {
+      ...formData,
+      is_admin: isAdmin,
+    };
+
     const res: ApiReturn<any> = await api_caller<any>(
       "POST",
       API.USER.REGISTER,
-      formData
+      payload
     );
     if (res.success) {
       dispatch(setLoading({ loading: false }));
@@ -94,13 +102,13 @@ const SignUp = () => {
 
   return (
     <>
-      <Head>
+      {/* <Head>
         <title>Sign Up - Guestify</title>
         <meta
           name="description"
           content="Sign Up to your Guestify account and explore paying guest accommodations."
         />
-      </Head>
+      </Head> */}
 
       <div className="min-h-[85vh] flex flex-col lg:flex-row  items-center justify-evenly bg-gray-100 py-10">
         <Image
@@ -113,138 +121,16 @@ const SignUp = () => {
           <h2 className="text-3xl font-bold text-center text-gray-800">
             Register
           </h2>
-          <form onSubmit={handleSubmit} className="mt-6">
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium">
-                First name
-              </label>
-              <input
-                type="text"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                minLength={1}
-                maxLength={30}
-                required
-                placeholder="eg : John"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium">
-                Last name
-              </label>
-              <input
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                minLength={1}
-                maxLength={30}
-                required
-                placeholder="eg : Doe"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="eg : John@gmail.com"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={!showPassToggle ? "password" : "text"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="eg : Test@1234"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                {!showPassToggle ? (
-                  <span data-tooltip="Password not visible">
-                  <EyeSlash
-                    size={24}
-                    className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-                    onClick={() => {
-                      setshowPassToggle(true);
-                    }}
-                  />
-                  </span>
-                ) : (
-                  <span data-tooltip="Password visible">
-                  <Eye
-                    size={24}
-                    className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-                    onClick={() => {
-                      setshowPassToggle(false);
-                    }}
-                  />
-                  </span>
-                )}
-              </div>
-              {passwordError && (
-                <p className="text-red-500 text-sm mt-1">{passwordError}</p>
-              )}
-            </div>
-            <label className="block text-gray-700 font-medium">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                type={!showPassToggle ? "password" : "text"}
-                name="confirmpassword"
-                value={formData.confirmpassword}
-                onChange={handleChange}
-                required
-                placeholder="eg : Test@1234"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-              {!showPassToggle ? (
-                <span data-tooltip="Password not visible">
-                <EyeSlash
-                  size={24}
-                  className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-                  onClick={() => {
-                    setshowPassToggle(true);
-                  }}
-                />
-                </span>
-              ) : (
-                <span data-tooltip="Password visible">
-                <Eye
-                  size={24}
-                  className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-                  onClick={() => {
-                    setshowPassToggle(false);
-                  }}
-                />
-                </span>
-              )}
-            </div>
-            {confirmpasswordError && (
-              <p className="text-red-500 text-sm mt-1">
-                {confirmpasswordError}
-              </p>
-            )}
-            <button
-              type="submit"
-              className="w-full bg-buttons text-white py-2 mt-4 rounded-lg hover:bg-buttonsHover"
-            >
-              Register
-            </button>
-          </form>
+          <SlidingSignupForm
+            formData={formData}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            showPassToggle={showPassToggle}
+            setshowPassToggle={setshowPassToggle}
+            passwordError={passwordError}
+            confirmpasswordError={confirmpasswordError}
+            onFormTypeChange={(type: "user" | "admin") => setIsAdmin(type === "admin")}
+          />
           <p className="mt-4 text-center text-gray-600">
             <span className=" me-2">Already have an account?</span>
             <Link href="/login" className="text-buttons">
