@@ -17,6 +17,9 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { set } from "mongoose";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
+import { ArrowClockwise, Download, Eye } from "@phosphor-icons/react/dist/ssr";
+import { useDispatch } from "react-redux";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -65,6 +68,9 @@ export default function BookingList() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+
+  // Dispatch
+  const dispatch = useDispatch();
 
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const perPageDropdownRef = useRef<HTMLDivElement>(null);
@@ -198,6 +204,19 @@ export default function BookingList() {
       <div className="bg-white rounded-xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] p-6">
         {/* Search & Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
+          {/* Refresh or Reset Filter Button */}
+          <div>
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setFilterStatus("all");
+                setCurrentPage(1);
+              }}
+              className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200 transition"
+            >
+              <ArrowClockwise size={16} />
+            </button>
+          </div>
           <div className="flex-1 relative">
             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
@@ -273,11 +292,37 @@ export default function BookingList() {
                 className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3"
               >
                 <div className="">
-                  <div className="flex justify-start items-center gap-3">
-                    <p className="text-lg font-semibold text-gray-500">
-                      <span>{b.pg_name}</span> <span>({b.room_type} bed)</span>
-                    </p>
-                    <div>{getStatusBadge(b.status)}</div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex justify-start gap-3 items-center">
+                      <p className="text-lg font-semibold text-gray-500">
+                        <span>{b.pg_name}</span>{" "}
+                        <span>({b.room_type} bed)</span>
+                      </p>
+                      <button
+                        className="flex justify-center items-center gap-1 text-sm border rounded-md px-2 py-1"
+                        onClick={() => {
+                          dispatch(
+                            setModalVisibility({
+                              open: true,
+                              type: "viewbooking",
+                              modalData: {
+                                caption: "View Booking",
+                                booking_id: b.id,
+                              },
+                            })
+                          );
+                        }}
+                      >
+                        <Eye size={18} />
+                        <span>View</span>
+                      </button>
+                    </div>
+                    <div className="flex justify-start gap-6 items-center">
+                      <div>{getStatusBadge(b.status)}</div>
+                      <div className="border rounded-md p-2">
+                        <Download size={17} />
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500">
                     Booking Date: {b.dateOfBooking}
@@ -303,7 +348,7 @@ export default function BookingList() {
                           </h3>
                           {/* 👇 Light gray badge for person count */}
                           <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-200">
-                            {b.personCount || 1} Person
+                            {b.personCount} Person
                             {(b.personCount || 1) > 1 ? "s" : ""}
                           </span>
                         </div>
