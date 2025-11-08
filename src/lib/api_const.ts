@@ -17,12 +17,14 @@ export const API = {
         CHANGE_PASSWORD : "/changePassword",
         DELETE_ACCOUNT : "/deleteAccount",
         GET_PGs : "/getPg/user",
-        GET_STATS : "/getStats"
+        GET_STATS : "/getStats",
+        BOOKING:{
+            CREATE : "/booking/create",
+        }
     },
     ADMIN:{
         BOOKING:{
             LIST : "/booking/list",
-            CREATE : "/booking/create",
             VIEW: "/booking/:id/details",
             CHANGE_STATUS: "/booking/:id/status",
             DELETE: "/booking",

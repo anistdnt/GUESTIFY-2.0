@@ -1,8 +1,10 @@
 'use client';
 
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import { FormField } from './FormField';
 import Select from 'react-select';
+import ImagePicker from '../Forms/imagePicker';
+import { use, useEffect } from 'react';
 
 interface PersonCardProps {
   index: number;
@@ -12,14 +14,7 @@ interface PersonCardProps {
   isPrimary: boolean;
 }
 
-export function PersonCard({
-  index,
-  person,
-  onRemove,
-  canRemove,
-  isPrimary,
-}: PersonCardProps) {
-  const genderOptions = [
+const genderOptions = [
     { value: 'male', label: 'Male' },
     { value: 'female', label: 'Female' },
     { value: 'other', label: 'Other' },
@@ -31,6 +26,21 @@ export function PersonCard({
     { value: 'passport', label: 'Passport' },
     { value: 'driving_license', label: 'Driving License' },
   ];
+
+export function PersonCard({
+  index,
+  person,
+  onRemove,
+  canRemove,
+  isPrimary,
+}: PersonCardProps) {
+  
+  const {setFieldValue, values , touched, errors} = useFormikContext<any>();
+
+  // useEffect(() => {
+  //   console.log('err : ', errors);
+  //   console.log('values : ', values);
+  // },[errors])
 
   return (
     <div className="border-2 border-slate-200 rounded-xl overflow-hidden">
@@ -59,7 +69,7 @@ export function PersonCard({
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* First Name */}
-          <FormField label="First Name" name={`persons.${index}.first_name`} required>
+          <FormField label="First Name" name={`persons.${index}.first_name`} required error={touched.persons && touched.persons[index]?.first_name && errors.persons && errors.persons[index]?.first_name}>
             <Field
               name={`persons.${index}.first_name`}
               placeholder="Enter first name"
@@ -68,7 +78,7 @@ export function PersonCard({
           </FormField>
 
           {/* Last Name */}
-          <FormField label="Last Name" name={`persons.${index}.last_name`} required>
+          <FormField label="Last Name" name={`persons.${index}.last_name`} required error={touched.persons && touched.persons[index]?.last_name && errors.persons && errors.persons[index]?.last_name}>
             <Field
               name={`persons.${index}.last_name`}
               placeholder="Enter last name"
@@ -77,7 +87,7 @@ export function PersonCard({
           </FormField>
 
           {/* Age */}
-          <FormField label="Age" name={`persons.${index}.age`} required>
+          <FormField label="Age" name={`persons.${index}.age`} required error={touched.persons && touched.persons[index]?.age && errors.persons && errors.persons[index]?.age}>
             <Field
               type="number"
               name={`persons.${index}.age`}
@@ -89,7 +99,7 @@ export function PersonCard({
           </FormField>
 
           {/* Gender */}
-          <FormField label="Gender" name={`persons.${index}.gender`} required>
+          <FormField label="Gender" name={`persons.${index}.gender`} required error={touched.persons && touched.persons[index]?.gender && errors.persons && errors.persons[index]?.gender}>
             <Field name={`persons.${index}.gender`}>
               {({ form }: any) => (
                 <Select
@@ -106,9 +116,35 @@ export function PersonCard({
             </Field>
           </FormField>
 
+          <FormField label="Contact Number" name={`persons.${index}.contact_number`} required error={touched.persons && touched.persons[index]?.contact_number && errors.persons && errors.persons[index]?.contact_number}>
+            <div className="flex">
+              {/* Country Code */}
+              <Field
+                as="select"
+                name={`persons.${index}.dial_code`}
+                className="border border-r-0 rounded-l-md px-3 py-2 bg-white min-w-[90px] focus:ring-0 focus:outline-none"
+              >
+                <option value="+91">🇮🇳 +91</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+971">🇦🇪 +971</option>
+              </Field>
+
+              {/* Phone Number */}
+              <Field
+                type="tel"
+                name={`persons.${index}.contact_number`}
+                placeholder="9876543210"
+                className="border rounded-r-md px-3 py-2 w-full focus:ring-0 focus:outline-none"
+              />
+            </div>
+          </FormField>
+
+
           {/* Address */}
           <div className="md:col-span-2">
-            <FormField label="Address" name={`persons.${index}.address`} required>
+            <FormField label="Address" name={`persons.${index}.address`} required error={touched.persons && touched.persons[index]?.address && errors.persons && errors.persons[index]?.address}>
               <Field
                 as="textarea"
                 name={`persons.${index}.address`}
@@ -124,6 +160,7 @@ export function PersonCard({
             label="Type of Identity"
             name={`persons.${index}.type_of_identity`}
             required
+            error={touched.persons && touched.persons[index]?.type_of_identity && errors.persons && errors.persons[index]?.type_of_identity}
           >
             <Field name={`persons.${index}.type_of_identity`}>
               {({ form }: any) => (
@@ -146,7 +183,7 @@ export function PersonCard({
           </FormField>
 
           {/* Identity ID */}
-          <FormField label="Identity ID" name={`persons.${index}.identity_id`} required>
+          <FormField label="Identity ID" name={`persons.${index}.identity_id`} required error={touched.persons && touched.persons[index]?.identity_id && errors.persons && errors.persons[index]?.identity_id}>
             <Field
               name={`persons.${index}.identity_id`}
               placeholder="Enter identity ID"
@@ -155,12 +192,14 @@ export function PersonCard({
           </FormField>
 
           {/* Guest Photo */}
-          <div className="md:col-span-2">
-          </div>
+          <FormField label="Guest Photo" name={`persons.${index}.image`} required error={touched.persons && touched.persons[index]?.image && errors.persons && errors.persons[index]?.image}>
+            <ImagePicker  values={person} imageKey='image' single={true} {...{setFieldValue,index}}/>
+           </FormField> 
 
           {/* Identity Document Photo */}
-          <div className="md:col-span-2">
-          </div>
+          <FormField label="Photo of Identity" name={`persons.${index}.image`} required error={touched.persons && touched.persons[index]?.identity_image && errors.persons && errors.persons[index]?.identity_image}>
+            <ImagePicker  values={person} imageKey='identity_image' single={true} {...{setFieldValue,index}}/>
+           </FormField>
         </div>
       </div>
     </div>
