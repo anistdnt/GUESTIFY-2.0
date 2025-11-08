@@ -70,6 +70,7 @@ export const API = {
         DELETE: "/wishlist/remove"
     },
     BOOKING: {
-        VIEW: "/booking/:id/details"
+        VIEW: "/booking/:id/details",
+        ROOMLIST: "/booking/roomlist"
     }
 }
