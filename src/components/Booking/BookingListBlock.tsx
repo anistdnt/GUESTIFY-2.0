@@ -313,6 +313,17 @@ export default function BookingListBlock({
             </>
           )}
 
+          {["revolked", "canceled"]?.includes(b?.status) && b?.reason && (
+            <>
+              <button
+                className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg text-yellow-700 border border-1 border-yellow-700 transition-all text-sm"
+                data-tooltip={b.reason}
+              >
+                <span>Reason</span>
+              </button>
+            </>
+          )}
+
           <div className="relative" ref={actionDropdownRef}>
             <button
               className="p-1 border rounded-md"

@@ -113,6 +113,8 @@ export default function BookingList() {
             address: b?.user_address,
             dateOfBooking: b?.booking_date?.slice(0, 10),
             status: b?.status,
+            status_timestamp: b?.status_timestamp,
+            reason: b?.reason || "",
             image: b?.user_image,
             personCount: b?.person_number || 0,
             pg_name: b?.pg_name || "",
@@ -216,7 +218,7 @@ export default function BookingList() {
                   Filter by status
                 </div>
                 <ul className="py-2 text-sm text-gray-700">
-                  {["all", "pending", "accepted", "declined"].map((s) => (
+                  {["all", "pending", "accepted", "declined", "revolked"].map((s) => (
                     <li key={s}>
                       <button
                         onClick={() => {
