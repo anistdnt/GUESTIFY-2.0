@@ -23,6 +23,10 @@ export const API = {
         BOOKING:{
             LIST : "/booking/list",
             CREATE : "/booking/create",
+            VIEW: "/booking/:id/details",
+            CHANGE_STATUS: "/booking/:id/status",
+            DELETE: "/booking",
+            CLOSE_PAYMENT_SESSION: "/booking/:id/payment/close"
         }
     },
     COLLEGE: {
