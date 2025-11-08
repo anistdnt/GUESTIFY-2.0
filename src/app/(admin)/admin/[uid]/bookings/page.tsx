@@ -17,6 +17,9 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { set } from "mongoose";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
+import { ArrowClockwise, Download, Eye } from "@phosphor-icons/react/dist/ssr";
+import { useDispatch } from "react-redux";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -32,6 +35,7 @@ export interface Booking {
   personCount: number;
   pg_name?: string;
   room_type?: string;
+  room_id?: string;
 }
 
 const SkeletonRow = () => (
@@ -65,6 +69,18 @@ export default function BookingList() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+
+  //Loading States for individual actions
+  const [actionLoading, setActionLoading] = useState<{
+    target: string | number | null;
+    accept: boolean;
+    decline: boolean;
+    revolk: boolean;
+    download: boolean;
+  }>({ target: null, accept: false, decline: false, revolk: false, download: false });
+
+  // Dispatch
+  const dispatch = useDispatch();
 
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const perPageDropdownRef = useRef<HTMLDivElement>(null);
@@ -104,6 +120,7 @@ export default function BookingList() {
             personCount: b?.person_number || 0,
             pg_name: b?.pg_name || "",
             room_type: b?.room_type || "",
+            room_id: b?.room_id || "",
           }))
         );
         setTotalPages(res.data.total_pages);
@@ -130,18 +147,26 @@ export default function BookingList() {
     toast.success("Booking declined");
   };
 
-  const handleDownload = (b: Booking) => {
-    const data = JSON.stringify(b, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `booking-${b.id}-${b.name}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success("Booking details downloaded");
+  const handleDownload = async (booking_id: string) => {
+    try {
+      setActionLoading((prev) => ({ ...prev, target: booking_id, download: true }));
+      const res = await fetch(`/api/download/${booking_id}`);
+      if (!res.ok) throw new Error("Download failed");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `booking_${booking_id}.pdf`;
+      link.click();
+
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("PDF download error:", err);
+    } finally {
+      setActionLoading((prev) => ({ ...prev, target: null, download: false }));
+    }
   };
 
   const getStatusBadge = (status: BookingStatus) => {
@@ -198,6 +223,20 @@ export default function BookingList() {
       <div className="bg-white rounded-xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] p-6">
         {/* Search & Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
+          {/* Refresh or Reset Filter Button */}
+          <div>
+            <button
+              data-tooltip="Reset Filters"
+              onClick={() => {
+                setSearchTerm("");
+                setFilterStatus("all");
+                setCurrentPage(1);
+              }}
+              className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200 transition"
+            >
+              <ArrowClockwise size={16} />
+            </button>
+          </div>
           <div className="flex-1 relative">
             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
@@ -273,11 +312,47 @@ export default function BookingList() {
                 className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-3"
               >
                 <div className="">
-                  <div className="flex justify-start items-center gap-3">
-                    <p className="text-lg font-semibold text-gray-500">
-                      <span>{b.pg_name}</span> <span>({b.room_type} bed)</span>
-                    </p>
-                    <div>{getStatusBadge(b.status)}</div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex justify-start gap-3 items-center">
+                      <p className="text-lg font-semibold text-gray-500">
+                        <span>{b.pg_name}</span>{" "}
+                        <span>({b.room_type} bed)</span>
+                      </p>
+                      <button
+                        data-tooltip="View Booking Details"
+                        className="flex justify-center items-center gap-1 text-sm border rounded-md px-2 py-1"
+                        onClick={() => {
+                          dispatch(
+                            setModalVisibility({
+                              open: true,
+                              type: "viewbooking",
+                              modalData: {
+                                caption: "View Booking",
+                                booking_id: b.id,
+                                room_id: b.room_id,
+                              },
+                            })
+                          );
+                        }}
+                      >
+                        <Eye size={18} />
+                        <span>View</span>
+                      </button>
+                    </div>
+                    <div className="flex justify-start gap-6 items-center">
+                      <div>{getStatusBadge(b.status)}</div>
+                      <div
+                        data-tooltip="Download Booking PDF"
+                        className="border rounded-md p-2"
+                        onClick={() => handleDownload(b.id)}
+                      >
+                        {actionLoading.download && actionLoading?.target && actionLoading?.target === b.id ? (
+                          <ArrowClockwise size={17} className="animate-spin" />
+                        ) : (
+                          <Download size={17} />
+                        )}
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500">
                     Booking Date: {b.dateOfBooking}
@@ -303,7 +378,7 @@ export default function BookingList() {
                           </h3>
                           {/* 👇 Light gray badge for person count */}
                           <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-full border border-gray-200">
-                            {b.personCount || 1} Person
+                            {b.personCount} Person
                             {(b.personCount || 1) > 1 ? "s" : ""}
                           </span>
                         </div>
@@ -334,14 +409,6 @@ export default function BookingList() {
                         >
                           <X size={18} weight="bold" />
                         </button>
-
-                        <button
-                          onClick={() => handleDownload(b)}
-                          className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                          title="Download"
-                        >
-                          <DownloadSimple size={18} weight="bold" />
-                        </button>
                       </>
                     )}
 
@@ -362,24 +429,7 @@ export default function BookingList() {
                         >
                           ↩
                         </button>
-                        <button
-                          onClick={() => handleDownload(b)}
-                          className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                          title="Download"
-                        >
-                          <DownloadSimple size={18} weight="bold" />
-                        </button>
                       </>
-                    )}
-
-                    {b.status === "declined" && (
-                      <button
-                        onClick={() => handleDownload(b)}
-                        className="p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-all"
-                        title="Download"
-                      >
-                        <DownloadSimple size={18} weight="bold" />
-                      </button>
                     )}
                   </div>
                 </div>
