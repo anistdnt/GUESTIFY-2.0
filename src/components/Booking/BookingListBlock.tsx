@@ -6,6 +6,7 @@ import { setModalVisibility } from "@/redux/slices/modalSlice";
 import {
   ArrowClockwise,
   Check,
+  ClockClockwise,
   DotsThreeOutlineVertical,
   Download,
   Eye,
@@ -64,7 +65,7 @@ export default function BookingListBlock({
         type: "accept_and_initiatePayment",
         modalData: {
           caption: "Accept and Initiate Payment",
-          booking_id: b.id,
+          booking_id: id,
           room_id: b.room_id,
         },
       })
@@ -129,7 +130,19 @@ export default function BookingListBlock({
     }
   };
 
-  const handleRevolke = async (id: string) => {};
+  const handleRevolke = async (id: string) => {
+    dispatch(
+      setModalVisibility({
+        open: true,
+        type: "revolke_booking",
+        modalData: {
+          caption: "Accept and Initiate Payment",
+          booking_id: id,
+          room_id: b.room_id,
+        },
+      })
+    );
+  };
 
   const getStatusBadge = (status: BookingStatus) => {
     const styles = {
@@ -291,16 +304,20 @@ export default function BookingListBlock({
             <>
               <button
                 onClick={() => handleRevolke(b.id)}
-                className="p-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-all"
-                title="Return to pending"
+                className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all text-sm"
+                data-tooltip="Revolke this Booking"
               >
-                ↩
+                <ClockClockwise size={15} weight="bold" />
+                <span>Revolke</span>
               </button>
             </>
           )}
 
           <div className="relative" ref={actionDropdownRef}>
-            <button onClick={() => setShowActionDropdown((prev) => !prev)}>
+            <button
+              className="p-1 border rounded-md"
+              onClick={() => setShowActionDropdown((prev) => !prev)}
+            >
               <DotsThreeOutlineVertical
                 size={18}
                 className="text-gray-500"
@@ -314,7 +331,21 @@ export default function BookingListBlock({
                   <div>
                     <div
                       className="block px-4 py-2 text-xs hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {}}
+                      onClick={() => {
+                        dispatch(
+                          setModalVisibility({
+                            open: true,
+                            type: "genericConfirmation",
+                            modalData: {
+                              caption: "Close Payment Session",
+                              placeholder: "close this Payment Session",
+                              btnText: "Close Session",
+                              endpoint: API.ADMIN.BOOKING.CLOSE_PAYMENT_SESSION.replace(":id", b.id),
+                              method: "PATCH",
+                            },
+                          })
+                        );
+                      }}
                     >
                       Close Payment Session
                     </div>
@@ -324,7 +355,20 @@ export default function BookingListBlock({
 
                 <div
                   className="block px-4 py-2 text-xs text-red-600 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => {}}
+                  onClick={() => {
+                    dispatch(
+                      setModalVisibility({
+                        open: true,
+                        type: "deletePG",
+                        modalData: {
+                          caption: "Delete Booking",
+                          placeholder: "this Booking Ticket",
+                          rowid: b.id,
+                          target: "booking",
+                        },
+                      })
+                    );
+                  }}
                 >
                   Delete Booking
                 </div>

@@ -14,6 +14,8 @@ import OTPModal from "./ReturnModals/OTPModal";
 import BookingModal from "./BookingModal";
 import ViewModal from "./Booking/ViewModal";
 import AcceptandInitiatePaymentModal from "./Booking/Accept_and_initiatePayment";
+import RevolkModal from "./Booking/RevolkModal";
+import GenericConfirmationModal from "./GenericConfirmationModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -40,6 +42,9 @@ export default function DefaultModal() {
           {type === "delete" && (
             <ConfirmationModal setshowModal={setshowModal}/>
           )}
+          {type === "genericConfirmation" && (
+            <GenericConfirmationModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
           {type === "deletePG" && (
             <DeleteModal setshowModal={setshowModal} modalData={modalData}/>
           )}
@@ -60,6 +65,9 @@ export default function DefaultModal() {
           )}
           {type === "accept_and_initiatePayment" && (
             <AcceptandInitiatePaymentModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "revolke_booking" && (
+            <RevolkModal setshowModal={setshowModal} modalData={modalData}/>
           )}
         </div>
       )}

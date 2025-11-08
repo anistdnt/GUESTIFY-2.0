@@ -18,7 +18,7 @@ import {
 import BookingListBlock from "@/components/Booking/BookingListBlock";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { triggerRefetch } from "@/redux/slices/modalSlice";
+import { deleteSuccess, triggerRefetch } from "@/redux/slices/modalSlice";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -75,6 +75,9 @@ export default function BookingList() {
   const isRefetch = useSelector(
     (state: RootState) => state.modal_slice.isRefetch
   );
+  const isDeleted = useSelector(
+    (state: RootState) => state.modal_slice.isDeleted
+  );
   const dispatch = useDispatch();
 
   function useDebounce<T>(value: T, delay: number): T {
@@ -92,7 +95,8 @@ export default function BookingList() {
   useEffect(() => {
     fetchBookings();
     dispatch(triggerRefetch(false));
-  }, [currentPage, perPage, filterStatus, debouncedSearch, isRefetch]);
+    dispatch(deleteSuccess(true));
+  }, [currentPage, perPage, filterStatus, debouncedSearch, isRefetch, isDeleted]);
 
   const fetchBookings = async () => {
     setLoading(true);
