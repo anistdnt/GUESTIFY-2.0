@@ -79,7 +79,7 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
 
   if (loading || !data) return <Skeleton />;
 
-  const { room_id, duration, persons } = data;
+  const { room_id, duration, persons, remarks } = data;
 
   return (
     <div className="space-y-6 max-h-[70vh] pr-2">
@@ -109,6 +109,16 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
           </p>
         </div>
       </div>
+
+      {/* Remarks */}
+      {remarks && <div>
+        <h2 className="text-lg font-semibold text-gray-800">
+          Booking Remarks
+        </h2>
+        <div className="bg-gray-50 p-3 rounded-lg mt-2 border text-gray-700 flex gap-4">
+          {remarks}
+        </div>
+      </div>}
 
       {/* Persons */}
       <div>
