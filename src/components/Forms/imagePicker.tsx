@@ -6,7 +6,7 @@ import {
     uploadCellBlank,
     uploadedCell,
 } from "../../app/global_styles";
-import { PencilSimple, Trash, CircleNotch } from "@phosphor-icons/react";
+import { PencilSimple, Trash, CircleNotch, FilePdf } from "@phosphor-icons/react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -36,6 +36,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
     const selectedImageIndex = useRef<number>(-1);
     const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>({});
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const isPDF = (url: string) => url?.toLowerCase().endsWith(".pdf");
 
     // Load existing images
     useEffect(() => {
@@ -59,7 +60,13 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
                 )
             );
         }
-    }, [values?.pg_images, imageKey, room?.room_images]);
+        if(single && imageKey === "image" && values?.image){
+            setImages([{ url: values.image, public_id: values.image_id }]);
+        }
+        if(single && imageKey === "identity_image" && values?.identity_image){
+            setImages([{ url: values.identity_image, public_id: values.identity_image_id }]);
+        }
+    }, [values?.pg_images, imageKey, room?.room_images, values.image]);
 
     // Upload function (✅ fixed: skip adding temp preview if editing)
     const uploadImage = async (file: File, isEditing = false) => {
@@ -81,6 +88,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
         try {
             const res = await api_caller<ImageInfo>("POST", API.IMAGE.UPLOAD, formData, headers);
             if (res?.success) {
+                setUploadError(null);
                 if (tempId) {
                     // Replace the temp preview
                     setImages((prev) =>
@@ -97,6 +105,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
             }
         } catch (error: any) {
             toast.error(error?.message || "Upload failed");
+            setUploadError(error?.message || "Image upload failed");
             if (tempId) {
                 setImages((prev) => prev.filter((img) => img.public_id !== tempId));
             }
@@ -163,7 +172,8 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
                     pg_image_id: img.public_id,
                 }))
             );
-        } else {
+        } 
+        if (imageKey === "room_image_url") {
             setFieldValue(
                 `rooms[${index}].room_images`,
                 newImages.map((img) => ({
@@ -172,12 +182,23 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
                 }))
             );
         }
+        if (imageKey === "image" && single) {
+            setFieldValue(`persons.${index}.image`, newImages[0]?.url || "");
+            setFieldValue(`persons.${index}.image_id`, newImages[0]?.public_id || "");
+        }
+        if (imageKey === "identity_image" && single) {
+            setFieldValue( `persons.${index}.identity_image`, newImages[0]?.url || "");
+            setFieldValue(`persons.${index}.identity_image_id`, newImages[0]?.public_id || "");
+        }
     };
 
     // Dropzone config
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { "image/jpeg": [], "image/jpg": [], "image/png": [] },
+        onDropRejected: () => {
+            setUploadError("Only JPG, PNG & PDF files are allowed.");
+        },
+        accept: { "image/jpeg": [], "image/jpg": [], "image/png": [], "application/pdf": [] },
         multiple: !single && selectedImageIndex.current === -1,
         maxFiles: selectedImageIndex.current !== -1 ? 1 : single ? 1 : undefined,
         noClick: true,
@@ -248,20 +269,45 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
                                     </div>
                                 )}
 
-                                <Image
-                                    src={img.url}
-                                    alt="product"
-                                    width={160}
-                                    height={160}
-                                    className="max-w-full max-h-full object-contain"
-                                    onLoadingComplete={() =>
-                                        setLoadedImages((prev) => ({
-                                            ...prev,
-                                            [img.public_id]: true,
-                                        }))
-                                    }
-                                />
+                                {isPDF(img.url) ? (
+                                    (() => {
+                                        if (!loadedImages[img.public_id]) {
+                                            setLoadedImages((prev) => ({ ...prev, [img.public_id]: true }));
+                                        }
+                                        return (
+                                            <div className="flex flex-col items-center justify-center gap-1 text-center">
+                                                <FilePdf size={38} className="text-red-600" />
+                                                {/* <span className="text-xs text-gray-600 max-w-[120px] truncate">
+                                                    {img.public_id}.pdf
+                                                </span> */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => window.open(img.url, "_blank")}
+                                                    className="text-xs text-indigo-600 underline"
+                                                >
+                                                    View PDF
+                                                </button>
+                                            </div>
+                                        );
+                                    })()
+                                ) : (
+                                    // ✅ Render Image normally
+                                    <Image
+                                        src={img.url}
+                                        alt="preview"
+                                        width={160}
+                                        height={160}
+                                        className="max-w-full max-h-full object-contain"
+                                        onLoadingComplete={() =>
+                                            setLoadedImages((prev) => ({
+                                                ...prev,
+                                                [img.public_id]: true,
+                                            }))
+                                        }
+                                    />
+                                )}
                             </div>
+
 
                             {!isProcessing && loadedImages[img.public_id] && (
                                 <div className={`${imageActions}`}>
