@@ -77,6 +77,7 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
   const router = useRouter();
   const targetId = modalData?.rowid;
   const [isSubmitting, setIsSubmitting] = useState(false);;
+  const [previewData, setPreviewData] = useState(null);
 
   const initialValues = {
   room_id: modalData?.room_id,
@@ -106,43 +107,40 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
   ],
 };
 
-  const handleSubmit = async (
-    values: any,
-    { setSubmitting, resetForm }: any
-  ) => {
-    setIsSubmitting(true);
-    try {
-      const payload = {
-        ...values,
-        start_date: new Date(values.start_date)
-          .toISOString()
-          .split("T")[0]
-          .replace(/-/g, "/"),
-        persons: values.persons.map((person: any, index: number) => ({
-          ...person,
-          age: parseInt(person.age),
-          is_primary: index === 0 ? 1 : 0,
-        })),
-      };
-
-      const response : ApiReturn<any> = await api_caller<any,typeof initialValues>("POST", API.USER.BOOKING.CREATE, payload);
-      console.log(response)
-
-      if (!response.success) {
-        throw new Error(response.message || "Booking failed");
-      }
-
-      toast.success(response?.message || "Booking submitted successfully!");
-      resetForm();
-      setshowModal(false);
-    } catch (error) {
-      console.error("Booking error:", error);
-      toast.error(error.message || "Failed to submit booking. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-      setSubmitting(false);
-    }
+  const handleSubmit = (values: any, formikHelpers: any) => {
+    setPreviewData(values); // show preview
   };
+
+  const confirmBooking = async () => {
+  setIsSubmitting(true);
+  try {
+    const payload = {
+      ...previewData,
+      start_date: new Date(previewData.start_date)
+        .toISOString()
+        .split("T")[0]
+        .replace(/-/g, "/"),
+      persons: previewData.persons.map((p: any, index: number) => ({
+        ...p,
+        age: parseInt(p.age),
+        is_primary: index === 0 ? 1 : 0,
+      })),
+    };
+
+    const response: ApiReturn<any> = await api_caller("POST", API.USER.BOOKING.CREATE, payload);
+
+    if (!response.success) throw new Error(response.message);
+
+    toast.success(response.message || "Booking submitted successfully!");
+    setshowModal(false);
+  } catch (err: any) {
+    toast.error(err.message);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
 
   return (
     <div
@@ -170,6 +168,7 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
           onSubmit={handleSubmit}
         >
           {({ values }) => (
+            
             <Form className="flex flex-col h-[95%]">
               {/* Scrollable content area */}
               <div className="flex-1 overflow-y-auto p-1">
@@ -249,6 +248,63 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
             </Form>
           )}
         </Formik>
+
+        {previewData && (
+          <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[999]">
+            <div className="bg-white w-3/5 h-[80%] rounded-lg shadow-lg flex flex-col">
+
+              {/* Title */}
+              <div className="p-6 border-b">
+                <h2 className="text-xl font-bold">Review Your Booking</h2>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+
+                <p><strong>Room:</strong> {modalData.title}</p>
+                <p><strong>Start Date:</strong> {previewData.start_date}</p>
+                <p><strong>Duration:</strong> {previewData.duration.year} yr {previewData.duration.month} mo</p>
+                <p><strong>Remarks:</strong> {previewData.remarks || "None"}</p>
+
+                <h3 className="text-lg mt-4 font-semibold">Guest List</h3>
+                <hr className="mb-3" />
+
+                {previewData.persons.map((p: any, i: number) => (
+                  <div key={i} className="border p-3 rounded mb-3">
+                    <p><strong>Name:</strong> {p.first_name} {p.last_name}</p>
+                    <p><strong>Age:</strong> {p.age}</p>
+                    <p><strong>Gender:</strong> {p.gender}</p>
+                    <p><strong>Phone:</strong> {p.dial_code} {p.contact_number}</p>
+                    <p><strong>Address:</strong> {p.address}</p>
+                    <p><strong>ID:</strong> {p.type_of_identity.toUpperCase()} - {p.identity_id}</p>
+                  </div>
+                ))}
+
+              </div>
+
+              {/* Sticky Footer */}
+              <div className="border-t bg-white py-4 px-6 flex justify-end gap-3">
+                <button
+                  onClick={() => setPreviewData(null)}
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={confirmBooking}
+                  disabled={isSubmitting}
+                  className="px-3 py-2 text-sm font-semibold bg-buttons text-white rounded-md hover:bg-buttonsHover transition"
+                >
+                  {isSubmitting ? "Submitting..." : "Confirm & Submit"}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+
       </div>
     </div>
   );
