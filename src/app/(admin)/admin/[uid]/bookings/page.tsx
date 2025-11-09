@@ -122,6 +122,8 @@ export default function BookingList() {
             room_id: b?.room_id || "",
             room_rent: b?.room_rent || 0,
             deposit_duration: b?.deposit_duration || "",
+            payment_at: b?.payment_at,
+            payment_ttl: b?.payment_ttl,
           }))
         );
         setTotalPages(res.data.total_pages);

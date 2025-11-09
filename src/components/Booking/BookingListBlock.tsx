@@ -1,7 +1,7 @@
 "use client";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
-import { formatDateTime } from "@/lib/utils/utilities";
+import { formatDateTime, formatSeconds } from "@/lib/utils/utilities";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import {
   ArrowClockwise,
@@ -321,7 +321,18 @@ export default function BookingListBlock({
           )}
 
           {b.status === "accepted" && (
-            <>
+            <div className="flex flex-row items-center gap-3">
+              <div className="border border-1 rounded-md border-yellow-700 text-yellow-700 text-sm px-2 py-1 font-medium">
+                {b.payment_at !== null && (
+                  <span>Paymnet Done : {formatDateTime(b.payment_at)}</span>
+                )}
+                {b.payment_ttl !== 0 && (
+                  <span>
+                    Payment Session will expire in:{" "}
+                    {formatSeconds(b.payment_ttl)}
+                  </span>
+                )}
+              </div>
               <button
                 onClick={() => handleRevolke(b.id)}
                 className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all text-sm"
@@ -330,7 +341,7 @@ export default function BookingListBlock({
                 <ClockClockwise size={15} weight="bold" />
                 <span>Revolke</span>
               </button>
-            </>
+            </div>
           )}
 
           {["revolked", "canceled"]?.includes(b?.status) && b?.reason && (
@@ -348,7 +359,7 @@ export default function BookingListBlock({
                  max-h-40 overflow-y-auto z-50"
               >
                 <h4 className="mb-1 text-yellow-700 font-medium">Message</h4>
-                <hr className="py-1"/>
+                <hr className="py-1" />
                 <span className="text-gray-600 font-semibold">{b.reason}</span>
               </div>
             </div>
