@@ -81,7 +81,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
         }
 
         const formData = new FormData();
-        formData.append("pg_image_url", file);
+        formData.append("image_url", file);
 
         const headers = { "Content-Type": "multipart/form-data" };
 
