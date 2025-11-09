@@ -2,6 +2,7 @@
 
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
+import { FileDoc } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
@@ -175,13 +176,9 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
                   </p>
                 </div>
                 <div className="w-2/5 flex justify-end">
-                  <div className="relative w-40 h-24 rounded-lg overflow-hidden border">
-                    <Image
-                      src={person?.identity_image || ""}
-                      alt="Identity"
-                      fill
-                      className="object-cover"
-                    />
+                  <div className="border rounded-lg p-4 flex flex-col justify-center items-center gap-2 cursor-pointer hover:bg-gray-100 transition" onClick={()=> window?.open(person?.identity_image || "","_blank")}>
+                    <FileDoc size={50} />
+                    <span className="text-blue-500">View Document</span>
                   </div>
                 </div>
               </div>

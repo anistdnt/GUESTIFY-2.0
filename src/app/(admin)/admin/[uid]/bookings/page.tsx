@@ -120,6 +120,8 @@ export default function BookingList() {
             pg_name: b?.pg_name || "",
             room_type: b?.room_type || "",
             room_id: b?.room_id || "",
+            room_rent: b?.room_rent || 0,
+            deposit_duration: b?.deposit_duration || "",
           }))
         );
         setTotalPages(res.data.total_pages);

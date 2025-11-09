@@ -86,11 +86,11 @@ function AcceptandInitiatePaymentModal({ setshowModal, modalData }: ModalType) {
 
         <hr />
 
-        <h4 className="flex justify-start items-center gap-1">
+        <h4 className="flex justify-start items-center gap-1 p-2 border bg-gray-100 rounded-md">
           <span>Total Amount :</span>{" "}
           <span className="flex items-center gap-1">
             <CurrencyInr size={15} />
-            <span>{modalData?.amount || '2345'}</span>
+            <span className="font-semibold">{modalData?.amount || '2345'}</span>
           </span>
           <span className="text-gray-700 text-sm">({modalData?.deposit_duration || 'Monthly'})</span>
         </h4>

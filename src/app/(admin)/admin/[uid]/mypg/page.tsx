@@ -93,15 +93,30 @@ const Page = () => {
     return <CardSkeleton no_of_card={2} />;
   } else if (cards?.length === 0 && !loading) {
     return (
-      <div className="w-full py-10">
-        <NoDataFound
-          text="No Paying Guest House Found"
-          redirectBtn={{
-            text: "Add New Paying Guest House",
-            link: "/pg/new",
-          }}
-        />
-      </div>
+      <>
+        <div>
+          <h1 className="text-gray-500">
+            <span className="text-gray-500 text-2xl">Manage Your</span> <br />
+            <span className="text-4xl font-semibold text-gray-700">
+              <span className="text-yellow-700">Paying Guest</span> Properties
+            </span>
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Manage all your listed Paying Guest properties here — <br />
+            update details, monitor occupancy, and keep your PGs performing at
+            their best.
+          </p>
+        </div>
+        <div className="w-full py-10">
+          <NoDataFound
+            text="No Paying Guest House Found"
+            redirectBtn={{
+              text: "Add New Paying Guest House",
+              link: `/admin/${param?.uid}/pg/new`,
+            }}
+          />
+        </div>
+      </>
     );
   } else {
     return (
