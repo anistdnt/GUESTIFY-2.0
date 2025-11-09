@@ -58,7 +58,24 @@ export default function BookingListBlock({
   const dispatch = useDispatch();
   const actionDropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleAccept = async (id: string) => {
+  const handleAccept = async (id: string, rent?: number, duration?: string) => {
+    let amount = 0;
+    switch (duration) {
+      case "monthly":
+        amount = rent || 0;
+        break;
+      case "quarterly":
+        amount = (rent || 0) * 3;
+        break;
+      case "half-yearly":
+        amount = (rent || 0) * 6;
+        break;
+      case "yearly":
+        amount = (rent || 0) * 12;
+        break;
+      default:
+        amount = rent || 0;
+    }
     dispatch(
       setModalVisibility({
         open: true,
@@ -66,7 +83,8 @@ export default function BookingListBlock({
         modalData: {
           caption: "Accept and Initiate Payment",
           booking_id: id,
-          room_id: b.room_id,
+          amount: amount,
+          deposit_duration: duration
         },
       })
     );
@@ -272,7 +290,7 @@ export default function BookingListBlock({
           {b.status === "pending" && (
             <>
               <button
-                onClick={() => handleAccept(b.id)}
+                onClick={() => handleAccept(b.id, b?.room_rent, b?.deposit_duration)}
                 className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all text-sm"
                 data-tooltip="Accept this Booking"
               >

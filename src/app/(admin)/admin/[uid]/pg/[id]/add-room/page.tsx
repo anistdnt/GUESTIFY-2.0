@@ -23,43 +23,30 @@ export default function AddRoomsForm() {
   const router = useRouter();
 
   const handleSubmit = async (values: any) => {
-    const formData = new FormData();
+    try {
+      dispatch(setLoading({ loading: true }));
 
-    // ✅ Add rooms array with their files
-    values.rooms.forEach((room: any, index: number) => {
-      Object.entries(room).forEach(([key, value]) => {
-        if (key === "room_image_url" && value) {
-          if (typeof value === "string" && value.startsWith("data:image/")) {
-            const file = base64ToFile(value, `Room-Image-${Date.now()}`);
-            formData.append(`rooms[${index}][${key}]`, file);
-          } else {
-            formData.append(`rooms[${index}][${key}]`, value as File);
-          }
-        } else if (key !== "room_image_url") {
-          formData.append(`rooms[${index}][${key}]`, (value as string) ?? "");
-        }
-      });
-    });
+      const payload = {
+        rooms : {...values.rooms, room_rent: Number(values?.rooms?.room_rent) || null },
+      }
 
-    // console.log("Submitted values Formadata:", values);
-    dispatch(setLoading({ loading: true }));
-
-    const res: ApiReturn<any> = await api_caller<any>(
-      "POST",
-      `${paying_guestID}/${API.PG.ADD_ROOM}`,
-      formData
-    );
-    if (res.success) {
+      const res: ApiReturn<any> = await api_caller<any>(
+        "POST",
+        `${paying_guestID}/${API.PG.ADD_ROOM}`,
+        payload
+      );
+      if (res.success) {
+        router?.back();
+        toast.success(res.message || "Save In successfully");
+      } else {
+        toast.error(`${res.message} : ${res.error}`);
+      }
+    } catch (error: any) {
+      console.error("Error in submitting room details:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
       dispatch(setLoading({ loading: false }));
-      // router?.push(`/profile/${reduxUserData?._id}/mypg`);
-      router?.back();
-      toast.success(res.message || "Save In successfully");
-    } else {
-      dispatch(setLoading({ loading: false }));
-      toast.error(`${res.message} : ${res.error}`);
     }
-
-    // alert("Form submitted successfully!");
   };
 
   return (
@@ -80,16 +67,16 @@ export default function AddRoomsForm() {
                   dirty
                     ? "bg-yellow-600 hover:bg-yellow-700 text-white"
                     : "bg-gray-400 cursor-not-allowed text-white"
-                  }`}
+                }`}
               >
                 Submit Room Details
               </button>
               <button
-                  type="button"
-                  onClick={() => {
-                    router.back();
-                  }}
-                  className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+                type="button"
+                onClick={() => {
+                  router.back();
+                }}
+                className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
               >
                 Cancel
               </button>

@@ -92,13 +92,13 @@ export const ViewRoom = ({ room_id }: { room_id: string }) => {
   return (
     <div className="space-y-6 max-h-[70vh] pr-2">
       {/* Room Image */}
-      <div className="relative h-52 w-full rounded-lg">
+      <div className="relative h-52 rounded-lg mx-auto" style={{width: '500px'}}>
         <Swiper
           modules={[Navigation, Pagination]}
           navigation
           pagination={{ clickable: true }}
           loop
-          className="h-full w-full custom-swiper"
+          className="h-full custom-swiper"
         >
           {room_images?.map((img, idx) => (
             <SwiperSlide key={idx}>
