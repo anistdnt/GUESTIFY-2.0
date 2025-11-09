@@ -122,6 +122,8 @@ export default function BookingList() {
             room_id: b?.room_id || "",
             room_rent: b?.room_rent || 0,
             deposit_duration: b?.deposit_duration || "",
+            payment_at: b?.payment_at,
+            payment_ttl: b?.payment_ttl,
           }))
         );
         setTotalPages(res.data.total_pages);
@@ -176,11 +178,15 @@ export default function BookingList() {
           {/* Refresh or Reset Filter Button */}
           <div>
             <button
-              data-tooltip="Reset Filters"
+              data-tooltip="Refresh or Reset Filters"
               onClick={() => {
-                setSearchTerm("");
-                setFilterStatus("all");
-                setCurrentPage(1);
+                if(filterStatus !== "all" || searchTerm !== "" || currentPage !==1){
+                  setSearchTerm("");
+                  setFilterStatus("all");
+                  setCurrentPage(1);
+                } else {
+                  fetchBookings();
+                }
               }}
               className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200 transition"
             >

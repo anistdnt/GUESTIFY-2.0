@@ -46,7 +46,7 @@ export default function AdminLayoutComponent({ children }: Props) {
       dispatch(setUserData({}));
       setuserInfo(null);
       setisLoggedIn(false);
-      router.push("/");
+      router.push("/login");
       toast.success(res.message || "Logged out successfully");
     } else {
       toast.error(`${res.message} : ${res.error}`);
