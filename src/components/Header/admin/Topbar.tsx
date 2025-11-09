@@ -91,22 +91,11 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
                     </Link>
                     <Link
                       href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
                       onClick={logout_user}
                     >
                       Sign out
                     </Link>
-                    <div
-                      className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        setshowProfileDropdown((prev) => !prev);
-                        dispatch(
-                          setModalVisibility({ open: true, type: "delete" })
-                        );
-                      }}
-                    >
-                      Delete Profile
-                    </div>
                   </div>
                 )}
               </div>

@@ -6,7 +6,7 @@ import { setLoading } from "@/redux/slices/loaderSlice";
 import { deleteSuccess, hideModal } from "@/redux/slices/modalSlice";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
@@ -45,6 +45,8 @@ const validationSchema = Yup.object().shape({
           .oneOf(["male", "female", "other"], "Invalid gender")
           .required("Gender is required"),
         address: Yup.string().required("Address is required"),
+        dial_code: Yup.string().required("Dial code is required"),
+        contact_number: Yup.string().required("Contact number is required"),
         type_of_identity: Yup.string()
           .oneOf(
             ["aadhar", "pan", "passport", "driving_license"],
@@ -68,8 +70,16 @@ const validationSchema = Yup.object().shape({
     .min(1, "At least one person is required"),
 });
 
-const initialValues = {
-  room_id: "",
+
+
+function BookingModal({ setshowModal, modalData }: ModalType) {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const targetId = modalData?.rowid;
+  const [isSubmitting, setIsSubmitting] = useState(false);;
+
+  const initialValues = {
+  room_id: modalData?.room_id,
   start_date: "",
   duration: {
     year: 0,
@@ -83,6 +93,8 @@ const initialValues = {
       age: "",
       gender: "male",
       address: "",
+      dial_code: "+91",
+      contact_number:"",
       type_of_identity: "aadhar",
       identity_id: "",
       is_primary: 1,
@@ -93,12 +105,6 @@ const initialValues = {
     },
   ],
 };
-
-function BookingModal({ setshowModal, modalData }: ModalType) {
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const targetId = modalData?.rowid;
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (
     values: any,
@@ -119,15 +125,19 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
         })),
       };
 
-      console.log("Booking Payload:", JSON.stringify(payload, null, 2));
+      const response : ApiReturn<any> = await api_caller<any,typeof initialValues>("POST", API.USER.BOOKING.CREATE, payload);
+      console.log(response)
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (!response.success) {
+        throw new Error(response.message || "Booking failed");
+      }
 
-      toast.success("Booking submitted successfully!");
+      toast.success(response?.message || "Booking submitted successfully!");
       resetForm();
+      setshowModal(false);
     } catch (error) {
       console.error("Booking error:", error);
-      toast.error("Failed to submit booking. Please try again.");
+      toast.error(error.message || "Failed to submit booking. Please try again.");
     } finally {
       setIsSubmitting(false);
       setSubmitting(false);
@@ -202,6 +212,8 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
                               age: "",
                               gender: "male",
                               address: "",
+                              dial_code: "+91",
+                              contact_number:"",
                               type_of_identity: "aadhar",
                               identity_id: "",
                               is_primary: 0,
