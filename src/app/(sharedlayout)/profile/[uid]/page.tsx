@@ -87,14 +87,23 @@ export default function Profile() {
             Profile
           </Link>
 
-          {!profile_info?.is_admin && <Link
-            href={`/profile/${uid}/wishlist`}
-            className={linkClass(`/profile/${uid}/wishlist`)}
+          {!profile_info?.is_admin && (
+            <Link
+              href={`/profile/${uid}/wishlist`}
+              className={linkClass(`/profile/${uid}/wishlist`)}
             >
               Wishlist
             </Link>
-          }
-          
+          )}
+
+          {!profile_info?.is_admin && (
+            <Link
+              href={`/profile/${uid}/my-bookings`}
+              className={linkClass(`/profile/${uid}/my-bookings`)}
+            >
+              My Bookings
+            </Link>
+          )}
         </div>
 
         {isModalOpen && (
