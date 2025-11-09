@@ -84,7 +84,7 @@ export default function BookingListBlock({
           caption: "Accept and Initiate Payment",
           booking_id: id,
           amount: amount,
-          deposit_duration: duration
+          deposit_duration: duration,
         },
       })
     );
@@ -290,7 +290,9 @@ export default function BookingListBlock({
           {b.status === "pending" && (
             <>
               <button
-                onClick={() => handleAccept(b.id, b?.room_rent, b?.deposit_duration)}
+                onClick={() =>
+                  handleAccept(b.id, b?.room_rent, b?.deposit_duration)
+                }
                 className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all text-sm"
                 data-tooltip="Accept this Booking"
               >
@@ -332,14 +334,24 @@ export default function BookingListBlock({
           )}
 
           {["revolked", "canceled"]?.includes(b?.status) && b?.reason && (
-            <>
-              <button
-                className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg text-yellow-700 border border-1 border-yellow-700 transition-all text-sm"
-                data-tooltip={b.reason}
-              >
+            <div className="relative group inline-block">
+              <button className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg text-yellow-700 border border-yellow-700 text-sm transition-all">
                 <span>Reason</span>
               </button>
-            </>
+
+              {/* Tooltip Div */}
+              <div
+                className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2
+                 w-60 bg-white text-gray-800 border border-gray-300 
+                 rounded-lg shadow-lg py-3 px-2 text-sm opacity-0 pointer-events-none 
+                 group-hover:opacity-100 group-hover:pointer-events-auto transition-all
+                 max-h-40 overflow-y-auto z-50"
+              >
+                <h4 className="mb-1 text-yellow-700 font-medium">Message</h4>
+                <hr className="py-1"/>
+                <span className="text-gray-600 font-semibold">{b.reason}</span>
+              </div>
+            </div>
           )}
 
           <div className="relative" ref={actionDropdownRef}>
@@ -369,7 +381,11 @@ export default function BookingListBlock({
                               caption: "Close Payment Session",
                               placeholder: "close this Payment Session",
                               btnText: "Close Session",
-                              endpoint: API.ADMIN.BOOKING.CLOSE_PAYMENT_SESSION.replace(":id", b.id),
+                              endpoint:
+                                API.ADMIN.BOOKING.CLOSE_PAYMENT_SESSION.replace(
+                                  ":id",
+                                  b.id
+                                ),
                               method: "PATCH",
                             },
                           })
