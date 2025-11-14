@@ -21,6 +21,7 @@ interface MapProps {
   clg_addr?: string;
   clg_pin?: string;
   clg_id?: string;
+  showAdditionalSettings?: boolean;
 }
 
 export interface pgInfo {
@@ -54,7 +55,7 @@ const mapStyles = [
 ];
 
 
-export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_pin, clg_id }: MapProps) {
+export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_pin, clg_id, showAdditionalSettings=true }: MapProps) {
   // console.log("Map Props:", { clg_coords, position, name, address, clg_name, clg_addr, clg_pin, clg_id, pg_idno });
   // const isMulti = Array.isArray(position[0]);
   const isMulti = Array.isArray(pgInfo);
@@ -320,7 +321,7 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
 
 
         {/* Map Style Switcher */}
-        <div
+        {showAdditionalSettings && <div
           style={{
             position: "absolute",
             bottom: 10,
@@ -366,15 +367,15 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
               </span>
             </div>
           ))}
-        </div>
+        </div>}
 
         {/* pg near me button */}
-        <div
+        {showAdditionalSettings && <div
           className="absolute bottom-[70px] right-2 bg-white px-3 py-2 rounded-md cursor-pointer shadow-md z-10"
           onClick={fetchNearbyPGs}
         >
           {loadingNearby ? <Loadercomp size={20} color="buttons" /> : <span>🏠 PGs Near Me</span>}
-        </div>
+        </div>}
 
 
         {/* Navigation Control */}

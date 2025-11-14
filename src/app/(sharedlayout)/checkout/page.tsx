@@ -16,8 +16,17 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: [{ name: "Premium Plan", price: 5000.00, quantity: 1 }],
-          userID: "68012da9a9b2f3a9a37b3638"
+          items: [{
+            name: "Premium Plan",
+            price: 5000.00,
+            quantity: 1,
+            images: ["https://res.cloudinary.com/dlgxyaqfu/image/upload/v1759671711/user-assets/68e271a912470bcfc6a22b6a/azk6thzyfseqq3ei6wq4.jpg"]
+          }],
+          user_id: "68012da9a9b2f3a9a37b3638",
+          location:{
+            latitude: 22.5817993,
+            longitude: 88.4897112
+          }
         }),
       });
 
