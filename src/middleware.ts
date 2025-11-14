@@ -21,11 +21,12 @@ export function middleware(req: NextRequest) {
 
   const authToken = req.cookies.get("authToken");
   const pathname = req.nextUrl.pathname;
+  console.log("Middleware - Pathname:", pathname);
 
   // 🧩 If no token and visiting protected or admin routes → redirect to login
   if (
     !authToken &&
-    ["/pg", "/profile", "/admin"].some((route) => pathname.startsWith(route))
+    ["/pg", "/profile", "/admin", "/thankyou"].some((route) => pathname.startsWith(route))
   ) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
@@ -82,5 +83,6 @@ export const config = {
     "/login",
     "/signup",
     "/admin/:path*",
+    "/thankyou",
   ],
 };

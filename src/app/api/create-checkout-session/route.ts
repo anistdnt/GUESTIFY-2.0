@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 //backend part
 export async function POST(req: Request) {
     try {
-        const { items, userID } = await req.json();
+        const { items, user_id, location } = await req.json();
 
         // Example product data
         const session = await stripe.checkout.sessions.create({
@@ -17,13 +17,16 @@ export async function POST(req: Request) {
             line_items: items.map((item: any) => ({
                 price_data: {
                     currency: "inr",
-                    product_data: { name: item.name },
+                    product_data: {
+                        name: item.name,
+                        images: item.images
+                    },
                     unit_amount: Math.round(item.price * 100),
                 },
                 quantity: item.quantity,
             })),
-            success_url: "http://localhost:3001/success",
-            cancel_url: `http://localhost:3001/profile/${userID}/my-bookings`,
+            success_url: `http://localhost:3001/thankyou?lat=${location.latitude}&long=${location.longitude}`,
+            cancel_url: `http://localhost:3001/profile/${user_id}/my-bookings`,
         });
 
         return NextResponse.json({ url: session.url });
