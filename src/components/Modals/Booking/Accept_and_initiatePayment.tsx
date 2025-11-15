@@ -18,6 +18,10 @@ type ModalType = {
 
 // ✅ Validation Schema
 const validationSchema = Yup.object().shape({
+  amount: Yup.number()
+    .typeError("Amount must be a number")
+    .required("Amount is required")
+    .positive("Must be a positive number"),
   payment_dunning: Yup.number()
     .typeError("Payment dunning must be a number")
     .required("Payment dunning is required")
@@ -29,27 +33,41 @@ function AcceptandInitiatePaymentModal({ setshowModal, modalData }: ModalType) {
   const dispatch = useDispatch();
 
   const handleSubmit = async (values: {
+    amount: string;
     payment_dunning: number;
     message: string;
   }) => {
     try {
       dispatch(setLoading({ loading: true }));
 
-      const payload = {
-        status: "accepted",
-        payment_details: {
-          amount: modalData?.amount || 100,
+      let payload = {};
+      let url = "";
+      let httpVerb: "POST" | "GET" | "PUT" | "DELETE" | "PATCH" = "POST";
+
+      if (modalData?.amount) {
+        payload = {
+          status: "accepted",
+          payment_details: {
+            amount: modalData?.amount || 100,
+            payment_dunning: values.payment_dunning,
+            message: values.message,
+          },
+        };
+        url = `${API.ADMIN.BOOKING.CHANGE_STATUS}`;
+        httpVerb = "PATCH";
+      } else {
+        payload = {
+          amount: values?.amount || 100,
           payment_dunning: values.payment_dunning,
           message: values.message,
-        },
-      };
+        };
+        url = `${API.ADMIN.BOOKING.CREATE_PAYMENT_SESSION}`;
+        httpVerb = "POST";
+      }
 
       const res: ApiReturn<any> = await api_caller<any>(
-        "PATCH",
-        `${API.ADMIN.BOOKING.CHANGE_STATUS}`.replace(
-          ":id",
-          modalData?.booking_id
-        ),
+        httpVerb,
+        url.replace(":id", modalData?.booking_id),
         payload
       );
 
@@ -78,7 +96,9 @@ function AcceptandInitiatePaymentModal({ setshowModal, modalData }: ModalType) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-row justify-between items-center">
-          <h3 className="text-xl font-semibold">Accept & Initiate Payment</h3>
+          <h3 className="text-xl font-semibold">
+            {modalData?.caption || "Accept & Initiate Payment"}
+          </h3>
           <button onClick={() => setshowModal(false)}>
             <X size={20} />
           </button>
@@ -86,22 +106,54 @@ function AcceptandInitiatePaymentModal({ setshowModal, modalData }: ModalType) {
 
         <hr />
 
-        <h4 className="flex justify-start items-center gap-1 p-2 border bg-gray-100 rounded-md">
-          <span>Total Amount :</span>{" "}
-          <span className="flex items-center gap-1">
-            <CurrencyInr size={15} />
-            <span className="font-semibold">{modalData?.amount || '2345'}</span>
-          </span>
-          <span className="text-gray-700 text-sm">({modalData?.deposit_duration || 'Monthly'})</span>
-        </h4>
+        {modalData?.amount && (
+          <h4 className="flex justify-start items-center gap-1 p-2 border bg-gray-100 rounded-md">
+            <span>Total Amount :</span>{" "}
+            <span className="flex items-center gap-1">
+              <CurrencyInr size={15} />
+              <span className="font-semibold">
+                {modalData?.amount || "2345"}
+              </span>
+            </span>
+            <span className="text-gray-700 text-sm">
+              ({modalData?.deposit_duration || "Monthly"})
+            </span>
+          </h4>
+        )}
 
         <Formik
-          initialValues={{ payment_dunning: 0, message: "" }}
+          initialValues={{
+            amount: modalData?.amount || 0,
+            payment_dunning: 0,
+            message: "",
+          }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({ isSubmitting }) => (
             <Form className="space-y-4">
+              {/* Custom Amount */}
+              {!modalData?.amount && (
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2 required">
+                    Enter Amount
+                  </label>
+                  <div className="flex items-center border rounded-lg overflow-hidden">
+                    <Field
+                      type="number"
+                      name="amount"
+                      placeholder="Enter Amount"
+                      className="w-full px-3 py-2 outline-none"
+                    />
+                  </div>
+                  <ErrorMessage
+                    name="amount"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              )}
+
               {/* Payment Dunning */}
               <div>
                 <label className="block text-gray-700 font-medium mb-2 required">

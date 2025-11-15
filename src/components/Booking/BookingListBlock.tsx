@@ -16,6 +16,7 @@ import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
+import PaymentCountdown from "./PaymentCountDown";
 
 export type BookingStatus = "pending" | "accepted" | "declined";
 
@@ -322,17 +323,16 @@ export default function BookingListBlock({
 
           {b.status === "accepted" && (
             <div className="flex flex-row items-center gap-3">
-              <div className="border border-1 rounded-md border-yellow-700 text-yellow-700 text-sm px-2 py-1 font-medium">
-                {b.payment_at !== null && (
-                  <span>Paymnet Done : {formatDateTime(b.payment_at)}</span>
-                )}
-                {b.payment_ttl !== 0 && (
-                  <span>
-                    Payment Session will expire in:{" "}
-                    {formatSeconds(b.payment_ttl)}
-                  </span>
-                )}
-              </div>
+              {b.payment_at && (
+                <div className="border border-1 rounded-md border-green-700 text-green-700 text-sm px-2 py-1 font-medium">
+                  <span>Payment Done : {formatDateTime(b.payment_at)}</span>
+                </div>
+              )}
+              {b.payment_ttl !== null && (
+                <div className="border border-1 rounded-md border-yellow-700 text-yellow-700 text-sm px-2 py-1 font-medium">
+                  <PaymentCountdown ttl={b.payment_ttl} />
+                </div>
+              )}
               <button
                 onClick={() => handleRevolke(b.id)}
                 className="flex justify-center items-center gap-1 py-1 px-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all text-sm"
@@ -384,26 +384,42 @@ export default function BookingListBlock({
                     <div
                       className="block px-4 py-2 text-xs hover:bg-gray-100 cursor-pointer"
                       onClick={() => {
-                        dispatch(
-                          setModalVisibility({
-                            open: true,
-                            type: "genericConfirmation",
-                            modalData: {
-                              caption: "Close Payment Session",
-                              placeholder: "close this Payment Session",
-                              btnText: "Close Session",
-                              endpoint:
-                                API.ADMIN.BOOKING.CLOSE_PAYMENT_SESSION.replace(
-                                  ":id",
-                                  b.id
-                                ),
-                              method: "PATCH",
-                            },
-                          })
-                        );
+                        if (b.payment_ttl !== null && b.payment_ttl !== 0) {
+                          dispatch(
+                            setModalVisibility({
+                              open: true,
+                              type: "genericConfirmation",
+                              modalData: {
+                                caption: "Close Payment Session",
+                                placeholder: "close this Payment Session",
+                                btnText: "Close Session",
+                                endpoint:
+                                  API.ADMIN.BOOKING.CLOSE_PAYMENT_SESSION.replace(
+                                    ":id",
+                                    b.id
+                                  ),
+                                method: "PATCH",
+                              },
+                            })
+                          );
+                        } else {
+                          dispatch(
+                            setModalVisibility({
+                              open: true,
+                              type: "accept_and_initiatePayment",
+                              modalData: {
+                                caption: "Create New Payment Session",
+                                booking_id: b.id,
+                                deposit_duration: b?.deposit_duration,
+                              },
+                            })
+                          );
+                        }
                       }}
                     >
-                      Close Payment Session
+                      {b.payment_ttl === 0 || b.payment_ttl === null
+                        ? "Create Payment Session"
+                        : "Close Payment Session"}
                     </div>
                     <hr />
                   </div>
