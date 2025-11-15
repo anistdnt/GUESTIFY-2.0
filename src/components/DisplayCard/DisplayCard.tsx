@@ -20,9 +20,15 @@ type Props = {
   item?: PGData;
   number_of_stars: number;
   profile?: ProfileType;
+  isSearchByDist?: boolean;
 };
 
-export default function DisplayCard({ item, number_of_stars, profile }: Props) {
+export default function DisplayCard({
+  item,
+  number_of_stars,
+  profile,
+  isSearchByDist,
+}: Props) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
@@ -30,7 +36,7 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
   const profile_info = useSelector(
     (state: RootState) => state.user_slice.userData
   );
-  console.log(profile_info, "profile")
+  console.log(profile_info, "profile");
   // Utility to extract coordinates from query string
   const [college_longitude, setLongitude] = useState<number | null>(null);
   const [college_latitude, setLatitude] = useState<number | null>(null);
@@ -43,7 +49,6 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
   const clg_id = params.get("clg_id") || "";
 
   const addToWishlist = async (pgId: string) => {
-
     const isNotAddToWishlistPg = profile_info?.wishlist?.includes(pginfo?._id);
 
     if (isNotAddToWishlistPg) {
@@ -64,14 +69,16 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
       const response = await api_caller(method, endpoint, payload);
 
       if (!response.success) {
-        if(isNotAddToWishlistPg) {
+        if (isNotAddToWishlistPg) {
           dispatch(setWishlistData(pgId));
         } else {
           dispatch(removeWishlistData(pgId));
         }
-        toast.error(response.error || "Something went wrong. Please try again.");
+        toast.error(
+          response.error || "Something went wrong. Please try again."
+        );
       } else {
-        toast.success(response.message)
+        toast.success(response.message);
       }
     } catch (err) {
       toast.error("Unable to update wishlist. Try again later.");
@@ -84,14 +91,29 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
         <div className="relative">
           <button
             className={`absolute top-2 left-2 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-30 ${
-                        profile_info?.wishlist?.includes(pginfo?._id) ? "heart-animate" : ""}`}
+              profile_info?.wishlist?.includes(pginfo?._id)
+                ? "heart-animate"
+                : ""
+            }`}
             onClick={() => addToWishlist(pginfo?._id)}
-            aria-label={profile_info?.wishlist?.includes(pginfo?._id) ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={
+              profile_info?.wishlist?.includes(pginfo?._id)
+                ? "Remove from wishlist"
+                : "Add to wishlist"
+            }
           >
             <Heart
               size={22}
-              weight={profile_info?.wishlist?.includes(pginfo?._id) ? "fill" : "regular"}
-              color={profile_info?.wishlist?.includes(pginfo?._id) ? "#e0245e" : "#888"}
+              weight={
+                profile_info?.wishlist?.includes(pginfo?._id)
+                  ? "fill"
+                  : "regular"
+              }
+              color={
+                profile_info?.wishlist?.includes(pginfo?._id)
+                  ? "#e0245e"
+                  : "#888"
+              }
               className="transition-all duration-300"
             />
           </button>
@@ -196,15 +218,19 @@ export default function DisplayCard({ item, number_of_stars, profile }: Props) {
               <button
                 className="bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded"
                 onClick={() => {
-                  router.push(
-                    `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
-                      clg_coords
-                    )}&clg_name=${encodeURIComponent(
-                      clg_name
-                    )}&clg_addr=${encodeURIComponent(
-                      clg_addr
-                    )}&clg_pin=${clg_pin}&clg_id=${clg_id}`
-                  );
+                  if (!isSearchByDist) {
+                    router.push(
+                      `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
+                        clg_coords
+                      )}&clg_name=${encodeURIComponent(
+                        clg_name
+                      )}&clg_addr=${encodeURIComponent(
+                        clg_addr
+                      )}&clg_pin=${clg_pin}&clg_id=${clg_id}`
+                    );
+                  } else {
+                    router?.push(`/pg/${pginfo?._id}`);
+                  }
                 }}
               >
                 View full details

@@ -26,7 +26,7 @@ export function middleware(req: NextRequest) {
   // 🧩 If no token and visiting protected or admin routes → redirect to login
   if (
     !authToken &&
-    ["/pg", "/profile", "/admin", "/thankyou"].some((route) => pathname.startsWith(route))
+    ["/profile", "/admin", "/thankyou"].some((route) => pathname.startsWith(route))
   ) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
@@ -78,7 +78,6 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: [
     "/",
-    "/pg/:path*",
     "/profile/:path*",
     "/login",
     "/signup",
