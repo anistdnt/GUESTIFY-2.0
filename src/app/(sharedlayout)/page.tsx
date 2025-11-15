@@ -4,6 +4,7 @@ import HowItWorks from "@/components/Landing/HowItWorks";
 import PopularSearches from "@/components/Landing/PopularSearches";
 import Statistics from "@/components/Landing/Statistics";
 import Testimonials from "@/components/Landing/Testimonials";
+import { Districts } from "@/components/Searchbar/Districts";
 import Searchbar from "@/components/Searchbar/Searchbar";
 
 export default function Home() {
@@ -22,6 +23,10 @@ export default function Home() {
             <p className="text-lg text-primaryText">
               Search by your college name to discover nearby accommodations
             </p>
+          </div>
+
+          <div>
+            <Districts/>
           </div>
 
           <div className="bg-gray-100 py-10">

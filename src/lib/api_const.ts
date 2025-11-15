@@ -28,7 +28,8 @@ export const API = {
             VIEW: "/booking/:id/details",
             CHANGE_STATUS: "/booking/:id/status",
             DELETE: "/booking",
-            CLOSE_PAYMENT_SESSION: "/booking/:id/payment/close"
+            CLOSE_PAYMENT_SESSION: "/booking/:id/payment/close",
+            CREATE_PAYMENT_SESSION: "/booking/:id/payment/create-session"
         }
     },
     COLLEGE: {
@@ -37,6 +38,7 @@ export const API = {
     },
     PG: {
         ALL : "/getAllpg",
+        ALL_BY_DIST : "/getAllPgByDistrict",
         GET_PG_BY_ID : "/getPg",
         ADD : "/addpg",
         DELETE : "/deletePG",
