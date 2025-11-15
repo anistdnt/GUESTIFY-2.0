@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import FadedImageSlider from "@/components/DisplayCard/FadedImageSlider";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { useDispatch } from "react-redux";
-import { formatDate } from "@/lib/utils/utilities" 
+import { formatDate, formatTTL } from "@/lib/utils/utilities" 
 
 type RoomDetails = {
   id: string;
@@ -34,6 +34,7 @@ type BookingItem = {
 export default function BookingPage() {
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [countdowns, setCountdowns] = useState<Record<string, number>>({});
   const params = useParams();
   const dispatch = useDispatch();
 
@@ -42,10 +43,19 @@ export default function BookingPage() {
     try {
       const response: ApiReturn<any> = await api_caller("GET", `${API.BOOKING.ROOMLIST}?page=1&show=10&filter=all&search=PG`);
       console.log(response, "response")
-      if (response.success) {
-        setBookings(response.data.bookings || []);
+      if (response?.success) {
+        setBookings(response?.data?.bookings || []);
+
+        const initial: Record<string, number> = {};
+        response?.data?.bookings?.forEach((b: BookingItem) => {
+          if (b.payment_ttl !== null) {
+            initial[b.booking_id] = b.payment_ttl;
+          }
+        });
+        setCountdowns(initial);
+
       } else {
-        toast.error(response.message || "Failed to load bookings");
+        toast.error(response?.message || "Failed to load bookings");
       }
     } catch (error) {
       toast.error("Unable to fetch bookings");
@@ -56,6 +66,20 @@ export default function BookingPage() {
 
   useEffect(() => {
     getBookings();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdowns((prev) => {
+        const updated: Record<string, number> = { ...prev };
+        Object.keys(updated).forEach((id) => {
+          if (updated[id] > 0) updated[id] -= 1;
+        });
+        return updated;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
@@ -168,7 +192,10 @@ export default function BookingPage() {
               </Link> */}
               <div className="flex justify-between">
                 {booking.payment_ttl !== null && (
-                  <button className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center">
+                  <button 
+                    data-tooltip={formatTTL(countdowns[booking.booking_id] || 0)}
+                    className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
+                  >
                     Make Payment
                   </button>
                 )}
