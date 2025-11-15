@@ -38,6 +38,7 @@ export const API = {
     },
     PG: {
         ALL : "/getAllpg",
+        ALL_BY_DIST : "/getAllPgByDistrict",
         GET_PG_BY_ID : "/getPg",
         ADD : "/addpg",
         DELETE : "/deletePG",
