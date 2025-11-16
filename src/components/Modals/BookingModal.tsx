@@ -235,6 +235,9 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
               {/* Fixed footer inside modal */}
               <div className="sticky bottom-0 left-0 right-0 bg-white border-t py-4 mt-2">
                 <div className="flex justify-end gap-4 px-6">
+                  <button type="button" className="bg-gray-200 px-3 py-2 text-sm font-semibold rounded-md" onClick={() => setshowModal(false)}>
+                    Cancel
+                  </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
