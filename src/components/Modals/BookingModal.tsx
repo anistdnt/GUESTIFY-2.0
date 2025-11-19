@@ -4,13 +4,13 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import * as Yup from "yup";
 import { BookingFormFields } from "../Booking/BookingFormFields";
 import { PersonCard } from "../Booking/PersonCard";
-import { Formik, Form, FieldArray } from "formik";
+import { Formik, Form, FieldArray, useFormikContext } from "formik";
 import { Calendar, ChatDots, Check, Clock, CreditCard, MapPin, Phone, Users } from "@phosphor-icons/react";
 
 type ModalType = {
@@ -74,9 +74,11 @@ const validationSchema = Yup.object().shape({
 function BookingModal({ setshowModal, modalData }: ModalType) {
   const dispatch = useDispatch();
   const router = useRouter();
+  const formikRef = useRef<any>(null);
   const targetId = modalData?.rowid;
   const [isSubmitting, setIsSubmitting] = useState(false);;
   const [previewData, setPreviewData] = useState(null);
+  const [personImages, setPersonImages] = useState<string[]>([]);
 
   const initialValues = {
     room_id: modalData?.room_id,
@@ -139,12 +141,32 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
     }
   };
 
+  async function handleCloseModal() {
+    setshowModal(false);
+    try {
+      const values = formikRef.current?.values;
+      const publicIdsForImages = values.persons.filter((person: any) => person?.image_id !== "").map((person: any) => person.image_id);
+      const publicIdsForIdentityImages = values.persons.filter((person: any) => person?.identity_image_id !== "").map((person: any) => person.identity_image_id);
+      const payload = {
+        public_ids: [...publicIdsForImages, ...publicIdsForIdentityImages],
+      }
+      if(payload.public_ids.length > 0) {
+        const resData : ApiReturn<any> = await api_caller<any,typeof payload>("DELETE", API.IMAGE.MULTIDELETE, payload);
+        if(!resData.success) {
+          console.error("Error deleting images on modal close: ", resData.message);
+        }
+      }
+     } catch (error) {
+      console.error("Error closing modal:", error);
+    }
+  }
+
 
 
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50"
-      onClick={() => setshowModal(false)}
+      onClick={async () => await handleCloseModal()}
     >
       <div
         className="relative flex flex-col bg-white p-6 mx-2 rounded-md shadow-lg w-3/4 h-5/6"
@@ -155,18 +177,20 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
           <h3 className="text-xl font-medium">
             {modalData?.caption ?? "Booking Modal"} ({modalData?.title || ''})
           </h3>
-          <button onClick={() => setshowModal(false)}>
+          <button onClick={async () => await handleCloseModal()}>
             <X size={20} />
           </button>
         </div>
         <hr />
 
         <Formik
+          innerRef={formikRef}
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values }) => (
+          {({ values }) => {
+            return (
 
             <Form className="flex flex-col h-[95%]">
               {/* Scrollable content area */}
@@ -235,7 +259,7 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
               {/* Fixed footer inside modal */}
               <div className="sticky bottom-0 left-0 right-0 bg-white border-t py-4 mt-2">
                 <div className="flex justify-end gap-4 px-6">
-                  <button type="button" className="bg-gray-200 px-3 py-2 text-sm font-semibold rounded-md" onClick={() => setshowModal(false)}>
+                  <button type="button" className="bg-gray-200 px-3 py-2 text-sm font-semibold rounded-md" onClick={async () => await handleCloseModal()}>
                     Cancel
                   </button>
                   <button
@@ -248,7 +272,7 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
                 </div>
               </div>
             </Form>
-          )}
+          )}}
         </Formik>
 
         {previewData && (

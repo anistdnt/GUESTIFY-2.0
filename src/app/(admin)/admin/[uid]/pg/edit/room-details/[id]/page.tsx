@@ -85,8 +85,23 @@ export default function RoomDetailsEdit() {
         onSubmit={handleSubmit}
       >
         {({ dirty, errors, values }) => {
-          console.log("Formik errors:", errors);
-          console.log("Formik values:", values);
+          async function handleClose() {
+            router.back();
+            try {
+              const publicIdsForRoomImages = values.rooms.flatMap((room: any) => room.room_images.filter((image: any) => image?.room_image_id !== "").map((image: any) => image?.room_image_id))
+              const payload = {
+                public_ids: publicIdsForRoomImages,
+              }
+              if (payload.public_ids.length > 0) {
+                const resData: ApiReturn<any> = await api_caller<any, typeof payload>("DELETE", API.IMAGE.MULTIDELETE, payload);
+                if (!resData.success) {
+                  console.error("Error deleting images on modal close: ", resData.message);
+                }
+              }
+            } catch (error) {
+              console.error("Error closing modal:", error);
+            }
+          }
           return(
           <Form>
             <RoomForm hasAddBtn={false} caption="Update Room Details" />
@@ -105,8 +120,8 @@ export default function RoomDetailsEdit() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    router.back();
+                  onClick={async () => {
+                    await handleClose();
                   }}
                   className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
                 >
