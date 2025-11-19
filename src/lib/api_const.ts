@@ -70,7 +70,8 @@ export const API = {
     },
     IMAGE: {
         UPLOAD: "/uploadImage",
-        DELETE: "/deleteImage"
+        DELETE: "/deleteImage",
+        MULTIDELETE: "/deleteMultipleImages"
     },
     WISHLIST: {
         ADD: "/wishlist/add",

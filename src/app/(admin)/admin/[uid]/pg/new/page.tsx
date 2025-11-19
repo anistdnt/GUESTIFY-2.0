@@ -179,6 +179,7 @@ export default function PGFormWrapper() {
               { label: "Room Details", content: <RoomForm /> },
             ]}
             helpers={{
+              values: values,
               validateForm: validateForm,
               errors: errors,
               touched: touched,

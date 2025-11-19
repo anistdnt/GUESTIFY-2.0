@@ -1,4 +1,6 @@
 "use client";
+import { api_caller, ApiReturn } from "@/lib/api_caller";
+import { API } from "@/lib/api_const";
 import { RootState } from "@/redux/store";
 import { Check } from "@phosphor-icons/react/dist/ssr";
 import { Form, getIn, setIn } from "formik";
@@ -86,6 +88,25 @@ export default function Stepper({ steps, helpers }: StepperProps) {
     }
   };
 
+  async function handleClose() {
+    router.push(`/profile/${reduxUserData?.userData?._id}/mypg`);
+    try {
+      const publicIdsForPgImages = helpers?.values.pg_images.filter((image: any) => image?.pg_image_id !== "").map((image: any) => image?.pg_image_id);
+      const publicIdsForRoomImages = helpers?.values.rooms.flatMap((room: any) => room.room_images.filter((image: any) => image?.room_image_id !== "").map((image: any) => image?.room_image_id))
+      const payload = {
+        public_ids: [...publicIdsForPgImages, ...publicIdsForRoomImages],
+      }
+      if (payload.public_ids.length > 0) {
+        const resData: ApiReturn<any> = await api_caller<any, typeof payload>("DELETE", API.IMAGE.MULTIDELETE, payload);
+        if (!resData.success) {
+          console.error("Error deleting images on modal close: ", resData.message);
+        }
+      }
+    } catch (error) {
+      console.error("Error closing modal:", error);
+    }
+  }
+
   useEffect(() => {
     window?.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentStep]);
@@ -159,8 +180,15 @@ export default function Stepper({ steps, helpers }: StepperProps) {
           </button>
         )}
 
-        {!isLast ? (
           <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={async () => await handleClose()}
+              className="ml-auto bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+            >
+              Cancel
+            </button>
+            {!isLast ? (
             <button
               type="button"
               onClick={() => {
@@ -177,16 +205,6 @@ export default function Stepper({ steps, helpers }: StepperProps) {
             >
               Next
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                router.push(`/profile/${reduxUserData?.userData?._id}/mypg`);
-              }}
-              className="ml-auto bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
-            >
-              Cancel
-            </button>
-          </div>
         ) : (
           <button
             type="submit"
@@ -198,6 +216,7 @@ export default function Stepper({ steps, helpers }: StepperProps) {
             Submit
           </button>
         )}
+        </div>
       </div>
     </div>
   );
