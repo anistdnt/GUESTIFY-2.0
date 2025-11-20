@@ -88,7 +88,8 @@ export default function RoomDetailsEdit() {
           async function handleClose() {
             router.back();
             try {
-              const publicIdsForRoomImages = values.rooms.flatMap((room: any) => room.room_images.filter((image: any) => image?.room_image_id !== "").map((image: any) => image?.room_image_id))
+              const prevImageIds: string[] = initialFieldData.rooms.flatMap((room: any) => room.room_images.map((image: any) => image?.room_image_id));
+              const publicIdsForRoomImages = values.rooms.flatMap((room: any) => room.room_images.filter((image: any) => image?.room_image_id !== "" && !prevImageIds.includes(image?.room_image_id)).map((image: any) => image?.room_image_id))
               const payload = {
                 public_ids: publicIdsForRoomImages,
               }

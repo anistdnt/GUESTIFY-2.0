@@ -76,7 +76,8 @@ export default function BasicDetailsEdit() {
           async function handleClose() {
             router.back();
             try {
-              const publicIdsForPgImages = values.pg_images.filter((image: any) => image?.pg_image_id !== "").map((image: any) => image?.pg_image_id);
+              const prevImageIds:string[] = initialFieldData?.pg_images?.map((img: any) => img?.pg_image_id) || [];
+              const publicIdsForPgImages = values.pg_images.filter((image: any) => image?.pg_image_id !== "" && !prevImageIds.includes(image.pg_image_id)).map((image: any) => image?.pg_image_id);
               const payload = {
                 public_ids: publicIdsForPgImages,
               }
