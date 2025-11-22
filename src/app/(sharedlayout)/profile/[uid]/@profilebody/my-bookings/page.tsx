@@ -8,6 +8,9 @@ import { Calendar, CurrencyInr, UsersThree } from "@phosphor-icons/react/dist/ss
 import Link from "next/link";
 import toast from "react-hot-toast";
 import FadedImageSlider from "@/components/DisplayCard/FadedImageSlider";
+import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { useDispatch } from "react-redux";
+import { formatDate, formatTTL } from "@/lib/utils/utilities" 
 
 type RoomDetails = {
   id: string;
@@ -25,21 +28,34 @@ type BookingItem = {
   pg_name: string;
   status_timestamp: string | null;
   room_details: RoomDetails;
+  payment_ttl: number | null;
 };
 
 export default function BookingPage() {
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [countdowns, setCountdowns] = useState<Record<string, number>>({});
   const params = useParams();
+  const dispatch = useDispatch();
 
   // Fetch booking details
   const getBookings = async () => {
     try {
       const response: ApiReturn<any> = await api_caller("GET", `${API.BOOKING.ROOMLIST}?page=1&show=10&filter=all&search=PG`);
-      if (response.success) {
-        setBookings(response.data.bookings || []);
+      console.log(response, "response")
+      if (response?.success) {
+        setBookings(response?.data?.bookings || []);
+
+        const initial: Record<string, number> = {};
+        response?.data?.bookings?.forEach((b: BookingItem) => {
+          if (b.payment_ttl !== null) {
+            initial[b.booking_id] = b.payment_ttl;
+          }
+        });
+        setCountdowns(initial);
+
       } else {
-        toast.error(response.message || "Failed to load bookings");
+        toast.error(response?.message || "Failed to load bookings");
       }
     } catch (error) {
       toast.error("Unable to fetch bookings");
@@ -50,6 +66,20 @@ export default function BookingPage() {
 
   useEffect(() => {
     getBookings();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdowns((prev) => {
+        const updated: Record<string, number> = { ...prev };
+        Object.keys(updated).forEach((id) => {
+          if (updated[id] > 0) updated[id] -= 1;
+        });
+        return updated;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
@@ -93,27 +123,28 @@ export default function BookingPage() {
                   pg_image_id: img.room_image_id,
                 }))}
               />
-              <span
-                className={`absolute top-2 right-2 text-xs px-2 py-1 rounded text-white ${
-                  booking.status === "pending"
-                    ? "bg-yellow-500"
-                    : booking.status === "confirmed"
-                    ? "bg-green-500"
-                    : booking.status === "cancelled"
-                    ? "bg-red-500"
-                    : "bg-gray-500"
-                }`}
-              >
-                {booking.status.charAt(0).toUpperCase() +
-                  booking.status.slice(1)}
-              </span>
             </div>
 
             {/* Info */}
             <div className="mt-4 flex flex-col flex-1">
-              <h4 className="font-bold text-lg text-gray-900">
-                {booking.pg_name}
-              </h4>
+              <div className="flex justify-between">
+                <h4 className="font-bold text-lg text-gray-900">{booking.pg_name}</h4>
+                <div
+                  data-tooltip={`Booked on ${formatDate(booking?.booking_date)}`}
+                  className={`text-xs p-1 rounded text-white ${
+                    booking.status === "pending"
+                      ? "bg-yellow-500"
+                      : booking.status === "accepted"
+                      ? "bg-green-500"
+                      : booking.status === "cancelled"
+                      ? "bg-red-500"
+                      : "bg-gray-500"
+                  }`}
+                >
+                  {booking.status.charAt(0).toUpperCase() +
+                    booking.status.slice(1)}
+                </div>
+              </div>
 
               {/* Booking Details */}
               <div className="mt-3 text-sm text-gray-700 space-y-1">
@@ -153,12 +184,43 @@ export default function BookingPage() {
                 </p>
               </div>
 
-              <Link
+              {/* <Link
                 href={`/booking/${booking.booking_id}`}
                 className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
               >
                 View Details
-              </Link>
+              </Link> */}
+              <div className="flex justify-between">
+                {booking.payment_ttl !== null && (
+                  <button 
+                    data-tooltip={formatTTL(countdowns[booking.booking_id] || 0)}
+                    className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
+                  >
+                    Make Payment
+                  </button>
+                )}
+                <button
+                  data-tooltip="View Booking Details"
+                  className={`mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center ${
+                    booking?.payment_ttl ? "" : "w-full"
+                  }`}
+                  onClick={() => {
+                    dispatch(
+                      setModalVisibility({
+                        open: true,
+                        type: "viewbooking",
+                        modalData: {
+                          caption: "View Booking",
+                          booking_id: booking.booking_id,
+                          room_id: booking.room_details.id,
+                        },
+                      })
+                    );
+                  }}
+                >
+                  <span>View Details</span>
+                </button>
+              </div>
             </div>
           </div>
         ))}

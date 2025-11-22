@@ -70,7 +70,8 @@ export const API = {
     },
     IMAGE: {
         UPLOAD: "/uploadImage",
-        DELETE: "/deleteImage"
+        DELETE: "/deleteImage",
+        MULTIDELETE: "/deleteMultipleImages"
     },
     WISHLIST: {
         ADD: "/wishlist/add",
@@ -80,5 +81,9 @@ export const API = {
     BOOKING: {
         VIEW: "/booking/:id/details",
         ROOMLIST: "/booking/roomlist"
+    },
+    CHECKOUT: {
+        CREATE_SESSION: "/create-checkout-session",
+        CHECKOUT_INFO: "/api/get-checkout-info"
     }
 }

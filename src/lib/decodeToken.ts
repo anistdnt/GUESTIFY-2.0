@@ -77,6 +77,7 @@ export function shouldSkipAuthCheck(url: string): boolean {
     API.REVIEW.GET_REVIWS_OF_PG,
     API.REVIEW.ADD_REVIEW,
     API.OWNER.GET_OWNER_BY_ID,
+    API.CHECKOUT.CHECKOUT_INFO,
   ];
   return exemptedUrls.some(exempted => url.includes(exempted));
 }

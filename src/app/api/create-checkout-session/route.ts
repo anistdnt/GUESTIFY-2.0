@@ -25,7 +25,7 @@ export async function POST(req: Request) {
                 },
                 quantity: item.quantity,
             })),
-            success_url: `http://localhost:3001/thankyou?lat=${location.latitude}&long=${location.longitude}`,
+            success_url: `http://localhost:3001/thankyou?session_id={CHECKOUT_SESSION_ID}&lat=${location.latitude}&long=${location.longitude}`,
             cancel_url: `http://localhost:3001/profile/${user_id}/my-bookings`,
         });
 

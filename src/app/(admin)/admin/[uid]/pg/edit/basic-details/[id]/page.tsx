@@ -72,7 +72,26 @@ export default function BasicDetailsEdit() {
         enableReinitialize={true}
         onSubmit={handleSubmit}
       >
-        {({ dirty, errors, values }) => (
+        {({ dirty, errors, values }) => {
+          async function handleClose() {
+            router.back();
+            try {
+              const prevImageIds:string[] = initialFieldData?.pg_images?.map((img: any) => img?.pg_image_id) || [];
+              const publicIdsForPgImages = values.pg_images.filter((image: any) => image?.pg_image_id !== "" && !prevImageIds.includes(image.pg_image_id)).map((image: any) => image?.pg_image_id);
+              const payload = {
+                public_ids: publicIdsForPgImages,
+              }
+              if (payload.public_ids.length > 0) {
+                const resData: ApiReturn<any> = await api_caller<any, typeof payload>("DELETE", API.IMAGE.MULTIDELETE, payload);
+                if (!resData.success) {
+                  console.error("Error deleting images on modal close: ", resData.message);
+                }
+              }
+            } catch (error) {
+              console.error("Error closing modal:", error);
+            }
+          }
+          return (
           <Form>
             <PGForm
               caption="Update Basic Details"
@@ -91,8 +110,8 @@ export default function BasicDetailsEdit() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  router.back();
+                onClick={async () => {
+                  await handleClose()
                 }}
                 className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
               >
@@ -100,7 +119,7 @@ export default function BasicDetailsEdit() {
               </button>
             </div>
           </Form>
-        )
+        )}
         }
       </Formik>
     </div>

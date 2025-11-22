@@ -43,3 +43,12 @@ export function formatSeconds(seconds: number): string {
 
   return parts.join(" ");
 }
+
+
+export function formatTTL(seconds: number) {
+  if (!seconds || seconds <= 0) return "Expired";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return `${h}h ${m}m ${s}s remaining`;
+};
