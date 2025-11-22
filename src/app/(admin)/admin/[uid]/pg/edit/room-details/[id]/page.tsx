@@ -1,5 +1,6 @@
 "use client";
 import RoomForm from "@/components/Forms/RoomForm";
+import RoomFormSkeleton from "@/components/FormSkeletons/RoomFormSkeleton";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { base64ToFile } from "@/lib/imageConvert";
@@ -22,6 +23,7 @@ export default function RoomDetailsEdit() {
   const [initialFieldData, setInitialFieldData] = useState(
     Only_RoomValidationSchema?.initials
   );
+  const [formloading, setFormLoading] = useState<boolean>(false);
 
   const reduxUserData = useSelector(
     (state: RootState) => state.user_slice.userData
@@ -35,16 +37,24 @@ export default function RoomDetailsEdit() {
 
   useEffect(() => {
     const fetchInformation = async () => {
-      const res: ApiReturn<any> = await api_caller<any>(
-        "GET",
-        `${API.ROOM.GET_ROOM_BY_ID}/${paying_guestID}/room-details`
-      );
-      if (res.success) {
-        setInitialFieldData({
-          rooms: res?.data,
-        });
-      } else {
-        toast.error(`${res.message} : ${res.error}`);
+      try {
+        setFormLoading(true);
+        const res: ApiReturn<any> = await api_caller<any>(
+          "GET",
+          `${API.ROOM.GET_ROOM_BY_ID}/${paying_guestID}/room-details`
+        );
+        if (res.success) {
+          setInitialFieldData({
+            rooms: res?.data,
+          });
+        } else {
+          throw new Error(`${res.message} : ${res.error}`);
+        }
+      } catch (error) {
+        console.error(error.message);
+        toast.error(error.message);
+      } finally {
+        setFormLoading(false);
       }
     };
     fetchInformation();
@@ -66,7 +76,7 @@ export default function RoomDetailsEdit() {
     );
     if (res.success) {
       dispatch(setLoading({ loading: false }));
-      router?.push(`/profile/${reduxUserData?._id}/mypg`);
+      router?.back();
       toast.success(res.message || "Save In successfully");
     } else {
       dispatch(setLoading({ loading: false }));
@@ -78,68 +88,95 @@ export default function RoomDetailsEdit() {
 
   return (
     <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
-      <Formik
-        initialValues={initialFieldData}
-        validationSchema={Only_RoomValidationSchema?.validation}
-        enableReinitialize={true}
-        onSubmit={handleSubmit}
-      >
-        {({ dirty, errors, values }) => {
-          async function handleClose() {
-            router.back();
-            try {
-              const prevImageIds: string[] = initialFieldData.rooms.flatMap((room: any) => room.room_images.map((image: any) => image?.room_image_id));
-              const publicIdsForRoomImages = values.rooms.flatMap((room: any) => room.room_images.filter((image: any) => image?.room_image_id !== "" && !prevImageIds.includes(image?.room_image_id)).map((image: any) => image?.room_image_id))
-              const payload = {
-                public_ids: publicIdsForRoomImages,
-              }
-              if (payload.public_ids.length > 0) {
-                const resData: ApiReturn<any> = await api_caller<any, typeof payload>("DELETE", API.IMAGE.MULTIDELETE, payload);
-                if (!resData.success) {
-                  console.error("Error deleting images on modal close: ", resData.message);
+      {formloading ? (
+        <RoomFormSkeleton />
+      ) : (
+        <Formik
+          initialValues={initialFieldData}
+          validationSchema={Only_RoomValidationSchema?.validation}
+          enableReinitialize={true}
+          onSubmit={handleSubmit}
+        >
+          {({ dirty, errors, values }) => {
+            async function handleClose() {
+              router.back();
+              try {
+                const prevImageIds: string[] = initialFieldData.rooms.flatMap(
+                  (room: any) =>
+                    room.room_images.map((image: any) => image?.room_image_id)
+                );
+                const publicIdsForRoomImages = values.rooms.flatMap(
+                  (room: any) =>
+                    room.room_images
+                      .filter(
+                        (image: any) =>
+                          image?.room_image_id !== "" &&
+                          !prevImageIds.includes(image?.room_image_id)
+                      )
+                      .map((image: any) => image?.room_image_id)
+                );
+                const payload = {
+                  public_ids: publicIdsForRoomImages,
+                };
+                if (payload.public_ids.length > 0) {
+                  const resData: ApiReturn<any> = await api_caller<
+                    any,
+                    typeof payload
+                  >("DELETE", API.IMAGE.MULTIDELETE, payload);
+                  if (!resData.success) {
+                    console.error(
+                      "Error deleting images on modal close: ",
+                      resData.message
+                    );
+                  }
                 }
+              } catch (error) {
+                console.error("Error closing modal:", error);
               }
-            } catch (error) {
-              console.error("Error closing modal:", error);
             }
-          }
-          return(
-          <Form>
-            <RoomForm hasAddBtn={false} caption="Update Room Details" />
-            <div className="flex justify-between w-full items-center">
-              <div className="flex items-center gap-4">
-                <button
-                  type="submit"
-                  disabled={!dirty} // ✅ disables if nothing changed
-                  className={`px-6 py-2 rounded transition ${
-                    dirty
-                      ? "bg-yellow-600 hover:bg-yellow-700 text-white"
-                      : "bg-gray-400 cursor-not-allowed text-white"
-                  }`}
-                >
-                  Update Details
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await handleClose();
-                  }}
-                  className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
-                >
-                  Cancel
-                </button>
-              </div>
-              <button
-                type="button"
-                className="px-6 py-2 rounded transition bg-buttonsSecondary hover:bg-buttonsHover text-white"
-                onClick={() => router.push(`/admin/${params?.uid}/pg/${paying_guestID}/add-room`)}
-              >
-                Enlist New Rooms
-              </button>
-            </div>
-          </Form>
-        )}}
-      </Formik>
+            return (
+              <Form>
+                <RoomForm hasAddBtn={false} caption="Update Room Details" />
+                <div className="flex justify-between w-full items-center">
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="submit"
+                      disabled={!dirty} // ✅ disables if nothing changed
+                      className={`px-6 py-2 rounded transition ${
+                        dirty
+                          ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                          : "bg-gray-400 cursor-not-allowed text-white"
+                      }`}
+                    >
+                      Update Details
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await handleClose();
+                      }}
+                      className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="px-6 py-2 rounded transition bg-buttonsSecondary hover:bg-buttonsHover text-white"
+                    onClick={() =>
+                      router.push(
+                        `/admin/${params?.uid}/pg/${paying_guestID}/add-room`
+                      )
+                    }
+                  >
+                    Enlist New Rooms
+                  </button>
+                </div>
+              </Form>
+            );
+          }}
+        </Formik>
+      )}
     </div>
   );
 }

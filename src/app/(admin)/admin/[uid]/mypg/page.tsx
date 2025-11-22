@@ -13,47 +13,11 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 
-function MyPGHeader() {
-  const [boxes, setboxes] = useState<{ label: string; value: number }[]>([
-    { label: "Total Paying Guest Enlisted", value: 0 },
-    { label: "Occupied Rooms", value: 0 },
-    { label: "Vacant Rooms", value: 0 },
-    { label: "Average Rating", value: 0 },
-  ]);
-  return (
-    <div className="mb-8">
-      <div>
-        <h1 className="text-gray-500">
-          <span className="text-gray-500 text-2xl">Manage Your</span> <br />
-          <span className="text-4xl font-semibold text-gray-700">
-            <span className="text-yellow-700">Paying Guest</span> Properties
-          </span>
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Manage all your listed Paying Guest properties here — <br />
-          update details, monitor occupancy, and keep your PGs performing at
-          their best.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
-        {boxes.map((box, idx) => (
-          <div
-            key={idx}
-            className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center"
-          >
-            <p className="text-gray-500 text-sm">{box.label}</p>
-            <p className="text-5xl font-bold">{box.value}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 const Page = () => {
   const [loading, setloading] = useState<boolean>(false);
+  const [statloading, setStatLoading] = useState<boolean>(false);
   const [cards, setCards] = useState<any>(null);
+  const [statBox, setStatBox] = useState<any>({});
   const router = useRouter();
   const param = useParams();
   const dispatch = useDispatch();
@@ -63,6 +27,33 @@ const Page = () => {
 
   function handleRoute() {
     router.push(`/admin/${param?.uid}/pg/new`);
+  }
+
+  function MyPGHeader({ stats }: { stats: any }) {
+    const boxes: {
+      label: string;
+      value: number;
+    }[] = [
+      { label: "Total Paying Guest Enlisted", value: stats?.total_pg || 0 },
+      { label: "Occupied Rooms", value: stats?.total_rooms?.occupied || 0 },
+      { label: "Vacant Rooms", value: Number(stats?.total_rooms?.count - stats?.total_rooms?.occupied) || 0 },
+      { label: "Total Reviews", value: stats?.total_reviews || 0 },
+    ];
+    return (
+      <div className="mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+          {boxes.map((box, idx) => (
+            <div
+              key={idx}
+              className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center"
+            >
+              <p className="text-gray-500 text-sm">{box.label}</p>
+              <p className="text-5xl font-bold">{box.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   useEffect(() => {
@@ -85,28 +76,55 @@ const Page = () => {
       setloading(false);
     };
 
+    const fetchPgs_Stats = async () => {
+      setStatLoading(true);
+      const res: ApiReturn<any> = await api_caller<any>(
+        "GET",
+        `${API.PG.GET_PG_STATS?.replace(":uid", param?.uid as string)}`
+      );
+      if (res.success) {
+        setStatBox(res?.data);
+      } else {
+        toast.error(`${res.message} : ${res.error}`);
+        setStatBox({});
+      }
+      setStatLoading(false);
+    };
+
     fetchPgs_ByUser();
+    fetchPgs_Stats();
     dispatch(deleteSuccess(false));
   }, [isDeleted]);
 
-  if (loading) {
-    return <CardSkeleton no_of_card={2} />;
-  } else if (cards?.length === 0 && !loading) {
-    return (
-      <>
-        <div>
-          <h1 className="text-gray-500">
-            <span className="text-gray-500 text-2xl">Manage Your</span> <br />
-            <span className="text-4xl font-semibold text-gray-700">
-              <span className="text-yellow-700">Paying Guest</span> Properties
-            </span>
-          </h1>
-          <p className="text-gray-500 mt-2">
-            Manage all your listed Paying Guest properties here — <br />
-            update details, monitor occupancy, and keep your PGs performing at
-            their best.
-          </p>
+  return (
+    <div className="p-6">
+      <div>
+        <h1 className="text-gray-500">
+          <span className="text-gray-500 text-2xl">Manage Your</span> <br />
+          <span className="text-4xl font-semibold text-gray-700">
+            <span className="text-yellow-700">Paying Guest</span> Properties
+          </span>
+        </h1>
+        <p className="text-gray-500 mt-2">
+          Manage all your listed Paying Guest properties here — <br />
+          update details, monitor occupancy, and keep your PGs performing at
+          their best.
+        </p>
+      </div>
+      {statloading ? (
+        <div className="animate-pulse space-y-6 mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-32 rounded-2xl bg-gray-300"></div>
+            ))}
+          </div>
         </div>
+      ) : (
+        <MyPGHeader stats={statBox} />
+      )}
+      {loading ? (
+        <CardSkeleton no_of_card={2} />
+      ) : cards?.length === 0 ? (
         <div className="w-full py-10">
           <NoDataFound
             text="No Paying Guest House Found"
@@ -116,17 +134,11 @@ const Page = () => {
             }}
           />
         </div>
-      </>
-    );
-  } else {
-    return (
-      <div className="p-6">
-        <MyPGHeader />
+      ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 justify-items-center">
           {cards?.map((item: any, index: number) => (
             <div key={index}>
               <ProfilePGCard item={item} />
-              {/* <DisplayCard item={item} number_of_stars={5} /> */}
             </div>
           ))}
 
@@ -144,9 +156,9 @@ const Page = () => {
             </div>
           </button>
         </div>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
 };
 
 export default Page;

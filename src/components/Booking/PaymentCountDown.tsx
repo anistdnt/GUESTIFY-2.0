@@ -41,13 +41,20 @@ export default function PaymentCountdown({ ttl }: PaymentCountdownProps) {
   };
 
   return (
-    <span className="flex items-center">
-      <Info size={16} className="inline mr-1" weight="fill" color={secondsLeft > 0 ? '#a16207' : '#de0d0d'} />
-      <span className={secondsLeft > 0 ? "text-yellow-700" : "text-red-600"}>
-        {secondsLeft > 0
-          ? `Payment expires in : ${format(secondsLeft)}`
-          : "Payment Expired"}
+    <div className={`border border-1 rounded-md ${secondsLeft > 0 ? "border-yellow-700" : "border-red-600"} text-sm px-2 py-1 font-medium`}>
+      <span className="flex items-center">
+        <Info
+          size={16}
+          className="inline mr-1"
+          weight="fill"
+          color={secondsLeft > 0 ? "#a16207" : "#de0d0d"}
+        />
+        <span className={secondsLeft > 0 ? "text-yellow-700" : "text-red-600"}>
+          {secondsLeft > 0
+            ? `Payment expires in : ${format(secondsLeft)}`
+            : "Session Expired"}
+        </span>
       </span>
-    </span>
+    </div>
   );
 }

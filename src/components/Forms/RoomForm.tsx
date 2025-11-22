@@ -137,7 +137,7 @@ export default function RoomForm({
             {values.rooms.map((room, index) => (
               <div
                 key={index}
-                className="bg-white p-6 rounded-lg shadow-md mb-8 relative"
+                className="bg-white p-6 rounded-lg shadow-[0_0_10px_0_rgba(0,0,0,0.12)] mb-8 relative"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   {/* Room Type */}

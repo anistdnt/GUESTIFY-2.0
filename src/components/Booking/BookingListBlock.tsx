@@ -329,9 +329,7 @@ export default function BookingListBlock({
                 </div>
               )}
               {b.payment_ttl !== null && (
-                <div className="border border-1 rounded-md border-yellow-700 text-yellow-700 text-sm px-2 py-1 font-medium">
-                  <PaymentCountdown ttl={b.payment_ttl} />
-                </div>
+                <PaymentCountdown ttl={b.payment_ttl} />
               )}
               <button
                 onClick={() => handleRevolke(b.id)}
@@ -426,20 +424,24 @@ export default function BookingListBlock({
                 )}
 
                 <div
-                  className="block px-4 py-2 text-xs text-red-600 hover:bg-gray-100 cursor-pointer"
+                  className={`block px-4 py-2 text-xs text-red-600 hover:bg-gray-100 ${
+                    b?.status === "accepted" ? "cursor-not-allowed text-red-400" : "cursor-pointer"
+                  }`}
                   onClick={() => {
-                    dispatch(
-                      setModalVisibility({
-                        open: true,
-                        type: "deletePG",
-                        modalData: {
-                          caption: "Delete Booking",
-                          placeholder: "this Booking Ticket",
-                          rowid: b.id,
-                          target: "booking",
-                        },
-                      })
-                    );
+                    if (b?.status !== "accepted") {
+                      dispatch(
+                        setModalVisibility({
+                          open: true,
+                          type: "deletePG",
+                          modalData: {
+                            caption: "Delete Booking",
+                            placeholder: "this Booking Ticket",
+                            rowid: b.id,
+                            target: "booking",
+                          },
+                        })
+                      );
+                    }
                   }}
                 >
                   Delete Booking
