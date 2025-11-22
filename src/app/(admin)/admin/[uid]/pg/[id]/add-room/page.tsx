@@ -23,12 +23,11 @@ export default function AddRoomsForm() {
   const router = useRouter();
 
   const handleSubmit = async (values: any) => {
+    // console.log(values);
     try {
       dispatch(setLoading({ loading: true }));
 
-      const payload = {
-        rooms : {...values.rooms, room_rent: Number(values?.rooms?.room_rent) || null },
-      }
+      const payload = values;
 
       const res: ApiReturn<any> = await api_caller<any>(
         "POST",
