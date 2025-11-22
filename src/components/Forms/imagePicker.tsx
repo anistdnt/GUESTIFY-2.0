@@ -66,7 +66,7 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
         if(single && imageKey === "identity_image" && values?.identity_image){
             setImages([{ url: values.identity_image, public_id: values.identity_image_id }]);
         }
-    }, [values?.pg_images, imageKey, room?.room_images, values.image]);
+    }, [values?.pg_images, imageKey, room?.room_images, values?.image]);
 
     // Upload function (✅ fixed: skip adding temp preview if editing)
     const uploadImage = async (file: File, isEditing = false) => {
