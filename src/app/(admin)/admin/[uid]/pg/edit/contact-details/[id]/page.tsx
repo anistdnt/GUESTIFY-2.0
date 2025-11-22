@@ -1,5 +1,6 @@
 "use client";
 import ContactDetails from "@/components/Forms/ContactDetails";
+import ContactDetailsFormSkeleton from "@/components/FormSkeletons/ContactDetailsFormSkeleton";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { base64ToFile } from "@/lib/imageConvert";
@@ -18,6 +19,7 @@ export default function BasicDetailsEdit() {
   const [initialFieldData, setInitialFieldData] = useState(
     OnlyContact_ValidationSchema?.initials
   );
+  const [formloading, setFormloading] = useState<boolean>(false);
   const reduxUserData = useSelector(
     (state: RootState) => state.user_slice.userData
   );
@@ -29,23 +31,29 @@ export default function BasicDetailsEdit() {
 
   useEffect(() => {
     const fetchInformation = async () => {
-      const res: ApiReturn<any> = await api_caller<any>(
-        "GET",
-        `${API.OWNER.GET_OWNER_BY_ID}/${paying_guestID}`
-      );
-      if (res.success) {
-        setInitialFieldData({
-          contact_details: res?.data
-        });
-      } else {
-        toast.error(`${res.message} : ${res.error}`);
+      try {
+        setFormloading(true);
+        const res: ApiReturn<any> = await api_caller<any>(
+          "GET",
+          `${API.OWNER.GET_OWNER_BY_ID}/${paying_guestID}`
+        );
+        if (res.success) {
+          setInitialFieldData({
+            contact_details: res?.data,
+          });
+        } else {
+          throw new Error(`${res.message} : ${res.error}`);
+        }
+      } catch (error) {
+        toast?.error(error.message);
+      } finally {
+        setFormloading(false);
       }
     };
     fetchInformation();
   }, []);
 
   const handleSubmit = async (values: any) => {
-
     if (!reduxAuthVerification?.isPhoneVerified) {
       toast.error("Please verify your phone number before proceeding.");
       return;
@@ -64,8 +72,9 @@ export default function BasicDetailsEdit() {
       is_phone_verified: reduxAuthVerification?.isPhoneVerified ? true : false,
       is_email_verified: reduxAuthVerification?.isEmailVerified ? true : false,
       image_url: reduxUserData?.image_url || "",
-      owner_name: `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || ""
-    }
+      owner_name:
+        `${reduxUserData?.first_name} ${reduxUserData?.last_name}` || "",
+    };
 
     dispatch(setLoading({ loading: true }));
 
@@ -88,39 +97,44 @@ export default function BasicDetailsEdit() {
 
   return (
     <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
-      <Formik
-        initialValues={initialFieldData}
-        validationSchema={OnlyContact_ValidationSchema?.validation}
-        enableReinitialize={true}
-        onSubmit={handleSubmit}
-      >
-        {({ dirty }) => (
-          <Form>
-            <ContactDetails caption="Update Contact Details" />
-            <div className="flex items-center gap-4">
-              <button
-                type="submit"
-                disabled={!dirty} // ✅ disables if nothing changed
-                className={`mt-5 px-6 py-2 rounded transition ${dirty
-                    ? "bg-yellow-600 hover:bg-yellow-700 text-white"
-                    : "bg-gray-400 cursor-not-allowed text-white"
+      {formloading ? (
+        <ContactDetailsFormSkeleton />
+      ) : (
+        <Formik
+          initialValues={initialFieldData}
+          validationSchema={OnlyContact_ValidationSchema?.validation}
+          enableReinitialize={true}
+          onSubmit={handleSubmit}
+        >
+          {({ dirty }) => (
+            <Form>
+              <ContactDetails caption="Update Contact Details" />
+              <div className="flex items-center gap-4">
+                <button
+                  type="submit"
+                  disabled={!dirty} // ✅ disables if nothing changed
+                  className={`mt-5 px-6 py-2 rounded transition ${
+                    dirty
+                      ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                      : "bg-gray-400 cursor-not-allowed text-white"
                   }`}
-              >
-                Update Details
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  router.back();
-                }}
-                className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition mt-5"
-              >
-                Cancel
-              </button>
-            </div>
-          </Form>
-        )}
-      </Formik>
+                >
+                  Update Details
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    router.back();
+                  }}
+                  className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition mt-5"
+                >
+                  Cancel
+                </button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      )}
     </div>
   );
 }

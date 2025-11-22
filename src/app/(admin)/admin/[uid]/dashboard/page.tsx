@@ -36,11 +36,9 @@ const SkeletonLoader = () => (
   <div className="space-y-8 animate-pulse">
     {/* Stat boxes skeleton */}
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {Array(4)
-        .fill(0)
-        .map((_, idx) => (
-          <div key={idx} className="rounded-2xl bg-gray-200 h-32"></div>
-        ))}
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="h-32 rounded-2xl bg-gray-300"></div>
+      ))}
     </div>
     {/* Chart skeleton */}
     <div className="bg-gray-200 rounded-2xl h-80 w-full"></div>
