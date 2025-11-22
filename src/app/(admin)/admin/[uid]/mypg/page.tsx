@@ -15,7 +15,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Page = () => {
   const [loading, setloading] = useState<boolean>(false);
+  const [statloading, setStatLoading] = useState<boolean>(false);
   const [cards, setCards] = useState<any>(null);
+  const [statBox, setStatBox] = useState<any>({});
   const router = useRouter();
   const param = useParams();
   const dispatch = useDispatch();
@@ -27,13 +29,16 @@ const Page = () => {
     router.push(`/admin/${param?.uid}/pg/new`);
   }
 
-  function MyPGHeader() {
-    const [boxes, setboxes] = useState<{ label: string; value: number }[]>([
-      { label: "Total Paying Guest Enlisted", value: 0 },
-      { label: "Occupied Rooms", value: 0 },
-      { label: "Vacant Rooms", value: 0 },
-      { label: "Average Rating", value: 0 },
-    ]);
+  function MyPGHeader({ stats }: { stats: any }) {
+    const boxes: {
+      label: string;
+      value: number;
+    }[] = [
+      { label: "Total Paying Guest Enlisted", value: stats?.total_pg || 0 },
+      { label: "Occupied Rooms", value: stats?.total_rooms?.occupied || 0 },
+      { label: "Vacant Rooms", value: Number(stats?.total_rooms?.count - stats?.total_rooms?.occupied) || 0 },
+      { label: "Total Reviews", value: stats?.total_reviews || 0 },
+    ];
     return (
       <div className="mb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
@@ -71,7 +76,23 @@ const Page = () => {
       setloading(false);
     };
 
+    const fetchPgs_Stats = async () => {
+      setStatLoading(true);
+      const res: ApiReturn<any> = await api_caller<any>(
+        "GET",
+        `${API.PG.GET_PG_STATS?.replace(":uid", param?.uid as string)}`
+      );
+      if (res.success) {
+        setStatBox(res?.data);
+      } else {
+        toast.error(`${res.message} : ${res.error}`);
+        setStatBox({});
+      }
+      setStatLoading(false);
+    };
+
     fetchPgs_ByUser();
+    fetchPgs_Stats();
     dispatch(deleteSuccess(false));
   }, [isDeleted]);
 
@@ -90,7 +111,7 @@ const Page = () => {
           their best.
         </p>
       </div>
-      {loading ? (
+      {statloading ? (
         <div className="animate-pulse space-y-6 mt-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
@@ -99,7 +120,7 @@ const Page = () => {
           </div>
         </div>
       ) : (
-        <MyPGHeader />
+        <MyPGHeader stats={statBox} />
       )}
       {loading ? (
         <CardSkeleton no_of_card={2} />

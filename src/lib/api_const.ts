@@ -23,6 +23,10 @@ export const API = {
         }
     },
     ADMIN:{
+        DASHBOARD: {
+            BOX: "/statistics/:uid",
+            ROOM_GRAPH: "/statistics/:uid/graph/rooms"
+        },
         BOOKING:{
             LIST : "/booking/list",
             VIEW: "/booking/:id/details",
@@ -47,12 +51,15 @@ export const API = {
         FOR_MAP : "/getPgForMap",
         GET_PG_NEAR_ME : "/getPgNearMe",
         GET_PG_NEAR_PG : "/getPgNearPg",
+        GET_PG_STATS: "/statistics/:uid/pg",
+        CATELOGUE: "/user/:uid/pg/catelogue"
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",
         UPDATE : "/updatePg",
         DELETE: "/deleteRoom",
-        VIEW_ROOM_DETAILS: "/room/:id"
+        VIEW_ROOM_DETAILS: "/room/:id",
+        CATELOGUE: "/pg/:pgid/room/catelogue"
     },
     REVIEW: {
         GET_REVIWS_OF_PG : "/getReviews",

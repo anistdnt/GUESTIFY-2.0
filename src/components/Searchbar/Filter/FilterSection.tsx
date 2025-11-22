@@ -85,8 +85,6 @@ export const FilterSection = () => {
   
         if (query.get("kmradi")) {
           queryArray?.push(`kmradi=${query.get("kmradi")}`);
-        } else {
-          queryArray?.push("kmradi=10");
         }
   
         if (query.get("coordinates")) {
