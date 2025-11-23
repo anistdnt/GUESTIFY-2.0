@@ -286,12 +286,6 @@ export default function BookingPage() {
                   </p>
                 </div>
 
-                {/* <Link
-                href={`/booking/${booking.booking_id}`}
-                className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
-              >
-                View Details
-              </Link> */}
                 <div className="flex justify-between">
                   {booking.payment_ttl !== null && (
                     <button
@@ -299,6 +293,17 @@ export default function BookingPage() {
                         countdowns[booking.booking_id] || 0
                       )}
                       className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
+                      onClick={() => {
+                      dispatch(
+                        setModalVisibility({
+                          open: true,
+                          type: "paymentSession",
+                          modalData: {
+                            booking_id: booking.booking_id
+                          },
+                        })
+                      );
+                    }}
                     >
                       Make Payment
                     </button>

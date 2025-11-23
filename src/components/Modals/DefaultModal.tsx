@@ -16,6 +16,7 @@ import ViewModal from "./Booking/ViewModal";
 import AcceptandInitiatePaymentModal from "./Booking/Accept_and_initiatePayment";
 import RevolkModal from "./Booking/RevolkModal";
 import GenericConfirmationModal from "./GenericConfirmationModal";
+import PaymentSessionModal from "./PaymentSessionModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -68,6 +69,9 @@ export default function DefaultModal() {
           )}
           {type === "revolke_booking" && (
             <RevolkModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "paymentSession" && (
+            <PaymentSessionModal setshowModal={setshowModal} modalData={modalData}/>
           )}
         </div>
       )}
