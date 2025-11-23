@@ -1,3 +1,5 @@
+import { District, westBengalDistricts } from "@/data/westbengal_districts";
+
 export const countryCodes = [
   { label: "India", value: "+91", flagUrl: "https://flagcdn.com/w20/in.png" },
   { label: "USA", value: "+1", flagUrl: "https://flagcdn.com/w20/us.png" },
@@ -50,24 +52,10 @@ export const yesNoOptions = [
   { label: "No", value: "no" },
 ];
 
-export const districtOptions = [
-  // West Bengal districts
-  { label: "Kolkata", value: "kolkata" },
-  { label: "Howrah", value: "howrah" },
-  { label: "Darjeeling", value: "darjeeling" },
-  { label: "Siliguri", value: "siliguri" },
-  { label: "Hooghly", value: "hooghly" },
-
-  // Assam districts
-  { label: "Guwahati", value: "guwahati" },
-  { label: "Dibrugarh", value: "dibrugarh" },
-  { label: "Silchar", value: "silchar" },
-
-  // Bihar districts
-  { label: "Patna", value: "patna" },
-  { label: "Gaya", value: "gaya" },
-  { label: "Muzaffarpur", value: "muzaffarpur" },
-];
+export const districtOptions = westBengalDistricts?.map((d: District)=>({
+  label: d?.label || "",
+  value: d?.value || ""
+}));
 
 export const stateOptions = [
   { label: "West Bengal", value: "West Bengal" },

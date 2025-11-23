@@ -25,7 +25,8 @@ export const API = {
     ADMIN:{
         DASHBOARD: {
             BOX: "/statistics/:uid",
-            ROOM_GRAPH: "/statistics/:uid/graph/rooms"
+            ROOM_GRAPH: "/statistics/:uid/graph/rooms",
+            BOOKING_LINE: "/statistics/graph/bookings",
         },
         BOOKING:{
             LIST : "/booking/list",
@@ -91,6 +92,6 @@ export const API = {
     },
     CHECKOUT: {
         CREATE_SESSION: "/create-checkout-session",
-        CHECKOUT_INFO: "/api/get-checkout-info"
+        CHECKOUT_INFO: "/booking/session/success"
     }
 }
