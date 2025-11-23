@@ -92,6 +92,6 @@ export const API = {
     },
     CHECKOUT: {
         CREATE_SESSION: "/create-checkout-session",
-        CHECKOUT_INFO: "/api/get-checkout-info"
+        CHECKOUT_INFO: "/booking/session/success"
     }
 }

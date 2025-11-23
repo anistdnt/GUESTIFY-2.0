@@ -1,5 +1,6 @@
 "use client";
 import { ArrowRight, CheckCircle } from "@phosphor-icons/react";
+import { CurrencyInr } from "@phosphor-icons/react/dist/ssr";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
@@ -81,22 +82,22 @@ export default function ThankYouPage({checkoutInfo , latitude , longitude}: Than
                                 <p className="font-medium text-gray-800">Room A</p>
                                 <p className="text-gray-500 text-sm">1 night</p>
                             </div>
-                            <p className="font-medium text-gray-800">$120</p>
+                            <p className="font-medium text-gray-800 flex gap-1 items-center"><CurrencyInr size={15}/><span>{checkoutInfo?.amount_total / 100}</span></p>
                         </div>
 
                         {/* Summary */}
                         <div className="pt-4 border-t text-sm text-gray-700 space-y-2">
                             <div className="flex justify-between">
                                 <span>Subtotal</span>
-                                <span>$120</span>
+                                <span className="font-medium text-gray-800 flex gap-1 items-center"><CurrencyInr size={15}/><span>{checkoutInfo?.amount_total / 100}</span></span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Tax</span>
-                                <span>$0</span>
+                                <span className="font-medium text-gray-800 flex gap-1 items-center"><CurrencyInr size={15}/><span>0</span></span>
                             </div>
                             <div className="flex justify-between font-semibold text-base pt-2 border-t">
                                 <span>Total</span>
-                                <span>$120</span>
+                                <span className=" text-gray-800 font-semibold flex gap-1 items-center"><CurrencyInr size={15}/><span>{checkoutInfo?.amount_total / 100}</span></span>
                             </div>
                         </div>
                     </div>
