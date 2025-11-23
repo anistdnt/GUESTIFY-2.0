@@ -15,6 +15,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  LineChart,
+  Line,
 } from "recharts";
 
 type PGByMonth = {
@@ -43,6 +45,11 @@ type RoomGraphTypes = {
   year: string | number;
   month: string;
   count: number;
+};
+
+type BookingLineType = {
+  label: string;
+  value: number;
 };
 
 function StatBoxes({ stats }: { stats: StatsResponse }) {
@@ -82,7 +89,11 @@ function StatBoxes({ stats }: { stats: StatsResponse }) {
 
 export default function Dashboard() {
   const [stats, setStats] = useState<StatsResponse | null>(null);
+
   const [roomgraph, setRoomGraph] = useState<RoomGraphTypes[]>([]);
+  const [bookingLine, setBookingLine] = useState<BookingLineType[]>([]);
+  const [type, setType] = useState<string>("day");
+
   const [pgcatelogue, setPgCatelogue] = useState<
     { label: string; value: string }[]
   >([]);
@@ -97,6 +108,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState<boolean>(false);
   const [graphloading, setGraphLoading] = useState<boolean>(false);
   const [catelogueloading, setCatelogueLoading] = useState<boolean>(false);
+  const [bookinglineloading, setBookingLineLoading] = useState<boolean>(false);
 
   const param = useParams();
 
@@ -167,6 +179,26 @@ export default function Dashboard() {
     };
     fetchStats_RoomGraph(roomgraphFilter?.pg_id, roomgraphFilter?.year);
   }, [roomgraphFilter?.year, roomgraphFilter?.pg_id]);
+
+  useEffect(() => {
+    const fetchStats_BookingLine = async (type?: string) => {
+      setBookingLineLoading(true);
+      let url = `${API.ADMIN.DASHBOARD.BOOKING_LINE}`;
+      // Build Queries
+      if (type) {
+        url += `?type=${type}`;
+      }
+      const res: ApiReturn<any> = await api_caller<any>("GET", url);
+      if (res.success) {
+        setBookingLine(res?.data);
+      } else {
+        toast.error(`${res.message} : ${res.error}`);
+        setBookingLine([]);
+      }
+      setBookingLineLoading(false);
+    };
+    fetchStats_BookingLine(type);
+  }, [type]);
 
   return (
     <div className="p-6 space-y-8">
@@ -282,6 +314,98 @@ export default function Dashboard() {
                 ))}
               </Bar>
             </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* Line Chart */}
+      <div className="bg-white shadow-[0_0_10px_rgba(0,0,0,0.12)] rounded-2xl p-6 transition-shadow hover:shadow-[0_0_18px_rgba(0,0,0,0.2)]">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold mb-4 text-gray-600">
+            Booking Analytics
+            <p className="text-sm text-gray-500 font-normal">Declined, Revolked or Cancel Bookings for more than 20 days will not be considered</p>
+          </h2>
+          <div className="flex flex-row gap-3 justify-end items-center">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="rangeType"
+                value="day"
+                checked={type === "day"}
+                onChange={() => setType("day")}
+              />
+              <span>Day</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="rangeType"
+                value="week"
+                checked={type === "week"}
+                onChange={() => setType("week")}
+              />
+              <span>Week</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="rangeType"
+                value="month"
+                checked={type === "month"}
+                onChange={() => setType("month")}
+              />
+              <span>Month</span>
+            </label>
+          </div>
+        </div>
+        {bookinglineloading && (
+          <div>
+            <div
+              className="flex justify-center items-center"
+              style={{ width: "100%", height: "300px" }}
+            >
+              Loading...
+            </div>
+          </div>
+        )}
+        {!bookinglineloading && bookingLine?.length === 0 && (
+          <div
+            className="flex justify-center items-center"
+            style={{ width: "100%", height: "300px" }}
+          >
+            No Records Found
+          </div>
+        )}
+        {!bookinglineloading && bookingLine?.length !== 0 && (
+          <ResponsiveContainer width="100%" height={300} className={"mt-8"}>
+            <LineChart
+              data={bookingLine}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+
+              <XAxis
+                dataKey="label"
+                padding={{ left: 40, right: 40 }} // <-- Creates horizontal offset
+              />
+
+              <YAxis
+                domain={["dataMin - 2", "dataMax + 2"]} // <-- Add vertical breathing space
+              />
+
+              <Tooltip />
+
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#ca8a04"
+                strokeWidth={3}
+                dot={{ r: 5 }}
+                activeDot={{ r: 7 }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         )}
       </div>

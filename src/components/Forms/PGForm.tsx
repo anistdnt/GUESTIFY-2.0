@@ -24,6 +24,14 @@ export default function PGForm({
 }) {
   const { setFieldValue, values } = useFormikContext<any>();
 
+  useEffect(()=>{
+    if(values?.wifi_available === "no"){
+      setFieldValue("wifi_speed",0);
+      setFieldValue("additional_wifi_charges",0);
+      setFieldValue("charge_duration","quarterly");
+    }
+  },[values?.wifi_available])
+
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
