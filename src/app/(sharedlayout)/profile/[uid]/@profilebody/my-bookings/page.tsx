@@ -105,7 +105,7 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-full">
       <h2 className="text-2xl font-semibold mb-6 text-gray-800">
         Your Bookings
       </h2>
