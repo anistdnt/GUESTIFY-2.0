@@ -196,9 +196,9 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         onDropRejected: () => {
-            setUploadError("Only JPG, PNG & PDF files are allowed.");
+            setUploadError(["pg_image_url","room_image_url"].includes(imageKey) ? "Only JPG, PNG files are allowed." : "Only JPG, PNG & PDF files are allowed.");
         },
-        accept: { "image/jpeg": [], "image/jpg": [], "image/png": [], "application/pdf": [] },
+        accept: ["pg_image_url","room_image_url"].includes(imageKey) ? { "image/jpeg": [], "image/jpg": [], "image/png": [] } : { "image/jpeg": [], "image/jpg": [], "image/png": [], "application/pdf": [] },
         multiple: !single && selectedImageIndex.current === -1,
         maxFiles: selectedImageIndex.current !== -1 ? 1 : single ? 1 : undefined,
         noClick: true,
