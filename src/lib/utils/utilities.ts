@@ -46,7 +46,7 @@ export function formatSeconds(seconds: number): string {
 
 
 export function formatTTL(seconds: number) {
-  if (!seconds || seconds <= 0) return "Expired";
+  if (!seconds || seconds <= 0) return "Session Expired";
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;

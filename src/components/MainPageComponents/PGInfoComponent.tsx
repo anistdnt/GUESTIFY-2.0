@@ -407,6 +407,10 @@ const PGInfoComponent = ({
                       }
                       attachedBathroom={room.attached_bathroom}
                       airconditioned={room.ac_available}
+                      bookinginfo={{
+                        booked_by: room?.booked_by,
+                        booking_status: room?.booking_status
+                      }}
                     />
                   </div>
                 );

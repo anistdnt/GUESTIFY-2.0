@@ -6,6 +6,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import {
   Calendar,
+  CheckCircle,
   CurrencyInr,
   UsersThree,
 } from "@phosphor-icons/react/dist/ssr";
@@ -40,11 +41,12 @@ type BookingItem = {
   status_timestamp: string | null;
   room_details: RoomDetails;
   payment_ttl: number | null;
+  payment_at: string | null;
 };
 
 export default function BookingPage() {
   const [bookings, setBookings] = useState<BookingItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [countdowns, setCountdowns] = useState<Record<string, number>>({});
   const params = useParams();
   const dispatch = useDispatch();
@@ -70,9 +72,10 @@ export default function BookingPage() {
   // Fetch booking details
   const getBookings = async () => {
     try {
+      setLoading(true);
       const buildUrl = `${API.BOOKING.ROOMLIST}?page=${currentPage}&filter=${filterStatus}&search=${debouncedSearch}`;
       const response: ApiReturn<any> = await api_caller("GET", buildUrl);
-      console.log(response, "response");
+      // console.log(response, "response");
       if (response?.success) {
         const fetchedBookings = response?.data?.bookings;
         setBookings([...(fetchedBookings || [])]);
@@ -112,19 +115,43 @@ export default function BookingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <p className="text-gray-600 animate-pulse">Loading bookings...</p>
-      </div>
-    );
+  const PaymentButton = ({booking_id, payment_ttl, payment_at}: {booking_id: string; payment_ttl: number | null ; payment_at: string})=>{
+    if(payment_ttl !== null && !payment_at){
+      return (
+        <button
+          data-tooltip={formatTTL(countdowns[booking_id] || 0)}
+          className="mt-5 me-2 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center disabled:cursor-not-allowed"
+          onClick={() => {
+            dispatch(
+              setModalVisibility({
+                open: true,
+                type: "paymentSession",
+                modalData: {
+                  booking_id: booking_id,
+                },
+              })
+            );
+          }}
+          disabled={payment_ttl === 0}
+        >
+          Make Payment
+        </button>
+      );
+    } 
+    else if(payment_ttl !== null && payment_at){
+      return (
+        <button className="bg-green-600 mt-5 me-2 text-white px-4 py-2 rounded text-center flex justify-center items-center gap-2" data-tooltip={formatDate(payment_at)}>
+          <CheckCircle size={20} /><span>Payment Done</span>
+        </button>
+      );
+    }
+    else {
+      return null;
+    }
   }
 
   return (
     <div className="max-w-full">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-        Your Bookings
-      </h2>
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         {/* Refresh or Reset Filter Button */}
         <div>
@@ -206,143 +233,130 @@ export default function BookingPage() {
           )}
         </div>
       </div>
-      {bookings.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {bookings.map((booking) => (
-            <div
-              key={booking.booking_id}
-              className="relative group p-5 border border-indigo-200 rounded-2xl hover:shadow-xl hover:shadow-indigo-50 flex flex-col transition-all bg-white"
-            >
-              {/* Room Image Slider */}
-              <div className="relative w-full h-48 overflow-hidden rounded-xl">
-                <FadedImageSlider
-                  images={booking.room_details.room_images.map((img) => ({
-                    pg_image_url: img.room_image_url,
-                    pg_image_id: img.room_image_id,
-                  }))}
-                />
-              </div>
 
-              {/* Info */}
-              <div className="mt-4 flex flex-col flex-1">
-                <div className="flex justify-between">
-                  <h4 className="font-bold text-lg text-gray-900">
-                    {booking.pg_name}
-                  </h4>
-                  <div
-                    data-tooltip={`Booked on ${formatDate(
-                      booking?.booking_date
-                    )}`}
-                    className={`text-xs p-1 rounded text-white ${
-                      booking.status === "pending"
-                        ? "bg-yellow-500"
-                        : booking.status === "accepted"
-                        ? "bg-green-500"
-                        : booking.status === "cancelled"
-                        ? "bg-red-500"
-                        : "bg-gray-500"
-                    }`}
-                  >
-                    {booking.status.charAt(0).toUpperCase() +
-                      booking.status.slice(1)}
-                  </div>
-                </div>
-
-                {/* Booking Details */}
-                <div className="mt-3 text-sm text-gray-700 space-y-1">
-                  <p className="flex items-center gap-2">
-                    <Calendar size={16} />{" "}
-                    <span>
-                      {new Date(booking.booking_date).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <UsersThree size={16} /> {booking.person_number} Person
-                    {booking.person_number > 1 ? "s" : ""}
-                  </p>
-                </div>
-
-                {/* Room Details */}
-                <div className="mt-3 text-sm text-gray-700 border-t pt-2 space-y-1">
-                  <p>
-                    Room Type:{" "}
-                    <span className="font-medium capitalize">
-                      {booking.room_details.type}
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-1">
-                    Rent: <CurrencyInr size={12} />
-                    {booking.room_details.room_rent} /{" "}
-                    {booking.room_details.deposit_duration}
-                  </p>
-                </div>
-
-                <div className="flex justify-between">
-                  {booking.payment_ttl !== null && (
-                    <button
-                      data-tooltip={formatTTL(
-                        countdowns[booking.booking_id] || 0
-                      )}
-                      className="mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
-                      onClick={() => {
-                      dispatch(
-                        setModalVisibility({
-                          open: true,
-                          type: "paymentSession",
-                          modalData: {
-                            booking_id: booking.booking_id
-                          },
-                        })
-                      );
-                    }}
-                    >
-                      Make Payment
-                    </button>
-                  )}
-                  <button
-                    data-tooltip="View Booking Details"
-                    className={`mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center ${
-                      booking?.payment_ttl ? "" : "w-full"
-                    }`}
-                    onClick={() => {
-                      dispatch(
-                        setModalVisibility({
-                          open: true,
-                          type: "viewbooking",
-                          modalData: {
-                            caption: "View Booking",
-                            booking_id: booking.booking_id,
-                            room_id: booking.room_details.id,
-                          },
-                        })
-                      );
-                    }}
-                  >
-                    <span>View Details</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <p className="text-gray-600 animate-pulse">Loading bookings...</p>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-600">
-          <p className="text-lg font-semibold">No bookings found</p>
-          <Link
-            href="/"
-            className="mt-4 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
-          >
-            Explore PGs
-          </Link>
+        <div>
+          {bookings.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bookings.map((booking) => (
+                <div
+                  key={booking.booking_id}
+                  className="relative group p-5 border border-indigo-200 rounded-2xl hover:shadow-xl hover:shadow-indigo-50 flex flex-col transition-all bg-white"
+                >
+                  {/* Room Image Slider */}
+                  <div className="relative w-full h-48 overflow-hidden rounded-xl">
+                    <FadedImageSlider
+                      images={booking.room_details.room_images.map((img) => ({
+                        pg_image_url: img.room_image_url,
+                        pg_image_id: img.room_image_id,
+                      }))}
+                    />
+                  </div>
+
+                  {/* Info */}
+                  <div className="mt-4 flex flex-col flex-1">
+                    <div className="flex justify-between">
+                      <h4 className="font-bold text-lg text-gray-900">
+                        {booking.pg_name}
+                      </h4>
+                      <div
+                        data-tooltip={`${booking?.status?.toUpperCase()} on ${formatDate(
+                          booking?.status_timestamp
+                        )}`}
+                        className={`text-xs px-2 py-1 rounded-md text-white ${
+                          booking.status === "pending"
+                            ? "bg-yellow-500"
+                            : booking.status === "accepted"
+                            ? "bg-green-500"
+                            : booking.status === "cancelled"
+                            ? "bg-red-500"
+                            : "bg-gray-500"
+                        }`}
+                      >
+                        {booking.status.charAt(0).toUpperCase() +
+                          booking.status.slice(1)}
+                      </div>
+                    </div>
+
+                    {/* Booking Details */}
+                    <div className="mt-3 text-sm text-gray-700 space-y-1">
+                      <p className="flex items-center gap-2">
+                        <Calendar size={16} />{" "}
+                        <span>
+                          {new Date(booking.booking_date).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </span>
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <UsersThree size={16} /> {booking.person_number} Person
+                        {booking.person_number > 1 ? "s" : ""}
+                      </p>
+                    </div>
+
+                    {/* Room Details */}
+                    <div className="mt-3 text-sm text-gray-700 border-t pt-2 space-y-1">
+                      <p>
+                        Room Type:{" "}
+                        <span className="font-medium capitalize">
+                          {booking.room_details.type}
+                        </span>
+                      </p>
+                      <p className="flex items-center gap-1">
+                        Rent: <CurrencyInr size={12} />
+                        {booking.room_details.room_rent} /{" "}
+                        {booking.room_details.deposit_duration}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <PaymentButton booking_id={booking?.booking_id} payment_at={booking?.payment_at} payment_ttl={booking?.payment_ttl}/>
+                      <button
+                        data-tooltip="View Booking Details"
+                        className={`mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 flex-1 rounded text-center`}
+                        onClick={() => {
+                          dispatch(
+                            setModalVisibility({
+                              open: true,
+                              type: "viewbooking",
+                              modalData: {
+                                caption: "View Booking",
+                                booking_id: booking.booking_id,
+                                room_id: booking.room_details.id,
+                              },
+                            })
+                          );
+                        }}
+                      >
+                        <span>View Details</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-600">
+              <p className="text-lg font-semibold">No bookings found</p>
+              <Link
+                href="/"
+                className="mt-4 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
+              >
+                Explore PGs
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>
