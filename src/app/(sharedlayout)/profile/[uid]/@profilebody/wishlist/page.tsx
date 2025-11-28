@@ -296,9 +296,10 @@ export default function WishlistPage() {
                               : room.booking_status
                           }
                           data-tooltip-pos="left"
-                          className="bg-buttons hover:bg-buttonsHover text-white px-3 py-1 rounded text-sm"
+                          className="bg-buttons hover:bg-buttonsHover text-white px-3 py-1 rounded text-sm disabled:cursor-not-allowed"
+                          disabled={room.booked_by !== null}
                         >
-                          Book Now
+                          {room.booked_by !== null ? 'Booked' : 'Book Now'}
                         </button>
                       </div>
                     ))
