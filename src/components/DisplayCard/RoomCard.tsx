@@ -26,6 +26,10 @@ type Props = {
   airconditioned?: string;
   imageUrls: { room_image_url: string; room_image_id: string }[];
   amenities: string[];
+  bookinginfo: {
+    booked_by?: string | null;
+    booking_status?: string;
+  }
 };
 
 const RoomCard = ({
@@ -40,6 +44,7 @@ const RoomCard = ({
   wifidetails,
   attachedBathroom,
   airconditioned,
+  bookinginfo
 }: Props) => {
   const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -170,7 +175,9 @@ const RoomCard = ({
         </div>
 
         <button
-          className="mt-3 w-full bg-buttons text-white py-2 rounded-md hover:bg-buttonsHover transition disabled:cursor-not-allowed"
+          className="mt-3 w-full bg-buttons text-white py-2 rounded-md hover:bg-buttonsHover transition disabled:cursor-not-allowed disabled:bg-yellow-500"
+          data-tooltip={bookinginfo?.booking_status || "Enlist new booking"}
+          disabled={bookinginfo?.booked_by !== null}
           onClick={() => {
             dispatch(
               setModalVisibility({
@@ -185,7 +192,7 @@ const RoomCard = ({
             );
           }}
         >
-          Book Now
+          {bookinginfo?.booked_by !== null ? 'Booked' : 'Book Now'}
         </button>
       </div>
       {showAllAmenities && (

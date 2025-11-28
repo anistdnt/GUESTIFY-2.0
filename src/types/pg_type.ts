@@ -30,6 +30,8 @@ export interface PGInfo {
 
 export interface Room {
   aminities: string[];
+  booked_by?: string | null;
+  booking_status?: string;
   _id: string;
   room_type: "single" | "double" | string;
   room_images: { room_image_url: string; room_image_id: string }[];
