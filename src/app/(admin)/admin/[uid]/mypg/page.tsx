@@ -34,9 +34,9 @@ const Page = () => {
       label: string;
       value: number;
     }[] = [
-      { label: "Total Paying Guest Enlisted", value: stats?.total_pg || 0 },
-      { label: "Occupied Rooms", value: stats?.total_rooms?.occupied || 0 },
-      { label: "Vacant Rooms", value: Number(stats?.total_rooms?.count - stats?.total_rooms?.occupied) || 0 },
+      { label: "Percent Occupied", value: `${stats?.percent_occupied || 0}%` },
+      { label: "Occupied Rooms", value: stats?.occupied_rooms || 0 },
+      { label: "Vacant Rooms", value: stats?.available_rooms || 0 },
       { label: "Total Reviews", value: stats?.total_reviews || 0 },
     ];
     return (
