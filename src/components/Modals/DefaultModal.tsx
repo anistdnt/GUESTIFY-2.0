@@ -17,6 +17,7 @@ import AcceptandInitiatePaymentModal from "./Booking/Accept_and_initiatePayment"
 import RevolkModal from "./Booking/RevolkModal";
 import GenericConfirmationModal from "./GenericConfirmationModal";
 import PaymentSessionModal from "./PaymentSessionModal";
+import SigningInModal from "./SigningInModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -72,6 +73,9 @@ export default function DefaultModal() {
           )}
           {type === "paymentSession" && (
             <PaymentSessionModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "signingin" && (
+            <SigningInModal setshowModal={setshowModal}/>
           )}
         </div>
       )}

@@ -6,6 +6,7 @@ import {
   MapPin,
   Pencil,
   Trash,
+  Users,
 } from "@phosphor-icons/react/dist/ssr";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
@@ -154,12 +155,17 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                     )}{" "}
                     Room
                   </p>
-                  <p className="font-bold flex flex-row justify-center items-center text-priceCol border-s-2 px-2">
-                    <span>
-                      <CurrencyInr size={10} />
-                    </span>
-                    <span>{room?.room_rent}</span>
-                  </p>
+                  <div className="flex flex-row justify-start items-center gap-1">
+                    <p className="font-bold flex flex-row justify-center items-center text-priceCol border-s-2 px-2">
+                      <span>
+                        <CurrencyInr size={10} />
+                      </span>
+                      <span>{room?.room_rent}</span>
+                    </p>
+                    {room?.booked_by && <span data-tooltip={room?.booking_status}>
+                      <Users size={15} weight="fill" className="text-green-700"/>
+                    </span>}
+                  </div>
                 </div>
               ))}
           </div>

@@ -20,8 +20,12 @@ export default function CardSection({isSearchByDist = false}: {isSearchByDist?: 
       let queryArray = [];
 
       // Queries only if isSearchByDist is false
-      if (!isSearchByDist && query.get("kmradi")) {
-        queryArray?.push(`kmradi=${query.get("kmradi")}`);
+      if (!isSearchByDist) {
+        if(query.get("kmradi")){
+          queryArray?.push(`kmradi=${query.get("kmradi")}`);
+        }else{
+          queryArray?.push(`kmradi=20`);
+        }
       }
 
       // Queries only if isSearchByDist is true

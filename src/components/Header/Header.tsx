@@ -12,7 +12,7 @@ import { setToken, setUserData } from "@/redux/slices/userSlice";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { setLoading } from "@/redux/slices/loaderSlice";
-import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { hideModal, setModalVisibility } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
 import Notification from "./Notification";
 import Noti from "./Noti";
@@ -134,6 +134,7 @@ export default function Header() {
       setisLoggedIn(false);
     }
     dispatch(setLoading({ loading: false }));
+    dispatch(hideModal());
   }, [isLoggedIn, pathname, reduxUserData]);
 
   return (
