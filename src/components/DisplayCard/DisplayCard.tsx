@@ -202,9 +202,9 @@ export default function DisplayCard({
           <p className="mt-2 text-gray-700 text-sm">
             Home-cooked food, Wi-Fi, AC, and other amenities. Electricity
             included. Convenient location.
-            <a href="#" className="text-blue-500">
+            {/* <a href="#" className="text-blue-500">
               Read More
-            </a>
+            </a> */}
           </p>
 
           <div className="flex flex-row flex-wrap gap-3 justify-between items-center text-sm text-gray-500 mt-3">
