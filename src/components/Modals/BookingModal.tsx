@@ -52,7 +52,34 @@ const validationSchema = Yup.object().shape({
             "Invalid identity type"
           )
           .required("Identity type is required"),
-        identity_id: Yup.string().trim().required("Identity ID is required"),
+        identity_id: Yup.string()
+          .trim()
+          .when("type_of_identity", ([type_of_identity], schema) => {
+            switch (type_of_identity) {
+              case "aadhar":
+                return schema
+                  .matches(/^[2-9]{1}[0-9]{11}$/, "Invalid Aadhar number")
+                  .required("Aadhar number is required");
+
+              case "pan":
+                return schema
+                  .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, "Invalid PAN number")
+                  .required("PAN number is required");
+
+              case "passport":
+                return schema
+                  .matches(/^[A-PR-WYa-pr-wy][0-9]{7}$/, "Invalid Passport number")
+                  .required("Passport number is required");
+
+              case "driving_license":
+                return schema
+                  .matches(/^[A-Z]{2}[0-9]{13}$/i, "Invalid Driving License number")
+                  .required("Driving License number is required");
+
+              default:
+                return schema.required("Identity ID is required");
+            }
+          }),
         is_primary: Yup.number().oneOf([0, 1]),
         image: Yup.string()
           .url("Must be a valid URL")
