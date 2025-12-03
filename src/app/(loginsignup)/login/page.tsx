@@ -7,7 +7,7 @@ import { Eye, EyeSlash } from "@phosphor-icons/react/dist/ssr";
 import { LoginFormData } from "@/types/auth_type";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { setCookie } from "cookies-next/client";
+import { deleteCookie, getCookie, setCookie } from "cookies-next/client";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { useDispatch } from "react-redux";
@@ -55,11 +55,12 @@ const Login = () => {
       formData
     );
     if (res.success) {
+      const callback_url = getCookie("callback_url");
       let redirectUrl = "";
       if (res?.data?.is_admin) {
-        redirectUrl = `/admin/${res?.data?.user_id}/dashboard`;
+        redirectUrl = callback_url || `/admin/${res?.data?.user_id}/dashboard`;
       } else {
-        redirectUrl = "/";
+        redirectUrl = callback_url || "/";
       }
       setCookie("authToken", res.data?.token, {
         maxAge: 2 * 60 * 60, //2 hours
@@ -71,6 +72,7 @@ const Login = () => {
         type: "signingin"
       }))
       router?.push(redirectUrl);
+      deleteCookie("callback_url");
       toast.success(res.message || "Loggged In successfully");
     } else {
       setLoginLoading(false);
