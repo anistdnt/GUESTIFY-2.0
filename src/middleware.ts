@@ -21,6 +21,8 @@ export function middleware(req: NextRequest) {
 
   const authToken = req.cookies.get("authToken");
   const pathname = req.nextUrl.pathname;
+  const queries = req.nextUrl.search
+  const fullPath = pathname + queries
   console.log("Middleware - Pathname:", pathname);
 
   // 🧩 If no token and visiting protected or admin routes → redirect to login
@@ -28,7 +30,16 @@ export function middleware(req: NextRequest) {
     !authToken &&
     ["/profile", "/admin", "/thankyou"].some((route) => pathname.startsWith(route))
   ) {
-    return NextResponse.redirect(new URL("/login", req.url));
+
+    const redirectRes = NextResponse.redirect(new URL("/login", req.url));
+
+    redirectRes.cookies.set("callback_url", fullPath, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+
+    return redirectRes;
   }
 
   // ✅ If token exists, decode it
@@ -68,7 +79,15 @@ export function middleware(req: NextRequest) {
       }
     } catch (err) {
       console.error("JWT decode error:", err);
-      return NextResponse.redirect(new URL("/login", req.url));
+      const redirectRes = NextResponse.redirect(new URL("/login", req.url));
+
+      redirectRes.cookies.set("callback_url", fullPath, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+
+      return redirectRes;
     }
   }
 
