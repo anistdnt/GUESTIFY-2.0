@@ -319,7 +319,7 @@ export default function PaymentLogList() {
                                 {/* RIGHT SECTION */}
                                 <div className="flex flex-row items-start gap-3">
 
-                                    {/* Status Chip */}
+                                    {/* Status */}
                                     <span
                                         className={`text-xs px-3 py-1 rounded-full font-semibold tracking-wide self-start ${p.payment_status === "paid"
                                             ? "bg-green-100 text-green-700"
