@@ -1,9 +1,18 @@
 interface Metadata {
   title: string;
   description: string;
+  icons?: object;
 }
 
 export const metadataMap: Record<string, Metadata> = {
+  global: {
+    title: "Guestify | Manage Your Paying Guest Properties Seamlessly",
+    description:
+      "Guestify is your all-in-one solution to manage and track your paying guest properties with ease.",
+    icons: {
+      icon: "/favicon.ico",
+    }
+  },
   bookings: {
     title: "Bookings | Maintain and Track Bookings",
     description: "Manage all your PG bookings in one place",
@@ -31,5 +40,15 @@ export const metadataMap: Record<string, Metadata> = {
   profile: {
     title: "My Profile | Manage Your Admin Account",
     description: "Update your personal information and account settings.",
+  },
+  login_signup: {
+    title: "Login/Signup | Access Your Admin Account",
+    description:
+      "Log in to your admin account or sign up to manage your paying guest properties.",
+  },
+  thankyou: {
+    title: "Thank You | Booking Confirmation",
+    description:
+      "Thank you for your booking! Your reservation has been successfully confirmed.",
   },
 };
