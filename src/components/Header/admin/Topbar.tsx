@@ -2,8 +2,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setModalVisibility } from "@/redux/slices/modalSlice";
 import Noti from "../Noti";
 import { UserInfo } from "@/types/admin";
 
@@ -19,9 +17,25 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
   const [showProfileDropdown, setshowProfileDropdown] =
     useState<boolean>(false);
 
-  const dispatch = useDispatch();
-  const tabHeading = tabValue === "dashboard" ? "Dashboard" :
-    tabValue === "profile" ? "My Profile" : "My Enlisted PGs"
+  const getTabHeading = () => {
+    switch (tabValue) {
+      case "dashboard":
+        return "Dashboard";
+      case "profile":
+        return "My Profile";
+      case "mypg":
+        return "My Enlisted PGs";
+      case "pg":
+        return "Enlist New PG";
+      case "payments":
+        return "Payments";
+      case "bookings":
+        return "Bookings";
+      default:
+        return "";
+    }
+  };
+  const tabHeading = getTabHeading();
 
   return (
     <header className="sticky z-40 top-0">

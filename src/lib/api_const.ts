@@ -38,6 +38,8 @@ export const API = {
         },
         PAYMENTS:{
             LOGS: "/admin/payment/logs",
+            TRANSACTION_STATS: "/payment/transaction/stats",
+            TRANSACTION_SUMMARY: "/payment/transaction/summary"
         }
     },
     COLLEGE: {
