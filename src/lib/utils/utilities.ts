@@ -52,3 +52,20 @@ export function formatTTL(seconds: number) {
   const s = seconds % 60;
   return `${h}h ${m}m ${s}s remaining`;
 };
+
+// Function for getting current monthname
+export function getCurrentMonthName(): string {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const currentDate = new Date();
+  return monthNames[currentDate.getMonth()];
+}
+
+export function getCurrentWeekNumber(): number {
+  const currentDate = new Date();
+  const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+  const pastDaysOfYear = (currentDate.valueOf() - startOfYear.valueOf()) / 86400000;
+  return Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+}
