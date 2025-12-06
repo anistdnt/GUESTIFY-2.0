@@ -8,11 +8,6 @@ import { ReduxProvider } from "@/redux/Provider";
 import DefaultModal from "@/components/Modals/DefaultModal";
 import AdminLayoutComponent from "@/components/Header/admin/AdminLayoutComponent";
 
-const metadata = {
-  title: "Admin Panel - PG Stay",
-  description: "Admin dashboard for PG accommodation management",
-};
-
 export default function AdminLayout({
   children,
 }: {
