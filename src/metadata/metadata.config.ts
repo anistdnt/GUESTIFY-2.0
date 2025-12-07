@@ -41,6 +41,10 @@ export const metadataMap: Record<string, Metadata> = {
     title: "My Profile | Manage Your Admin Account",
     description: "Update your personal information and account settings.",
   },
+  profile_user: {
+    title: "Profile | Manage Account, Bookings & Wishlist",
+    description: "View and manage your account details, bookings, and wishlist.",
+  },
   login_signup: {
     title: "Login/Signup | Access Your Admin Account",
     description:
@@ -50,5 +54,30 @@ export const metadataMap: Record<string, Metadata> = {
     title: "Thank You | Booking Confirmation",
     description:
       "Thank you for your booking! Your reservation has been successfully confirmed.",
+  },
+  about: {
+    title: "About Us | Learn More About Guestify",
+    description:
+      "Discover more about Guestify, our mission, and how we help manage paying guest properties.",
+  },
+  contact: {
+    title: "Contact Us | Get in Touch with Guestify",
+    description:
+      "Have questions? Reach out to the Guestify team for support and inquiries.",
+  },
+  terms_and_services: {
+    title: "Terms and Services | Guestify",
+    description:
+      "Read the terms and services for using Guestify's platform and services.",
+  },
+  explore_pg: {
+    title: "Explore PGs | Find Paying Guest Houses in West Bengal",
+    description:
+      "Browse and discover paying guest houses across various districts in West Bengal.",
+  },
+  search_pg: {
+    title: "Search PGs | Find Your Ideal Paying Guest House",
+    description:
+      "Search for paying guest houses based on your preferences and requirements.",
   },
 };
