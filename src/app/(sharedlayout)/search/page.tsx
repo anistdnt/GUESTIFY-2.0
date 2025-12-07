@@ -13,7 +13,7 @@ export default function SearchPage({
 }) {
   return (
     <>
-      <div className="bg-gray-100 py-10 flex flex-col gap-5 bg-[url('/assets/about-us-banner.jpg')] bg-fixed">
+      <div className="bg-gray-100 py-10 flex flex-col gap-5 bg-fixed">
         <CollegeSection searchParams={searchParams} />
         <Searchbar />
       </div>
