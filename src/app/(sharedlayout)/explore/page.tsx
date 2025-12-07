@@ -1,6 +1,9 @@
 import CardSection from "@/components/DisplayCard/CardSection";
 import { Districts } from "@/components/Searchbar/Districts";
 import { FilterSection } from "@/components/Searchbar/Filter/FilterSection";
+import { metadataMap } from "@/metadata/metadata.config";
+
+export const metadata = metadataMap['explore_pg'];
 
 export default function ExplorePage({
   searchParams,

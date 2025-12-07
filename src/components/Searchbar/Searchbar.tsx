@@ -99,9 +99,10 @@ const Searchbar = () => {
 
       //Adding query params
       url.set("coordinates", coordinates);
-      url.set("clg_name",college_name);
-      url.set("clg_addr",college_addr);
-      url.set("clg_pin", college_pin?.toString());
+      url.set("kmradi", "20");
+      // url.set("clg_name",college_name);
+      // url.set("clg_addr",college_addr);
+      // url.set("clg_pin", college_pin?.toString());
       url.set("clg_id", college_id);
 
 
