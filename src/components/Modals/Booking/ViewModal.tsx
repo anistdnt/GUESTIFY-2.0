@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { ViewBooking } from "./ViewBooking";
 import { ViewRoom } from "./ViewRoom";
+import BookingPaymentLogs from "./PaymentLogs";
 
 type ModalType = {
   setshowModal: (show: boolean) => void;
@@ -11,7 +12,7 @@ type ModalType = {
 };
 
 export default function ViewModal({ setshowModal, modalData }: ModalType) {
-  const [activeTab, setActiveTab] = useState<"booking" | "room">("booking");
+  const [activeTab, setActiveTab] = useState<"booking" | "room" | "payment">("booking");
 
   return (
     <div
@@ -57,13 +58,24 @@ export default function ViewModal({ setshowModal, modalData }: ModalType) {
           >
             Room Information
           </button>
+
+          <button
+            onClick={() => setActiveTab("payment")}
+            className={`px-4 py-2 text-sm font-medium rounded-t-md transition-colors ${
+              activeTab === "payment"
+                ? "border-b-2 border-yellow-700 text-yellow-700"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Payment Information
+          </button>
         </div>
 
         {/* Content Area */}
         <div className="overflow-y-auto max-h-[65vh] mt-2 pr-1">
           {activeTab === "booking" ? (
             <ViewBooking booking_id={modalData?.booking_id} />
-          ) : (
+          ) : activeTab === "payment" ? <BookingPaymentLogs booking_id={modalData?.booking_id}/>: (
             <ViewRoom room_id={modalData?.room_id} />
           )}
         </div>

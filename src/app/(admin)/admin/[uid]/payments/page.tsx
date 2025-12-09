@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
+import { PaymentResponse } from "@/components/Modals/Booking/PaymentLogs";
 
 interface PaymentLog {
     id: string;
@@ -26,6 +27,12 @@ interface PaymentLog {
     invoice_url: string;
     createdAt: string;
     generatedAt: string;
+}
+
+interface PaymentResponseForAdmin extends PaymentResponse {
+  total: number;
+  filter: string;
+  search: string;
 }
 
 const SkeletonRow = () => (
@@ -52,12 +59,15 @@ export default function PaymentLogList() {
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
-    const [sortBy, setSortBy] = useState("generatedAt");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const [sortBy, setSortBy] = useState("-create");
+    // const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const [showPerPageMenu,setShowPerPageMenu] = useState<boolean>(false);
+    const perPageDropdownRef = useRef<HTMLDivElement>(null);
 
 
     const [dropdownOpen, setDropdownOpen] = useState<"" | "filter" | "sort">("");
     const filterDropdownRef = useRef<HTMLDivElement>(null);
+    const sortDropdownRef = useRef<HTMLDivElement>(null);
 
     // debounce
     function useDebounce<T>(value: T, delay: number): T {
@@ -72,18 +82,38 @@ export default function PaymentLogList() {
 
     useEffect(() => {
         fetchPaymentLogs();
-    }, [currentPage, perPage, filterStatus, debouncedSearch, sortBy, sortOrder]);
+    }, [currentPage, perPage, filterStatus, debouncedSearch, sortBy]);
+
+    // Close dropdowns on outside click
+      useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+          if (
+            (filterDropdownRef.current &&
+            !filterDropdownRef.current.contains(e.target as Node)) ||
+            (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target as Node))
+          )
+            setDropdownOpen("");
+    
+          if (
+            perPageDropdownRef.current &&
+            !perPageDropdownRef.current.contains(e.target as Node)
+          )
+            setShowPerPageMenu(false);
+        };
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+      }, []);
 
     const fetchPaymentLogs = async () => {
         setLoading(true);
         try {
-            const res: ApiReturn<any> = await api_caller(
+            const res: ApiReturn<PaymentResponseForAdmin> = await api_caller<PaymentResponseForAdmin>(
                 "GET",
-                `${API.ADMIN.PAYMENTS.LOGS}?page=${currentPage}&show=${perPage}&filter=${filterStatus}&search=${debouncedSearch}`
+                `${API.ADMIN.PAYMENTS.LOGS}?page=${currentPage}&show=${perPage}&filter=${filterStatus}&search=${debouncedSearch}&sort=${sortBy}`
             );
 
             if (res?.success) {
-                const mapped = res?.data?.map((p: any) => ({
+                const mapped = res?.data?.payments?.map((p: any) => ({
                     id: p?._id,
                     amount: p?.amount,
                     payment_status: p?.payment_status,
@@ -95,14 +125,6 @@ export default function PaymentLogList() {
                     generatedAt: p?.invoice?.generated_at,
                 }));
 
-                // SORTING LOGIC
-                mapped.sort((a: any, b: any) => {
-                    const valA = sortBy === "amount" ? a.amount : new Date(a.generatedAt).getTime();
-                    const valB = sortBy === "amount" ? b.amount : new Date(b.generatedAt).getTime();
-
-                    return sortOrder === "asc" ? valA - valB : valB - valA;
-                });
-
                 setLogs(mapped);
                 setTotalPages(res.data.total_pages);
             } else {
@@ -112,17 +134,6 @@ export default function PaymentLogList() {
             setLoading(false);
         }
     };
-
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (filterDropdownRef.current && !filterDropdownRef.current.contains(e.target as Node)) {
-                setDropdownOpen("");
-            }
-        };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, []);
 
     return (
         <div className="p-6 space-y-6">
@@ -168,7 +179,7 @@ export default function PaymentLogList() {
 
                     {/* SORT SECTION */}
 
-                    <div className="relative">
+                    <div className="relative" ref={sortDropdownRef} >
                         <button
                             onClick={() =>
                                 setDropdownOpen(dropdownOpen === "sort" ? "" : "sort")
@@ -188,20 +199,20 @@ export default function PaymentLogList() {
 
                                 <ul className="py-2 text-sm text-gray-700">
                                     {[
-                                        { label: "Newest First", sortBy: "generatedAt", sortOrder: "desc" },
-                                        { label: "Oldest First", sortBy: "generatedAt", sortOrder: "asc" },
-                                        { label: "Amount – High to Low", sortBy: "amount", sortOrder: "desc" },
-                                        { label: "Amount – Low to High", sortBy: "amount", sortOrder: "asc" },
+                                        { label: "Newest First", sortBy: "-create" },
+                                        { label: "Oldest First", sortBy: "create" },
+                                        { label: "Amount – High to Low", sortBy: "-amount" },
+                                        { label: "Amount – Low to High", sortBy: "amount" },
                                     ].map((opt) => {
                                         const isSelected =
-                                            sortBy === opt.sortBy && sortOrder === opt.sortOrder;
+                                            sortBy === opt.sortBy;
 
                                         return (
                                             <li key={opt.label}>
                                                 <button
                                                     onClick={() => {
                                                         setSortBy(opt.sortBy as any);
-                                                        setSortOrder(opt.sortOrder as any);
+                                                        // setSortOrder(opt.sortOrder as any);
                                                         setDropdownOpen("");
                                                     }}
                                                     className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${isSelected
@@ -355,9 +366,41 @@ export default function PaymentLogList() {
                 {/* Pagination */}
                 {!loading && logs.length > 0 && (
                     <div className="mt-6 pt-4 border-t flex items-center justify-between text-sm text-gray-600">
-                        <div>
-                            <span>{perPage} per page</span>
-                        </div>
+                        <div className="relative" ref={perPageDropdownRef}>
+                                      <button
+                                        onClick={() => setShowPerPageMenu((prev) => !prev)}
+                                        className="flex items-center justify-between px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:ring-2 focus:ring-yellow-400 focus:outline-none w-32"
+                                      >
+                                        {perPage} per page
+                                        <CaretDown size={14} className="ml-2 text-gray-500" />
+                                      </button>
+                        
+                                      {showPerPageMenu && (
+                                        <div className="absolute left-0 bottom-12 z-30 w-40 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-200 animate-fadeIn">
+                                          <div className="px-4 py-2 border-b text-gray-600 font-semibold text-sm">
+                                            Rows per page
+                                          </div>
+                                          <ul className="py-2 text-sm text-gray-700">
+                                            {[5, 10, 20, 50].map((num) => (
+                                              <li key={num}>
+                                                <button
+                                                  onClick={() => {
+                                                    setPerPage(num);
+                                                    setCurrentPage(1);
+                                                    setShowPerPageMenu(false);
+                                                  }}
+                                                  className={`block w-full px-4 py-2 text-left hover:bg-yellow-50 ${
+                                                    num === perPage ? "bg-yellow-100 font-medium" : ""
+                                                  }`}
+                                                >
+                                                  {num} rows
+                                                </button>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      )}
+                                    </div>
                         <div className="flex items-center gap-2">
                             <button
                                 disabled={currentPage === 1}
