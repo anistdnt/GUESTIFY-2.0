@@ -9,6 +9,7 @@ import NoDataFound from "../NoDataFound/NoDataFound";
 import { useRouter } from "next/navigation";
 import { CollegeListSkeleton } from "./CollegeListSkeleton";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
+import Image from "next/image";
 
 
 const ExpandedComp = memo(
@@ -59,10 +60,12 @@ const ExpandedComp = memo(
                 }}
               >
                 <div className="flex items-center py-2 pl-2 rounded hover:bg-gray-50 cursor-pointer">
-                  <img
+                  <Image
                     className="w-10 h-10 mr-2 rounded-md inline-block"
                     src={item.image_url}
                     alt={item.college_name + " logo"}
+                    width={40}
+                    height={40}
                   />
                   <div className="ml-2">
                     <span className="text-black">{item.college_name}</span>{" "}
@@ -80,6 +83,8 @@ const ExpandedComp = memo(
     }
   }
 );
+
+ExpandedComp.displayName = "ExpandedComp";
 
 const Searchbar = () => {
   // const [selectedOption, setSelectedOption] = useState({

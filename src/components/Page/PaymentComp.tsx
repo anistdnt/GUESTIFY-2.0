@@ -18,6 +18,7 @@ import NoDataFound from "@/components/NoDataFound/NoDataFound";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getCurrentMonthName, getCurrentWeekNumber } from "@/lib/utils/utilities";
 import { CurrencyInr } from "@phosphor-icons/react/dist/ssr";
+import { PaymentResponse } from "../Modals/Booking/PaymentLogs";
 
 interface PaymentLog {
   id: string;
@@ -29,6 +30,12 @@ interface PaymentLog {
   invoice_url: string;
   createdAt: string;
   generatedAt: string;
+}
+
+interface PaymentResponseForAdmin extends PaymentResponse {
+  total: number;
+  filter: string;
+  search: string;
 }
 
 type TransactionLineType = {
@@ -54,365 +61,188 @@ const SkeletonRow = () => (
 );
 
 export default function PaymentLogList() {
-  const [logs, setLogs] = useState<PaymentLog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const [sortBy, setSortBy] = useState("generatedAt");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const [logs, setLogs] = useState<PaymentLog[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterStatus, setFilterStatus] = useState("all");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [sortBy, setSortBy] = useState("-create");
+    // const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+    const [showPerPageMenu,setShowPerPageMenu] = useState<boolean>(false);
+    const perPageDropdownRef = useRef<HTMLDivElement>(null);
 
-  const [dropdownOpen, setDropdownOpen] = useState<"" | "filter" | "sort">("");
-  const filterDropdownRef = useRef<HTMLDivElement>(null);
 
-  const [transactionLine, setTransactionLine] = useState<TransactionLineType[]>([]);
-  const [transactionLineLoading, setTransactionLineLoading] = useState<boolean>(false);
-  const [type, setType] = useState<string>("week");
-  const [transactionSummary, setTransactionSummary] = useState<Record<string, number>>({});
-  const [transactionSummaryLoading, setTransactionSummaryLoading] = useState<boolean>(false);
+    const [dropdownOpen, setDropdownOpen] = useState<"" | "filter" | "sort">("");
+    const filterDropdownRef = useRef<HTMLDivElement>(null);
+    const sortDropdownRef = useRef<HTMLDivElement>(null);
 
-  // debounce
-  function useDebounce<T>(value: T, delay: number): T {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-    useEffect(() => {
-      const handler = setTimeout(() => setDebouncedValue(value), delay);
-      return () => clearTimeout(handler);
-    }, [value, delay]);
-    return debouncedValue;
-  }
-  const debouncedSearch = useDebounce(searchTerm, 500);
-
-  useEffect(() => {
-    fetchPaymentLogs();
-  }, [currentPage, perPage, filterStatus, debouncedSearch, sortBy, sortOrder]);
-
-  const fetchPaymentLogs = async () => {
-    setLoading(true);
-    try {
-      const res: ApiReturn<any> = await api_caller(
-        "GET",
-        `${API.ADMIN.PAYMENTS.LOGS}?page=${currentPage}&show=${perPage}&filter=${filterStatus}&search=${debouncedSearch}`
-      );
-
-      if (res?.success) {
-        const mapped = res?.data?.payments?.map((p: any) => ({
-          id: p?._id,
-          booking_id: p?.booking_id,
-          amount: p?.amount,
-          payment_status: p?.payment_status,
-          payment_method: p?.payment_method,
-          name: p?.intent?.name,
-          email: p?.intent?.email,
-          invoice_url: p?.invoice?.url,
-          createdAt: p?.createdAt,
-          generatedAt: p?.invoice?.generated_at,
-        }));
-
-        // SORTING LOGIC
-        mapped.sort((a: any, b: any) => {
-          const valA =
-            sortBy === "amount" ? a.amount : new Date(a.generatedAt).getTime();
-          const valB =
-            sortBy === "amount" ? b.amount : new Date(b.generatedAt).getTime();
-
-          return sortOrder === "asc" ? valA - valB : valB - valA;
-        });
-
-        setLogs(mapped);
-        setTotalPages(res.data.total_pages);
-      } else {
-        toast.error(res.message || "Failed to fetch logs");
-      }
-    } finally {
-      setLoading(false);
+    // debounce
+    function useDebounce<T>(value: T, delay: number): T {
+        const [debouncedValue, setDebouncedValue] = useState(value);
+        useEffect(() => {
+            const handler = setTimeout(() => setDebouncedValue(value), delay);
+            return () => clearTimeout(handler);
+        }, [value, delay]);
+        return debouncedValue;
     }
-  };
+    const debouncedSearch = useDebounce(searchTerm, 500);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        filterDropdownRef.current &&
-        !filterDropdownRef.current.contains(e.target as Node)
-      ) {
-        setDropdownOpen("");
-      }
+    useEffect(() => {
+        fetchPaymentLogs();
+    }, [currentPage, perPage, filterStatus, debouncedSearch, sortBy]);
+
+    // Close dropdowns on outside click
+      useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+          if (
+            (filterDropdownRef.current &&
+            !filterDropdownRef.current.contains(e.target as Node)) ||
+            (sortDropdownRef.current && !sortDropdownRef.current.contains(e.target as Node))
+          )
+            setDropdownOpen("");
+    
+          if (
+            perPageDropdownRef.current &&
+            !perPageDropdownRef.current.contains(e.target as Node)
+          )
+            setShowPerPageMenu(false);
+        };
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+      }, []);
+
+    const fetchPaymentLogs = async () => {
+        setLoading(true);
+        try {
+            const res: ApiReturn<PaymentResponseForAdmin> = await api_caller<PaymentResponseForAdmin>(
+                "GET",
+                `${API.ADMIN.PAYMENTS.LOGS}?page=${currentPage}&show=${perPage}&filter=${filterStatus}&search=${debouncedSearch}&sort=${sortBy}`
+            );
+
+            if (res?.success) {
+                const mapped = res?.data?.payments?.map((p: any) => ({
+                    id: p?._id,
+                    amount: p?.amount,
+                    payment_status: p?.payment_status,
+                    payment_method: p?.payment_method,
+                    name: p?.intent?.name,
+                    email: p?.intent?.email,
+                    invoice_url: p?.invoice?.url,
+                    createdAt: p?.createdAt,
+                    generatedAt: p?.invoice?.generated_at,
+                }));
+
+                setLogs(mapped);
+                setTotalPages(res.data.total_pages);
+            } else {
+                toast.error(res.message || "Failed to fetch logs");
+            }
+        } finally {
+            setLoading(false);
+        }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
 
-  useEffect(() => {
-    const fetchStats_TransactionLine = async (type?: string) => {
-      setTransactionLineLoading(true);
-      let url = `${API.ADMIN.PAYMENTS.TRANSACTION_STATS}`;
-      // Build Queries
-      if (type) {
-        url += `?type=${type}`;
-      }
-      const res: ApiReturn<any> = await api_caller<any>("GET", url);
-      if (res.success) {
-        setTransactionLine(res?.data);
-      } else {
-        toast.error(`${res.message} : ${res.error}`);
-        setTransactionLine([]);
-      }
-      setTransactionLineLoading(false);
-    };
-    fetchStats_TransactionLine(type);
-  }, [type]);
-
-  useEffect(() => {
-    const fetchStats_TransactionSummary = async () => {
-      setTransactionSummaryLoading(true);
-      let url = `${API.ADMIN.PAYMENTS.TRANSACTION_SUMMARY}`;
-      const res: ApiReturn<any> = await api_caller<any>("GET", url);
-      if (res.success) {
-        setTransactionSummary(res?.data);
-      } else {
-        toast.error(`${res.message} : ${res.error}`);
-        setTransactionSummary({});
-      }
-      setTransactionSummaryLoading(false);
-    };
-    fetchStats_TransactionSummary();
-  }, []);
-
-  return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-gray-500">
-          <span>View All</span> <br />
-          <span className="text-4xl font-semibold text-gray-700">
-            Payment <span className="text-yellow-700">Logs</span>
-          </span>
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Track all payments made by tenants — amounts, methods, status and
-          invoices.
-        </p>
-      </div>
-
-      {/* Summary and Stats */}
-      <div className="flex justify-center items-center gap-3">
-        <div className="bg-white shadow-[0_0_10px_rgba(0,0,0,0.12)] rounded-2xl p-4 transition-shadow hover:shadow-[0_0_18px_rgba(0,0,0,0.2)] w-4/6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold mb-4 text-gray-600">
-              Transaction Analytics
-              <p className="text-sm text-gray-500 font-normal">
-                Total Amount Received Over Time in Week / Month
-              </p>
-            </h2>
-            <div className="flex flex-row gap-3 justify-end items-center">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="rangeType"
-                  value="week"
-                  checked={type === "week"}
-                  onChange={() => setType("week")}
-                />
-                <span>Week</span>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="rangeType"
-                  value="month"
-                  checked={type === "month"}
-                  onChange={() => setType("month")}
-                />
-                <span>Month</span>
-              </label>
-            </div>
-          </div>
-          {transactionLineLoading && (
+    return (
+        <div className="p-6 space-y-6">
+            {/* Header */}
             <div>
-              <div
-                className="flex justify-center items-center"
-                style={{ width: "100%", height: "250px" }}
-              >
-                Loading...
-              </div>
+                <h1 className="text-gray-500">
+                    <span>View All</span> <br />
+                    <span className="text-4xl font-semibold text-gray-700">
+                        Payment <span className="text-yellow-700">Logs</span>
+                    </span>
+                </h1>
+                <p className="text-gray-500 mt-2">
+                    Track all payments made by tenants — amounts, methods, status and invoices.
+                </p>
             </div>
-          )}
-          {!transactionLineLoading && transactionLine?.length === 0 && (
-            <div
-              className="flex justify-center items-center"
-              style={{ width: "100%", height: "300px" }}
-            >
-              No Records Found
-            </div>
-          )}
-          {!transactionLineLoading && transactionLine?.length !== 0 && (
-            <ResponsiveContainer width="100%" height={250} className={"mt-8"}>
-              <LineChart
-                data={transactionLine?.map((item) => ({
-                  label: item.name,
-                  value: item.totalAmount,
-                }))}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
 
-                <XAxis
-                  dataKey="label"
-                  padding={{ left: 40, right: 40 }} // <-- Creates horizontal offset
-                />
+            {/* Main Card */}
+            <div className="bg-white rounded-xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] p-6">
 
-                <YAxis
-                  domain={["dataMin - 2", "dataMax + 2"]} // <-- Add vertical breathing space
-                />
+                {/* Search + Filter */}
+                <div className="flex flex-col md:flex-row gap-4 mb-6">
+                    <button
+                        onClick={() => {
+                            setSearchTerm("");
+                            setFilterStatus("all");
+                            setCurrentPage(1);
+                            fetchPaymentLogs();
+                        }}
+                        className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200"
+                    >
+                        <ArrowClockwise size={18} />
+                    </button>
 
-                {/* Show number of transactions */}
-                <Tooltip
-                  formatter={(value: any, name: any, props: any) => {
-                    return [`₹ ${value.toLocaleString()}`, "Total Amount"];
-                  }}
-                />
+                    <div className="flex-1 relative">
+                        <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Search by Name, Email or Method..."
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
+                        />
+                    </div>
 
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#ca8a04"
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          )}
-        </div>
-        <div className="w-2/6 flex flex-col justify-between gap-2">
-          {/* Placeholder for future summary cards or stats */}
-          <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center">
-            <p className="text-gray-500 text-sm">Total Revenue (In Rupees)</p>
-            <p className="text-5xl font-bold">{transactionSummary?.totalRevenue || 0}</p>
-          </div>
-          <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-row gap-3 justify-evenly items-center">
-            <div className="flex flex-col">
-                <p className="text-gray-500 text-xl">Month: {getCurrentMonthName()}</p>
-                <p className="text-3xl font-bold flex items-center gap-1"><CurrencyInr size={16}/><span>{transactionSummary?.thisMonthAmount || 0}</span></p>
-                <hr/>
-                <p className="text-gray-500 text-xs mt-1">Transaction Count: {transactionSummary?.thisMonthCount || 0}</p>
-            </div>
-            <div className="border-2 w-1"></div>
-            <div className="flex flex-col">
-                <p className="text-gray-500 text-xl">Week: {getCurrentWeekNumber()}</p>
-                <p className="text-3xl font-bold flex items-center gap-1"><CurrencyInr size={16}/><span>{transactionSummary?.thisWeekAmount || 0}</span></p>
-                <hr/>
-                <p className="text-gray-500 text-xs mt-1">Transaction Count: {transactionSummary?.thisWeekCount || 0}</p>
-            </div>
-          </div>
-          <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center">
-            <p className="text-gray-500 text-sm">Total Transactions</p>
-            <p className="text-5xl font-bold">{transactionSummary?.totalTransactions || 0}</p>
-          </div>
-        </div>
-      </div>
+                    {/* SORT SECTION */}
 
-      {/* Main Card */}
-      <div className="bg-white rounded-xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] p-6">
-        {/* Search + Filter */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <button
-            onClick={() => {
-              setSearchTerm("");
-              setFilterStatus("all");
-              setCurrentPage(1);
-              fetchPaymentLogs();
-            }}
-            className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200"
-          >
-            <ArrowClockwise size={18} />
-          </button>
-
-          <div className="flex-1 relative">
-            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by Name, Email or Method..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-
-          {/* SORT SECTION */}
-
-          <div className="relative">
-            <button
-              onClick={() =>
-                setDropdownOpen(dropdownOpen === "sort" ? "" : "sort")
-              }
-              className="flex items-center gap-2 px-4 py-2 border rounded-lg"
-            >
-              <FunnelSimple size={18} />
-              Sort
-              <CaretDown size={14} />
-            </button>
-
-            {dropdownOpen === "sort" && (
-              <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-200 animate-fadeIn">
-                <div className="px-4 py-2 border-b text-gray-600 font-semibold text-sm">
-                  Sort by
-                </div>
-
-                <ul className="py-2 text-sm text-gray-700">
-                  {[
-                    {
-                      label: "Newest First",
-                      sortBy: "generatedAt",
-                      sortOrder: "desc",
-                    },
-                    {
-                      label: "Oldest First",
-                      sortBy: "generatedAt",
-                      sortOrder: "asc",
-                    },
-                    {
-                      label: "Amount – High to Low",
-                      sortBy: "amount",
-                      sortOrder: "desc",
-                    },
-                    {
-                      label: "Amount – Low to High",
-                      sortBy: "amount",
-                      sortOrder: "asc",
-                    },
-                  ].map((opt) => {
-                    const isSelected =
-                      sortBy === opt.sortBy && sortOrder === opt.sortOrder;
-
-                    return (
-                      <li key={opt.label}>
+                    <div className="relative" ref={sortDropdownRef} >
                         <button
-                          onClick={() => {
-                            setSortBy(opt.sortBy as any);
-                            setSortOrder(opt.sortOrder as any);
-                            setDropdownOpen("");
-                          }}
-                          className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${
-                            isSelected
-                              ? "bg-yellow-100 font-medium text-yellow-800"
-                              : "hover:bg-yellow-50"
-                          }`}
+                            onClick={() =>
+                                setDropdownOpen(dropdownOpen === "sort" ? "" : "sort")
+                            }
+                            className="flex items-center gap-2 px-4 py-2 border rounded-lg"
                         >
-                          {opt.label}
+                            <FunnelSimple size={18} />
+                            Sort
+                            <CaretDown size={14} />
                         </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-          </div>
 
-          {/* Status Filter */}
-          {/* <div className="relative" ref={filterDropdownRef}>
+                        {dropdownOpen === "sort" && (
+                            <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-200 animate-fadeIn">
+                                <div className="px-4 py-2 border-b text-gray-600 font-semibold text-sm">
+                                    Sort by
+                                </div>
+
+                                <ul className="py-2 text-sm text-gray-700">
+                                    {[
+                                        { label: "Newest First", sortBy: "-create" },
+                                        { label: "Oldest First", sortBy: "create" },
+                                        { label: "Amount – High to Low", sortBy: "-amount" },
+                                        { label: "Amount – Low to High", sortBy: "amount" },
+                                    ].map((opt) => {
+                                        const isSelected =
+                                            sortBy === opt.sortBy;
+
+                                        return (
+                                            <li key={opt.label}>
+                                                <button
+                                                    onClick={() => {
+                                                        setSortBy(opt.sortBy as any);
+                                                        // setSortOrder(opt.sortOrder as any);
+                                                        setDropdownOpen("");
+                                                    }}
+                                                    className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${isSelected
+                                                        ? "bg-yellow-100 font-medium text-yellow-800"
+                                                        : "hover:bg-yellow-50"
+                                                        }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+
+
+
+                    {/* Status Filter */}
+                    {/* <div className="relative" ref={filterDropdownRef}>
             <button
               onClick={() => setDropdownOpen(dropdownOpen === "filter" ? "" : "filter")}
               className="flex items-center justify-between w-40 px-4 py-2 border rounded-lg"
@@ -445,129 +275,163 @@ export default function PaymentLogList() {
               </div>
             )}
           </div> */}
-        </div>
+                </div>
 
-        {/* List */}
-        <div className="space-y-4">
-          {loading ? (
-            Array(5)
-              .fill(0)
-              .map((_, i) => <SkeletonRow key={i} />)
-          ) : logs.length === 0 ? (
-            <NoDataFound text="No Payment Logs Found" />
-          ) : (
-            logs.map((p) => (
-              <div
-                key={p.id}
-                className="bg-white p-5 rounded-xl shadow border border-gray-100 hover:shadow-md transition-all flex justify-between items-start gap-6"
-              >
-                {/* LEFT SECTION */}
-                <div className="flex items-start gap-4 flex-1">
-                  {/* Icon */}
-                  <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-                    <span className="text-2xl">💳</span>
-                  </div>
+                {/* List */}
+                <div className="space-y-4">
+                    {loading ? (
+                        Array(5)
+                            .fill(0)
+                            .map((_, i) => <SkeletonRow key={i} />)
+                    ) : logs.length === 0 ? (
+                        <NoDataFound text="No Payment Logs Found" />
+                    ) : (
+                        logs.map((p) => (
+                            <div
+                                key={p.id}
+                                className="bg-white p-5 rounded-xl shadow border border-gray-100 hover:shadow-md transition-all flex justify-between items-start gap-6"
+                            >
+                                {/* LEFT SECTION */}
+                                <div className="flex items-start gap-4 flex-1">
 
-                  {/* DETAILS BLOCK */}
-                  <div className="flex flex-col gap-3 w-full">
-                    {/* Amount */}
-                    <p className="text-2xl font-bold text-gray-800">
-                      ₹ {p.amount.toLocaleString()}
-                    </p>
+                                    {/* Icon */}
+                                    <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+                                        <span className="text-2xl">💳</span>
+                                    </div>
 
-                    {/* Payment Details + Customer Details */}
-                    <div className="flex items-start gap-6">
-                      {/* Payment Info */}
-                      <div className="flex flex-col text-sm text-gray-600 gap-1 min-w-[200px]">
-                        <span className="font-medium">
-                          Payment Method:{" "}
-                          <span className="text-gray-800">
-                            {p.payment_method.toUpperCase()}
-                          </span>
-                        </span>
+                                    {/* DETAILS BLOCK */}
+                                    <div className="flex flex-col gap-3 w-full">
 
-                        <span>
-                          Paid At:{" "}
-                          <span className="text-gray-800 font-medium">
-                            {new Date(p.generatedAt).toLocaleString()}
-                          </span>
-                        </span>
-                      </div>
+                                        {/* Amount */}
+                                        <p className="text-2xl font-bold text-gray-800">
+                                            ₹ {p.amount.toLocaleString()}
+                                        </p>
 
-                      {/* Vertical Divider */}
-                      <div className="w-px bg-gray-200 h-10"></div>
+                                        {/* Payment Details + Customer Details */}
+                                        <div className="flex items-start gap-6">
 
-                      {/* Customer Info */}
-                      <div className="flex flex-col text-sm">
-                        <p className="text-gray-700 font-semibold">{p.name}</p>
-                        <p className="text-gray-500 text-xs">{p.email}</p>
-                      </div>
+                                            {/* Payment Info */}
+                                            <div className="flex flex-col text-sm text-gray-600 gap-1 min-w-[200px]">
+                                                <span className="font-medium">
+                                                    Payment Method: <span className="text-gray-800">{p.payment_method.toUpperCase()}</span>
+                                                </span>
+
+                                                <span>
+                                                    Paid At:{" "}
+                                                    <span className="text-gray-800 font-medium">
+                                                        {new Date(p.generatedAt).toLocaleString()}
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                            {/* Vertical Divider */}
+                                            <div className="w-px bg-gray-200 h-10"></div>
+
+                                            {/* Customer Info */}
+                                            <div className="flex flex-col text-sm">
+                                                <p className="text-gray-700 font-semibold">{p.name}</p>
+                                                <p className="text-gray-500 text-xs">{p.email}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* RIGHT SECTION */}
+                                <div className="flex flex-row items-start gap-3">
+
+                                    {/* Status */}
+                                    <span
+                                        className={`text-xs px-3 py-1 rounded-full font-semibold tracking-wide self-start ${p.payment_status === "paid"
+                                            ? "bg-green-100 text-green-700"
+                                            : p.payment_status === "pending"
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : "bg-red-100 text-red-700"
+                                            }`}
+                                    >
+                                        {p.payment_status.toUpperCase()}
+                                    </span>
+
+                                    {/* Download Button */}
+                                    <button
+                                        data-tooltip="Download Invoice"
+                                        onClick={() => {
+                                            const a = document.createElement("a");
+                                            a.download = "";
+                                            a.href = p.invoice_url;
+                                            a.click();
+                                        }}
+                                        className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                                    >
+                                        <Download size={18} />
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        ))
+                    )}
+                </div>
+
+                {/* Pagination */}
+                {!loading && logs.length > 0 && (
+                    <div className="mt-6 pt-4 border-t flex items-center justify-between text-sm text-gray-600">
+                        <div className="relative" ref={perPageDropdownRef}>
+                                      <button
+                                        onClick={() => setShowPerPageMenu((prev) => !prev)}
+                                        className="flex items-center justify-between px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 focus:ring-2 focus:ring-yellow-400 focus:outline-none w-32"
+                                      >
+                                        {perPage} per page
+                                        <CaretDown size={14} className="ml-2 text-gray-500" />
+                                      </button>
+                        
+                                      {showPerPageMenu && (
+                                        <div className="absolute left-0 bottom-12 z-30 w-40 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-200 animate-fadeIn">
+                                          <div className="px-4 py-2 border-b text-gray-600 font-semibold text-sm">
+                                            Rows per page
+                                          </div>
+                                          <ul className="py-2 text-sm text-gray-700">
+                                            {[5, 10, 20, 50].map((num) => (
+                                              <li key={num}>
+                                                <button
+                                                  onClick={() => {
+                                                    setPerPage(num);
+                                                    setCurrentPage(1);
+                                                    setShowPerPageMenu(false);
+                                                  }}
+                                                  className={`block w-full px-4 py-2 text-left hover:bg-yellow-50 ${
+                                                    num === perPage ? "bg-yellow-100 font-medium" : ""
+                                                  }`}
+                                                >
+                                                  {num} rows
+                                                </button>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      )}
+                                    </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage((p) => p - 1)}
+                                className="p-2 border rounded-md disabled:opacity-30"
+                            >
+                                <CaretLeft size={16} />
+                            </button>
+                            <span>
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                disabled={currentPage === totalPages}
+                                onClick={() => setCurrentPage((p) => p + 1)}
+                                className="p-2 border rounded-md disabled:opacity-30"
+                            >
+                                <CaretRight size={16} />
+                            </button>
+                        </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* RIGHT SECTION */}
-                <div className="flex flex-row items-start gap-3">
-                  {/* Status */}
-                  <span
-                    className={`text-xs px-3 py-1 rounded-full font-semibold tracking-wide self-start ${
-                      p.payment_status === "paid"
-                        ? "bg-green-100 text-green-700"
-                        : p.payment_status === "pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {p.payment_status.toUpperCase()}
-                  </span>
-
-                  {/* Download Button */}
-                  <button
-                    data-tooltip="Download Invoice"
-                    onClick={() => {
-                      const a = document.createElement("a");
-                      a.download = "";
-                      a.href = p.invoice_url;
-                      a.click();
-                    }}
-                    className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                  >
-                    <Download size={18} />
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+                )}
+            </div>
         </div>
-
-        {/* Pagination */}
-        {!loading && logs.length > 0 && (
-          <div className="mt-6 pt-4 border-t flex items-center justify-between text-sm text-gray-600">
-            <div>
-              <span>{perPage} per page</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-                className="p-2 border rounded-md disabled:opacity-30"
-              >
-                <CaretLeft size={16} />
-              </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => p + 1)}
-                className="p-2 border rounded-md disabled:opacity-30"
-              >
-                <CaretRight size={16} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    );
 }
