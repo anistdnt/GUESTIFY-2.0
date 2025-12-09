@@ -70,7 +70,7 @@ const RoomCard = ({
   }, [showAllAmenities]);
 
   return (
-    <div className="max-w-xs bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-[1.02] hover:shadow-lg transition duration-300">
+    <div className="max-w-xs h-[550px] bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-[1.02] hover:shadow-lg transition duration-300 flex flex-col">
       <div className="relative h-48 w-full">
         <Swiper
           modules={[Navigation, Pagination]}
@@ -97,80 +97,83 @@ const RoomCard = ({
         </div>
       </div>
 
-      <div className="p-4 space-y-2">
-        <h2 className="text-xl font-semibold text-gray-700 truncate">
-          {title}
-        </h2>
+      <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+        <div>
 
-        <div className="text-sm text-gray-700">
-          <span className="font-bold text-lg">₹{rent.toLocaleString()}</span>{" "}
-          <span className="text-sm text-gray-600">
-            ({foodIncluded ? "Food Included" : "Food Excluded"})
-          </span>
-        </div>
+          <h2 className="text-xl font-semibold text-gray-700 truncate">
+            {title}
+          </h2>
 
-        {wifidetails && wifidetails.available === "yes" && (
-          <div className="flex items-center gap-1 text-sm text-gray-700">
-            <WifiHigh size={16} className="text-green-600" />
-            <span>
-              WiFi: {wifidetails.speed} at ₹{wifidetails.cost} (
-              {wifidetails.duration})
+          <div className="text-sm text-gray-700">
+            <span className="font-bold text-lg">₹{rent.toLocaleString()}</span>{" "}
+            <span className="text-sm text-gray-600">
+              ({foodIncluded ? "Food Included" : "Food Excluded"})
             </span>
           </div>
-        )}
 
-        <div className="text-sm text-gray-700 flex items-start gap-1">
-          <Bathtub size={16} />
-          <p>
-            Attached Bathroom:{" "}
-            <span className="font-semibold">
-              {attachedBathroom === "yes" ? "Yes" : "No"}
-            </span>
-          </p>
-        </div>
+          {wifidetails && wifidetails.available === "yes" && (
+            <div className="flex items-center gap-1 text-sm text-gray-700">
+              <WifiHigh size={16} className="text-green-600" />
+              <span>
+                WiFi: {wifidetails.speed} at ₹{wifidetails.cost} (
+                {wifidetails.duration})
+              </span>
+            </div>
+          )}
 
-        <div className="text-sm text-gray-700 flex items-start gap-1">
-          <Wind size={16} />
-          <p>
-            Air Conditioned:{" "}
-            <span className="font-semibold">
-              {airconditioned === "yes" ? "Yes" : "No"}
-            </span>
-          </p>
-        </div>
+          <div className="text-sm text-gray-700 flex items-start gap-1">
+            <Bathtub size={16} />
+            <p>
+              Attached Bathroom:{" "}
+              <span className="font-semibold">
+                {attachedBathroom === "yes" ? "Yes" : "No"}
+              </span>
+            </p>
+          </div>
 
-        <div className="text-sm text-gray-700 flex items-start gap-1">
-          <p>
-            Deposit Duration:{" "}
-            <span className="font-semibold">{depositDuration}</span>
-          </p>
-          <Tooltip text={`You Need to pay on ${depositDuration} basis`} />
-        </div>
+          <div className="text-sm text-gray-700 flex items-start gap-1">
+            <Wind size={16} />
+            <p>
+              Air Conditioned:{" "}
+              <span className="font-semibold">
+                {airconditioned === "yes" ? "Yes" : "No"}
+              </span>
+            </p>
+          </div>
 
-        {/* <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-700 flex items-start gap-1">
+            <p>
+              Deposit Duration:{" "}
+              <span className="font-semibold">{depositDuration}</span>
+            </p>
+            <Tooltip text={`You Need to pay on ${depositDuration} basis`} />
+          </div>
+
+          {/* <div className="text-sm text-gray-700">
                     Rooms Available:{" "}
                     <span className="font-semibold">{roomsAvailable}</span>
                 </div> */}
 
-        <div>
-          <h3 className="text-sm font-medium text-gray-800 mb-1">Amenities</h3>
-          <div className="flex flex-wrap gap-2 text-sm">
-            {amenities.slice(0, 6).map((item, idx) => (
-              <span
-                key={idx}
-                className="flex items-center gap-1 text-green-600 px-2 py-1"
-              >
-                <CheckCircle className="text-green-600" size={20} /> {item}
-              </span>
-            ))}
-            {amenities.length > 6 && (
-              <span
-                className="text-buttons hover:underline text-sm cursor-pointer"
-                onClick={() => setShowAllAmenities(true)}
-              >
-                +{amenities.length - 6} More
-              </span>
-            )}
+          <div>
+            <h3 className="text-sm font-medium text-gray-800 mb-1">Amenities</h3>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {amenities.slice(0, 6).map((item, idx) => (
+                <span
+                  key={idx}
+                  className="flex items-center gap-1 text-green-600 px-2 py-1"
+                >
+                  <CheckCircle className="text-green-600" size={20} /> {item}
+                </span>
+              ))}
+              {amenities.length > 6 && (
+                <span
+                  className="text-buttons hover:underline text-sm cursor-pointer"
+                  onClick={() => setShowAllAmenities(true)}
+                >
+                  +{amenities.length - 6} More
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
