@@ -68,7 +68,7 @@ export default function Header() {
     dispatch(setLoading({ loading: true }));
     const res: ApiReturn<any> = await api_caller<any>("GET", API.USER.LOGOUT);
     if (res.success) {
-      deleteCookie("authToken");
+      deleteCookie("authToken", { path: "/" });
       dispatch(setUserData({}));
       setuserInfo(null);
       setisLoggedIn(false);

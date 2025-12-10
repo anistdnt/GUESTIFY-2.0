@@ -62,9 +62,13 @@ const Login = () => {
       } else {
         redirectUrl = callback_url || "/";
       }
-      setCookie("authToken", res.data?.token, {
-        maxAge: 2 * 60 * 60, //2 hours
+      setCookie("authToken", res?.data?.token, {
+        maxAge: 2 * 60 * 60,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
       });
+
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
       setLoginLoading(false);
       dispatch(setModalVisibility({
