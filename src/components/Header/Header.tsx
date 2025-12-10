@@ -73,7 +73,7 @@ export default function Header() {
       setuserInfo(null);
       setisLoggedIn(false);
       setshowProfileDropdown(false);
-      router.push("/");
+      router.push("/login");
       toast.success(res.message || "Logged out successfully");
     } else {
       toast.error(`${res.message} : ${res.error}`);
