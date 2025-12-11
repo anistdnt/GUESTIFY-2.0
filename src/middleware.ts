@@ -23,7 +23,7 @@ export function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const queries = req.nextUrl.search
   const fullPath = pathname + queries
-  console.log("Middleware - Pathname:", pathname);
+  console.log("Middleware - Pathname:", pathname , queries);
 
   // 🧩 If no token and visiting protected or admin routes → redirect to login
   if (
