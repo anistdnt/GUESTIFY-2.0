@@ -55,7 +55,6 @@ const Login = () => {
       formData
     );
     if (res.success) {
-      console.log("Login Response data:", res?.data);
       const callback_url = getCookie("callback_url");
       let redirectUrl = "";
       if (res?.data?.is_admin) {
