@@ -72,7 +72,7 @@ export default function Header() {
       dispatch(setUserData({}));
       setuserInfo(null);
       setisLoggedIn(false);
-      // setshowProfileDropdown(false);
+      setshowProfileDropdown(false);
       router.push("/login");
       toast.success(res.message || "Logged out successfully");
     } else {

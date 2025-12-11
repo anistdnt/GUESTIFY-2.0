@@ -49,6 +49,8 @@ export function middleware(req: NextRequest) {
 
       // Handle login/signup redirection
       if (pathname.startsWith("/login") || pathname.startsWith("/signup")) {
+        if (!authToken) return res;
+        
         if (decoded?.is_admin) {
           return NextResponse.redirect(
             new URL(`/admin/${decoded?.user_id}/dashboard`, req.url)
