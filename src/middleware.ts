@@ -23,7 +23,7 @@ export function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const queries = req.nextUrl.search
   const fullPath = pathname + queries
-  console.log("Middleware - Pathname:", pathname , queries);
+  console.log("Middleware - Pathname:", pathname, queries);
 
   // 🧩 If no token and visiting protected or admin routes → redirect to login
   if (
@@ -33,11 +33,14 @@ export function middleware(req: NextRequest) {
 
     const redirectRes = NextResponse.redirect(new URL("/login", req.url));
 
-    redirectRes.cookies.set("callback_url", fullPath, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
+    if (!fullPath.includes(undefined)) {
+      redirectRes.cookies.set("callback_url", fullPath, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+      });
+    }
+
 
     return redirectRes;
   }
@@ -81,11 +84,13 @@ export function middleware(req: NextRequest) {
       console.error("JWT decode error:", err);
       const redirectRes = NextResponse.redirect(new URL("/login", req.url));
 
-      redirectRes.cookies.set("callback_url", fullPath, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
+      if (!fullPath.includes(undefined)) {
+        redirectRes.cookies.set("callback_url", fullPath, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === "production",
+          path: "/",
+        });
+      }
 
       return redirectRes;
     }
