@@ -129,9 +129,9 @@ export default function CustomMap({ clg_coords, pgInfo, clg_name, clg_addr, clg_
 
 
 
-  useEffect(() => {
-    console.log(activePopup)
-  }, [activePopup])
+  // useEffect(() => {
+  //   console.log(activePopup)
+  // }, [activePopup])
   // Get user's actual location
   useEffect(() => {
     if (navigator.geolocation) {

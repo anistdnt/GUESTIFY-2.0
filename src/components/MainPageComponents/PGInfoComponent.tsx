@@ -64,7 +64,7 @@ const PGInfoComponent = ({
   clg_pin,
   clg_id,
 }: Iprops) => {
-  console.log("pginfo", pginfo);
+  // console.log("pginfo", pginfo);
 
   const formRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
@@ -74,7 +74,7 @@ const PGInfoComponent = ({
     .reverse() as [number, number];
 
   useEffect(() => {
-    console.log(reviewData);
+    // console.log(reviewData);
   }, [reviewData]);
   const router = useRouter();
 
@@ -101,7 +101,7 @@ const PGInfoComponent = ({
     return (sum / reviewData.length).toFixed(1);
   };
 
-  console.log("Rendering PGInfoComponent with pginfo:", pginfo);
+  // console.log("Rendering PGInfoComponent with pginfo:", pginfo);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
