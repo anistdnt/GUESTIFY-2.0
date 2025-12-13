@@ -159,8 +159,9 @@ const Login = () => {
                 <label htmlFor="rememberMe">Remember Me</label>
               </div>
               <p
-                className="text-buttons text-sm cursor-pointer"
+                className={`text-buttons text-sm cursor-pointer ${loginloading ? "cursor-not-allowed" : ""}`}
                 onClick={() => {
+                  // console.log("Forgot Password clicked");
                   if(!loginloading){
                     dispatch(setModalVisibility({ open: true, type: "reset" }));
                   }

@@ -404,7 +404,7 @@ const PGInfoComponent = ({
                       title={`${
                         room.room_type[0].toUpperCase() +
                         room.room_type.slice(1)
-                      } Room`}
+                      } bed Room`}
                       rent={room.room_rent}
                       foodIncluded={pginfo.food_available === "yes"}
                       roomsAvailable={10}
