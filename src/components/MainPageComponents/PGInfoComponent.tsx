@@ -32,6 +32,8 @@ import dynamic from "next/dynamic";
 import { getAmenityLabel } from "@/data/countryPhone";
 import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { CameraPlus, Trash } from "@phosphor-icons/react/dist/ssr";
+import { useWishlist } from "@/lib/hook/useWishlist";
 
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 const Feedback = lazy(() => import("@/components/Feedback/Feedback"));
@@ -64,7 +66,7 @@ const PGInfoComponent = ({
   clg_pin,
   clg_id,
 }: Iprops) => {
-  console.log("pginfo", pginfo);
+  // console.log("pginfo", pginfo);
 
   const formRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
@@ -73,9 +75,9 @@ const PGInfoComponent = ({
     .map((coord) => Number(coord))
     .reverse() as [number, number];
 
-  useEffect(() => {
-    console.log(reviewData);
-  }, [reviewData]);
+  // useEffect(() => {
+  //   console.log(reviewData);
+  // }, [reviewData]);
   const router = useRouter();
 
   const position: LatLngTuple = pginfo?.location
@@ -100,8 +102,12 @@ const PGInfoComponent = ({
     const sum = reviewData.reduce((acc, review) => acc + review.rating, 0);
     return (sum / reviewData.length).toFixed(1);
   };
+  
 
-  console.log("Rendering PGInfoComponent with pginfo:", pginfo);
+  // Wishlist handler Hook
+  const { addToWishlist, wishlistArray, isUserLoggedIn } = useWishlist();
+
+  // console.log("Rendering PGInfoComponent with pginfo:", pginfo);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -306,6 +312,21 @@ const PGInfoComponent = ({
                     <Phone size={20} />
                     Get Contact Details
                   </button>
+                  {isUserLoggedIn && <button
+                    className="w-full text-buttons border-2 border-buttons hover:text-white hover:bg-buttons hover:border-0  font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+                    onClick={() => {
+                      addToWishlist(pginfo?._id);
+                    }}
+                  >
+                    {wishlistArray?.includes(pginfo?._id) ? <p className="flex justify-center items-center gap-1">
+                      <Trash size={20} />
+                      <span>Remove from Wishlist</span>
+                    </p> : <p className="flex justify-center items-center gap-1">
+                      <CameraPlus size={20} />
+                      <span>Add to Wishlist</span>
+                    </p>}
+                    
+                  </button>}
                 </div>
               </div>
             </div>
@@ -365,7 +386,7 @@ const PGInfoComponent = ({
             <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
           </div>
 
-          <div className="flex flex-wrap gap-6 justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms &&
               rooms.map((room, index) => {
                 // Getting room amenities labels
@@ -383,7 +404,7 @@ const PGInfoComponent = ({
                       title={`${
                         room.room_type[0].toUpperCase() +
                         room.room_type.slice(1)
-                      } Room`}
+                      } bed Room`}
                       rent={room.room_rent}
                       foodIncluded={pginfo.food_available === "yes"}
                       roomsAvailable={10}

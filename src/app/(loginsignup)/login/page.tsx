@@ -83,7 +83,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="min-h-[85vh] flex flex-col lg:flex-row  items-center justify-evenly bg-gray-100 py-10">
+      <div className="min-h-[calc(100vh-64px)] flex flex-col lg:flex-row  items-center justify-evenly bg-gray-100 py-10">
         <Image
           src="/assets/login_illustration.webp"
           height={600}
@@ -159,8 +159,9 @@ const Login = () => {
                 <label htmlFor="rememberMe">Remember Me</label>
               </div>
               <p
-                className="text-buttons text-sm cursor-pointer"
+                className={`text-buttons text-sm cursor-pointer ${loginloading ? "cursor-not-allowed" : ""}`}
                 onClick={() => {
+                  // console.log("Forgot Password clicked");
                   if(!loginloading){
                     dispatch(setModalVisibility({ open: true, type: "reset" }));
                   }
