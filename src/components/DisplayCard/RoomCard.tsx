@@ -7,8 +7,11 @@ import "swiper/css/pagination";
 import { Bathtub, CheckCircle, WifiHigh, Wind, X } from "@phosphor-icons/react";
 import { useState, useRef, useEffect } from "react";
 import Tooltip from "../Forms/Tooltip";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { ArrowsOut } from "@phosphor-icons/react/dist/ssr";
+import { useRouter } from "next/navigation";
+import { RootState } from "@/redux/store";
 type Props = {
   room_id: string;
   title: string;
@@ -49,6 +52,9 @@ const RoomCard = ({
   const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
+  const router = useRouter();
+
+  const profile_info = useSelector((state: RootState) => state.user_slice.userData);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -111,9 +117,24 @@ const RoomCard = ({
       <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
         <div>
           <div className="flex flex-col justify-start items-start gap-1 mb-1">
-            <h2 className="text-2xl font-semibold text-gray-600 truncate">
-              {title}
-            </h2>
+            <div className="flex justify-between items-center flex-1 w-full">
+              <h2 className="text-2xl font-semibold text-gray-600 truncate">
+                {title}
+              </h2>
+              <button data-tooltip="View in Enlarged form" data-tooltip-pos="left" className="p-1 bg-gray-100 rounded-md hover:bg-gray-300 transition" onClick={() => {
+                dispatch(
+                  setModalVisibility({
+                    open: true,
+                    type: "roomimageprev",
+                    modalData: {
+                      images: imageUrls,
+                    },
+                  })
+                );
+              }}>
+                <ArrowsOut size={20} />
+              </button>
+            </div>
 
             <div className="text-sm text-gray-700">
               <span className="font-bold text-lg">
@@ -204,17 +225,21 @@ const RoomCard = ({
           data-tooltip={getTooltipText()}
           disabled={bookinginfo?.booked_by !== null}
           onClick={() => {
-            dispatch(
-              setModalVisibility({
-                open: true,
-                type: "roombooking",
-                modalData: {
-                  caption: "Create New Booking",
-                  room_id: room_id,
-                  title: title,
-                },
-              })
-            );
+            if(profile_info && profile_info?._id){
+              dispatch(
+                setModalVisibility({
+                  open: true,
+                  type: "roombooking",
+                  modalData: {
+                    caption: "Create New Booking",
+                    room_id: room_id,
+                    title: title,
+                  },
+                })
+              );
+            } else {
+              router?.push('/login');
+            }
           }}
         >
           {bookinginfo?.booked_by !== null ? "Already Booked" : "Book Now"}

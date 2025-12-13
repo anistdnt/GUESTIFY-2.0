@@ -249,3 +249,49 @@ label.required::after {
 .heart-animate {
   animation: heartPop 0.25s ease-in-out;
 }
+
+
+/* Navigation button base */
+.room-image-modal .swiper-button-next,
+.room-image-modal .swiper-button-prev {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 9999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+/* Pull buttons inward */
+.room-image-modal .swiper-button-prev {
+  left: 24px;   /* 👈 distance from left edge */
+}
+
+.room-image-modal .swiper-button-next {
+  right: 24px;  /* 👉 distance from right edge */
+}
+
+/* Hover */
+.room-image-modal .swiper-button-next:hover,
+.room-image-modal .swiper-button-prev:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+/* Arrow icon */
+.room-image-modal .swiper-button-next::after,
+.room-image-modal .swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+}
+
+@media (min-width: 768px) {
+  .room-image-modal .swiper-button-prev {
+    left: 40px;
+  }
+
+  .room-image-modal .swiper-button-next {
+    right: 40px;
+  }
+}

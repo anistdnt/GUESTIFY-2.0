@@ -185,11 +185,7 @@ export default function DisplayCard({
                     router.push(
                       `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
                         clg_coords
-                      )}&clg_name=${encodeURIComponent(
-                        clg_name
-                      )}&clg_addr=${encodeURIComponent(
-                        clg_addr
-                      )}&clg_pin=${clg_pin}&clg_id=${clg_id}`
+                      )}&clg_id=${clg_id}`
                     );
                   } else {
                     router?.push(`/pg/${pginfo?._id}`);

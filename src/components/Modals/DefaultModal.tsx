@@ -18,6 +18,7 @@ import RevolkModal from "./Booking/RevolkModal";
 import GenericConfirmationModal from "./GenericConfirmationModal";
 import PaymentSessionModal from "./PaymentSessionModal";
 import SigningInModal from "./SigningInModal";
+import RoomImagePrevModal from "./RoomImagePrevModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -76,6 +77,9 @@ export default function DefaultModal() {
           )}
           {type === "signingin" && (
             <SigningInModal setshowModal={setshowModal}/>
+          )}
+          { type === "roomimageprev" && (
+            <RoomImagePrevModal setshowModal={setshowModal} modalData={modalData} />
           )}
         </div>
       )}
