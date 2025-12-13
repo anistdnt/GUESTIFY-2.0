@@ -99,7 +99,7 @@ export default function CardSection({isSearchByDist = false}: {isSearchByDist?: 
     return (
       <div className="max-w-7xl py-10 mx-auto">
         <div className="flex justify-between items-center max-w-7xl px-4 mx-auto">
-          <p className="font-semibold text-gray-500">Search For : {isSearchByDist ? query.get("district")?.replaceAll("_"," ")?.toUpperCase() : query.get("clg_name")}</p>
+          <p className="font-semibold text-gray-500">Search For : {isSearchByDist ? query.get("district")?.replaceAll("_"," ")?.toUpperCase() : 'West Bengal Colleges'}</p>
           <p className="font-semibold text-gray-500">{cards?.length} Results Found</p>
         </div>
         <div className="pt-5"><NoDataFound text="No Paying Guest Home Found" /></div>

@@ -29,7 +29,7 @@ type Props = {
   bookinginfo: {
     booked_by?: string | null;
     booking_status?: string;
-  }
+  };
 };
 
 const RoomCard = ({
@@ -44,7 +44,7 @@ const RoomCard = ({
   wifidetails,
   attachedBathroom,
   airconditioned,
-  bookinginfo
+  bookinginfo,
 }: Props) => {
   const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -69,8 +69,19 @@ const RoomCard = ({
     };
   }, [showAllAmenities]);
 
+  const getTooltipText = () => {
+    switch (bookinginfo?.booking_status) {
+      case "pending":
+        return "Booking Pending Approval";
+      case "booked":
+        return "This Room is Already Booked";
+      default:
+        return "Click here to Raise a Booking Request";
+    }
+  }
+
   return (
-    <div className="max-w-xs h-[550px] bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-[1.02] hover:shadow-lg transition duration-300 flex flex-col">
+    <div className="h-[550px] bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-[1.02] hover:shadow-lg transition duration-300 flex flex-col">
       <div className="relative h-48 w-full">
         <Swiper
           modules={[Navigation, Pagination]}
@@ -99,54 +110,61 @@ const RoomCard = ({
 
       <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
         <div>
+          <div className="flex flex-col justify-start items-start gap-1 mb-1">
+            <h2 className="text-2xl font-semibold text-gray-600 truncate">
+              {title}
+            </h2>
 
-          <h2 className="text-xl font-semibold text-gray-700 truncate">
-            {title}
-          </h2>
-
-          <div className="text-sm text-gray-700">
-            <span className="font-bold text-lg">₹{rent.toLocaleString()}</span>{" "}
-            <span className="text-sm text-gray-600">
-              ({foodIncluded ? "Food Included" : "Food Excluded"})
-            </span>
-          </div>
-
-          {wifidetails && wifidetails.available === "yes" && (
-            <div className="flex items-center gap-1 text-sm text-gray-700">
-              <WifiHigh size={16} className="text-green-600" />
-              <span>
-                WiFi: {wifidetails.speed} at ₹{wifidetails.cost} (
-                {wifidetails.duration})
+            <div className="text-sm text-gray-700">
+              <span className="font-bold text-lg">
+                ₹{rent.toLocaleString()}
+              </span>{" "}
+              <span className="text-sm text-gray-600">
+                ({foodIncluded ? "Food Included" : "Food Excluded"})
               </span>
             </div>
-          )}
-
-          <div className="text-sm text-gray-700 flex items-start gap-1">
-            <Bathtub size={16} />
-            <p>
-              Attached Bathroom:{" "}
-              <span className="font-semibold">
-                {attachedBathroom === "yes" ? "Yes" : "No"}
-              </span>
-            </p>
           </div>
 
-          <div className="text-sm text-gray-700 flex items-start gap-1">
-            <Wind size={16} />
-            <p>
-              Air Conditioned:{" "}
-              <span className="font-semibold">
-                {airconditioned === "yes" ? "Yes" : "No"}
-              </span>
-            </p>
-          </div>
+          <hr />
 
-          <div className="text-sm text-gray-700 flex items-start gap-1">
-            <p>
-              Deposit Duration:{" "}
-              <span className="font-semibold">{depositDuration}</span>
-            </p>
-            <Tooltip text={`You Need to pay on ${depositDuration} basis`} />
+          <div className="bg-gray-100 p-2 my-1 rounded-md space-y-2">
+            {wifidetails && wifidetails.available === "yes" && (
+              <div className="flex items-center gap-1 text-sm text-gray-700">
+                <WifiHigh size={16} className="text-green-600" />
+                <span>
+                  WiFi: {wifidetails.speed} at ₹{wifidetails.cost} (
+                  {wifidetails.duration})
+                </span>
+              </div>
+            )}
+
+            <div className="text-sm text-gray-700 flex items-start gap-1">
+              <Bathtub size={16} />
+              <p>
+                Attached Bathroom:{" "}
+                <span className="font-semibold">
+                  {attachedBathroom === "yes" ? "Yes" : "No"}
+                </span>
+              </p>
+            </div>
+
+            <div className="text-sm text-gray-700 flex items-start gap-1">
+              <Wind size={16} />
+              <p>
+                Air Conditioned:{" "}
+                <span className="font-semibold">
+                  {airconditioned === "yes" ? "Yes" : "No"}
+                </span>
+              </p>
+            </div>
+
+            <div className="text-sm text-gray-700 flex items-start gap-1">
+              <p>
+                Deposit Duration:{" "}
+                <span className="font-semibold">{depositDuration}</span>
+              </p>
+              <Tooltip text={`You Need to pay on ${depositDuration} basis`} />
+            </div>
           </div>
 
           {/* <div className="text-sm text-gray-700">
@@ -154,10 +172,14 @@ const RoomCard = ({
                     <span className="font-semibold">{roomsAvailable}</span>
                 </div> */}
 
-          <div>
-            <h3 className="text-sm font-medium text-gray-800 mb-1">Amenities</h3>
-            <div className="flex flex-wrap gap-2 text-sm">
-              {amenities.slice(0, 6).map((item, idx) => (
+          <hr/>
+
+          <div className="mt-1">
+            <h3 className="text-sm font-medium text-gray-800 mb-1">
+              Amenities
+            </h3>
+            <div className="flex flex-wrap gap-2 text-sm items-center">
+              {amenities.slice(0, 3).map((item, idx) => (
                 <span
                   key={idx}
                   className="flex items-center gap-1 text-green-600 px-2 py-1"
@@ -165,12 +187,12 @@ const RoomCard = ({
                   <CheckCircle className="text-green-600" size={20} /> {item}
                 </span>
               ))}
-              {amenities.length > 6 && (
+              {amenities.length > 3 && (
                 <span
                   className="text-buttons hover:underline text-sm cursor-pointer"
                   onClick={() => setShowAllAmenities(true)}
                 >
-                  +{amenities.length - 6} More
+                  +{amenities.length - 3} More...
                 </span>
               )}
             </div>
@@ -178,8 +200,8 @@ const RoomCard = ({
         </div>
 
         <button
-          className="mt-3 w-full bg-buttons text-white py-2 rounded-md hover:bg-buttonsHover transition disabled:cursor-not-allowed disabled:bg-yellow-500"
-          data-tooltip={bookinginfo?.booking_status || "Enlist new booking"}
+          className="mt-3 w-full bg-buttons text-white py-2 rounded-md hover:bg-buttonsHover transition disabled:cursor-not-allowed disabled:bg-gray-400"
+          data-tooltip={getTooltipText()}
           disabled={bookinginfo?.booked_by !== null}
           onClick={() => {
             dispatch(
@@ -189,13 +211,13 @@ const RoomCard = ({
                 modalData: {
                   caption: "Create New Booking",
                   room_id: room_id,
-                  title: title
+                  title: title,
                 },
               })
             );
           }}
         >
-          {bookinginfo?.booked_by !== null ? 'Booked' : 'Book Now'}
+          {bookinginfo?.booked_by !== null ? "Already Booked" : "Book Now"}
         </button>
       </div>
       {showAllAmenities && (
