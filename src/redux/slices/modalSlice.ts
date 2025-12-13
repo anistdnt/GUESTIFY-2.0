@@ -6,6 +6,7 @@ interface ModalShowType {
   props?: any;
   open: boolean;
   isDeleted?: boolean;
+  isRefetch?: boolean;
 }
 
 const initialState: ModalShowType = {
@@ -14,6 +15,7 @@ const initialState: ModalShowType = {
   props: {},
   open: false,
   isDeleted: false,
+  isRefetch: false,
 };
 
 const modalSlice = createSlice({
@@ -32,9 +34,12 @@ const modalSlice = createSlice({
     },
     deleteSuccess: (state, action: { payload: boolean }) => {
       state.isDeleted = action.payload;
+    },
+    triggerRefetch: (state, action: { payload: boolean }) => {
+      state.isRefetch = action.payload;
     }
   },
 });
 
-export const { setModalVisibility , hideModal, deleteSuccess} = modalSlice.actions;
+export const { setModalVisibility , hideModal, deleteSuccess, triggerRefetch } = modalSlice.actions;
 export default modalSlice.reducer;

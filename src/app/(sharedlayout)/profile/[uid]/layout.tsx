@@ -1,3 +1,7 @@
+import { metadataMap } from "@/metadata/metadata.config";
+
+export const metadata = metadataMap['profile_user'];
+
 const layout = ({
     children,
     profilebody,

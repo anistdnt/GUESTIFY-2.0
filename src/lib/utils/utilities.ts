@@ -12,3 +12,59 @@ export const formatDate = (isodate: string) => {
 
   return formattedDate;
 };
+
+export function formatDateTime(dateString: string): string {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Invalid Date";
+
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+export function formatSeconds(seconds: number): string {
+  if (seconds < 0 || isNaN(seconds)) return "Expired";
+
+  const days = Math.floor(seconds / (24 * 3600));
+  const hours = Math.floor((seconds % (24 * 3600)) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
+
+  return parts.join(" ");
+}
+
+export function formatTTL(seconds: number) {
+  if (!seconds || seconds <= 0) return "Session Expired";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return `${h}h ${m}m ${s}s remaining`;
+};
+
+// Function for getting current monthname
+export function getCurrentMonthName(): string {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const currentDate = new Date();
+  return monthNames[currentDate.getMonth()];
+}
+
+export function getCurrentWeekNumber(): number {
+  const currentDate = new Date();
+  const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+  const pastDaysOfYear = (currentDate.valueOf() - startOfYear.valueOf()) / 86400000;
+  return Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+}

@@ -1,4 +1,7 @@
+import { metadataMap } from '@/metadata/metadata.config';
 import React from 'react'
+
+export const metadata = metadataMap['terms_and_services'];
 
 export default function TermsPage() {
   return (

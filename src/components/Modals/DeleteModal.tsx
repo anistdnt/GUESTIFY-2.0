@@ -16,7 +16,8 @@ type ModalType = {
 
 const deleteEndpointMap = {
   "pg" : API.PG.DELETE,
-  "room" : API.ROOM.DELETE
+  "room" : API.ROOM.DELETE,
+  "booking": API.ADMIN.BOOKING.DELETE
 }
 
 
@@ -48,7 +49,7 @@ function DeleteModal({ setshowModal, modalData }: ModalType) {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-10"
+      className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50"
       onClick={() => setshowModal(false)}
     >
       <div

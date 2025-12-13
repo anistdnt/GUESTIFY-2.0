@@ -13,7 +13,7 @@ export const FilterIcon = ({ allowed_query_highlight = [] }: FilterIconProps) =>
   // Check if any allowed query param exists in the current URL
   const isHighlighted = allowed_query_highlight?.some(param => query.has(param));
 
-  console.log("Highlighted===>", isHighlighted, allowed_query_highlight, query.toString());
+  // console.log("Highlighted===>", isHighlighted, allowed_query_highlight, query.toString());
 
   const handleFilterClick = () => {
     dispatch(

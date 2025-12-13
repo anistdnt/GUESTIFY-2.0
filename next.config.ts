@@ -27,10 +27,15 @@ const nextConfig: NextConfig = {
         pathname: "/reviews-assets/**",
       },
       {
-      protocol: 'https',
-      hostname: 'images.collegedunia.com',
-      pathname: '/**',
-    },
+        protocol: 'https',
+        hostname: 'images.collegedunia.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '/**',
+      },
     ],
   },
 };

@@ -11,6 +11,14 @@ import DeleteModal from "./DeleteModal";
 import PGEditModal from "./PGEditModal";
 import FilterModal from "./FilterModal";
 import OTPModal from "./ReturnModals/OTPModal";
+import BookingModal from "./BookingModal";
+import ViewModal from "./Booking/ViewModal";
+import AcceptandInitiatePaymentModal from "./Booking/Accept_and_initiatePayment";
+import RevolkModal from "./Booking/RevolkModal";
+import GenericConfirmationModal from "./GenericConfirmationModal";
+import PaymentSessionModal from "./PaymentSessionModal";
+import SigningInModal from "./SigningInModal";
+import RoomImagePrevModal from "./RoomImagePrevModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -37,6 +45,9 @@ export default function DefaultModal() {
           {type === "delete" && (
             <ConfirmationModal setshowModal={setshowModal}/>
           )}
+          {type === "genericConfirmation" && (
+            <GenericConfirmationModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
           {type === "deletePG" && (
             <DeleteModal setshowModal={setshowModal} modalData={modalData}/>
           )}
@@ -48,6 +59,27 @@ export default function DefaultModal() {
           )}
           {type === "otpVerify" && (
             <OTPModal setshowModal={setshowModal} modalData={modalData} {...props}/>
+          )}
+          {type === "roombooking" && (
+            <BookingModal setshowModal={setshowModal} modalData={modalData} />
+          )}
+          {type === "viewbooking" && (
+            <ViewModal setshowModal={setshowModal} modalData={modalData} />
+          )}
+          {type === "accept_and_initiatePayment" && (
+            <AcceptandInitiatePaymentModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "revolke_booking" && (
+            <RevolkModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "paymentSession" && (
+            <PaymentSessionModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          {type === "signingin" && (
+            <SigningInModal setshowModal={setshowModal}/>
+          )}
+          { type === "roomimageprev" && (
+            <RoomImagePrevModal setshowModal={setshowModal} modalData={modalData} />
           )}
         </div>
       )}

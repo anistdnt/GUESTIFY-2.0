@@ -2,25 +2,42 @@
 import Rating from "../Rating/Rating";
 import { CurrencyInr, MapPin, UserPlus } from "@phosphor-icons/react/dist/ssr";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
+import { ProfileType } from "@/types/profile_type";
 import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import FadedImageSlider from "./FadedImageSlider";
+import { Heart } from "@phosphor-icons/react/dist/ssr";
+import { useWishlist } from "@/lib/hook/useWishlist";
 
 type Props = {
   item?: PGData;
   number_of_stars: number;
+  profile?: ProfileType;
+  isSearchByDist?: boolean;
 };
 
-export default function DisplayCard({ item, number_of_stars }: Props) {
+export default function DisplayCard({
+  item,
+  number_of_stars,
+  profile,
+  isSearchByDist,
+}: Props) {
   const router = useRouter();
   const dispatch = useDispatch();
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
+
+  // console.log(pginfo, "pginfo");
+  // console.log(profile_info, "profile");
+
   // Utility to extract coordinates from query string
   const [college_longitude, setLongitude] = useState<number | null>(null);
   const [college_latitude, setLatitude] = useState<number | null>(null);
+
+  // Wishlist handler Hook
+  const { addToWishlist, isUserLoggedIn, wishlistArray } = useWishlist();
 
   const params = useSearchParams();
   const clg_coords = params.get("coordinates");
@@ -29,10 +46,40 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
   const clg_pin = params.get("clg_pin");
   const clg_id = params.get("clg_id") || "";
 
+
   return (
     <>
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <div className="relative">
+          {isUserLoggedIn &&
+          <button
+            className={`absolute top-2 left-2 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-30 ${
+              wishlistArray?.includes(pginfo?._id)
+                ? "heart-animate"
+                : ""
+            }`}
+            onClick={() => addToWishlist(pginfo?._id)}
+            aria-label={
+              wishlistArray?.includes(pginfo?._id)
+                ? "Remove from wishlist"
+                : "Add to wishlist"
+            }
+          >
+            <Heart
+              size={22}
+              weight={
+                wishlistArray?.includes(pginfo?._id)
+                  ? "fill"
+                  : "regular"
+              }
+              color={
+                wishlistArray?.includes(pginfo?._id)
+                  ? "#e0245e"
+                  : "#888"
+              }
+              className="transition-all duration-300"
+            />
+          </button>}
           <FadedImageSlider images={pginfo?.pg_images} />
           {/* PG Type Badge */}
           <span
@@ -134,15 +181,15 @@ export default function DisplayCard({ item, number_of_stars }: Props) {
               <button
                 className="bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded"
                 onClick={() => {
-                  router.push(
-                    `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
-                      clg_coords
-                    )}&clg_name=${encodeURIComponent(
-                      clg_name
-                    )}&clg_addr=${encodeURIComponent(
-                      clg_addr
-                    )}&clg_pin=${clg_pin}&clg_id=${clg_id}`
-                  );
+                  if (!isSearchByDist) {
+                    router.push(
+                      `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
+                        clg_coords
+                      )}&clg_id=${clg_id}`
+                    );
+                  } else {
+                    router?.push(`/pg/${pginfo?._id}`);
+                  }
                 }}
               >
                 View full details

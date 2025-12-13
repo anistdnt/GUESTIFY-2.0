@@ -23,7 +23,7 @@ export default function SliderPGCard({ item, number_of_stars }: Props) {
   const clg_id = params.get("clg_id") || "";
 
   return (
-    <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+    <div className="h-[500px] mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex flex-col">
       <div className="relative">
         <FadedImageSlider images={pginfo?.pg_images} />
         {/* PG Type Badge */}
@@ -41,43 +41,45 @@ export default function SliderPGCard({ item, number_of_stars }: Props) {
         </span>
       </div>
 
-      <div className="p-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-semibold">{pginfo?.pg_name}</h3>
-            <p className="text-sm text-gray-600">{pginfo?.address}</p>
+      <div className="p-4 flex flex-col justify-between flex-1">
+        <div>
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-xl font-semibold">{pginfo?.pg_name}</h3>
+              <p className="text-sm text-gray-600">{pginfo?.address}</p>
+            </div>
           </div>
+
+          <div className="flex flex-wrap items-center gap-3 mt-2 mb-2 text-xs text-green-700">
+            <span
+              className={`${
+                pginfo?.food_available === "yes" ? "bg-green-100" : "bg-red-200"
+              } px-2 py-1 rounded`}
+            >
+              Food Available
+            </span>
+            <span
+              className={`${
+                pginfo?.wifi_available === "yes" ? "bg-green-100" : "bg-red-200"
+              } px-2 py-1 rounded`}
+            >
+              WiFi Available
+            </span>
+            {number_of_stars && number_of_stars !== 0 && (
+              <Rating no_of_star={number_of_stars} />
+            )}
+          </div>
+
+          <hr />
+
+          <p className="mt-2 text-gray-700 text-sm">
+            Home-cooked food, Wi-Fi, AC, and other amenities. Electricity
+            included. Convenient location.
+            <a href="#" className="text-blue-500">
+              Read More
+            </a>
+          </p>
         </div>
-
-        <div className="flex flex-wrap items-center gap-3 mt-2 mb-2 text-xs text-green-700">
-          <span
-            className={`${
-              pginfo?.food_available === "yes" ? "bg-green-100" : "bg-red-200"
-            } px-2 py-1 rounded`}
-          >
-            Food Available
-          </span>
-          <span
-            className={`${
-              pginfo?.wifi_available === "yes" ? "bg-green-100" : "bg-red-200"
-            } px-2 py-1 rounded`}
-          >
-            WiFi Available
-          </span>
-          {number_of_stars && number_of_stars !== 0 && (
-            <Rating no_of_star={number_of_stars} />
-          )}
-        </div>
-
-        <hr />
-
-        <p className="mt-2 text-gray-700 text-sm">
-          Home-cooked food, Wi-Fi, AC, and other amenities. Electricity
-          included. Convenient location.
-          <a href="#" className="text-blue-500">
-            Read More
-          </a>
-        </p>
 
         <div className="flex flex-row flex-wrap gap-3 justify-end items-center text-sm text-gray-500 mt-3">
           <button
@@ -86,11 +88,7 @@ export default function SliderPGCard({ item, number_of_stars }: Props) {
               router.push(
                 `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
                   clg_coords!
-                )}&clg_name=${encodeURIComponent(
-                  clg_name!
-                )}&clg_addr=${encodeURIComponent(
-                  clg_addr!
-                )}&clg_pin=${clg_pin}&clg_id=${clg_id}`
+                )}&clg_id=${clg_id}`
               )
             }
           >

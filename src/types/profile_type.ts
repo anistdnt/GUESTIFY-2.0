@@ -13,4 +13,6 @@ export interface ProfileType {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  is_admin?: boolean;
+  wishlist?: String[];
 }

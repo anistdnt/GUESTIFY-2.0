@@ -32,6 +32,10 @@ export default {
         slideInRight: 'slideInRight 0.3s ease-out forwards',
         slideOutRight: 'slideOutRight 0.3s ease-in forwards',
       },
+      backgroundImage: {
+        'gradient-male': 'linear-gradient(to right, #3B82F6, #6366F1)', // from-blue-500 to-indigo-500
+        'gradient-female': 'linear-gradient(to right, #EC4899, #F43F5E)', // from-pink-500 to-rose-500
+      },
       keyframes: {
         slideFadeIn: {
           "0%": { opacity: "0", transform: "translateY(20px)" },

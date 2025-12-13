@@ -13,6 +13,7 @@ import { PGData } from "@/types/pg_type";
 import toast from "react-hot-toast";
 import SliderPGCard from "../DisplayCard/SliderPGCard";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react/dist/ssr";
+import NoDataFound from "../NoDataFound/NoDataFound";
 
 // install modules
 SwiperCore.use([Navigation, Pagination]);
@@ -84,7 +85,7 @@ export default function SimilerPgs({
 
       {loading ? (
         <SwiperSkeleton />
-      ) : (
+      ) : nearPgs && nearPgs.length > 0 ? (
         <>
           <Swiper
             spaceBetween={24}
@@ -131,6 +132,8 @@ export default function SimilerPgs({
           {/* Pagination dots outside slider */}
           <div ref={paginationRef} className="flex justify-center mt-4"></div>
         </>
+      ) : (
+        <NoDataFound text="No Similar Paying Guest Homes Found" />
       )}
     </div>
   );

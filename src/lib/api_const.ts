@@ -17,7 +17,31 @@ export const API = {
         CHANGE_PASSWORD : "/changePassword",
         DELETE_ACCOUNT : "/deleteAccount",
         GET_PGs : "/getPg/user",
-        GET_STATS : "/getStats"
+        GET_STATS : "/getStats",
+        BOOKING:{
+            CREATE : "/booking/create",
+        }
+    },
+    ADMIN:{
+        DASHBOARD: {
+            BOX: "/statistics/:uid",
+            ROOM_GRAPH: "/statistics/:uid/graph/rooms",
+            BOOKING_LINE: "/statistics/graph/bookings",
+        },
+        BOOKING:{
+            LIST : "/booking/list",
+            VIEW: "/booking/:id/details",
+            CHANGE_STATUS: "/booking/:id/status",
+            DELETE: "/booking",
+            CLOSE_PAYMENT_SESSION: "/booking/:id/payment/close",
+            CREATE_PAYMENT_SESSION: "/booking/:id/payment/create-session",
+            PAYMENTS: "/booking/:id/payment/logs"
+        },
+        PAYMENTS:{
+            LOGS: "/admin/payment/logs",
+            TRANSACTION_STATS: "/payment/transaction/stats",
+            TRANSACTION_SUMMARY: "/payment/transaction/summary"
+        }
     },
     COLLEGE: {
         LIST : "/getAllColleges",
@@ -25,6 +49,7 @@ export const API = {
     },
     PG: {
         ALL : "/getAllpg",
+        ALL_BY_DIST : "/getAllPgByDistrict",
         GET_PG_BY_ID : "/getPg",
         ADD : "/addpg",
         DELETE : "/deletePG",
@@ -33,11 +58,15 @@ export const API = {
         FOR_MAP : "/getPgForMap",
         GET_PG_NEAR_ME : "/getPgNearMe",
         GET_PG_NEAR_PG : "/getPgNearPg",
+        GET_PG_STATS: "/statistics/:uid/pg",
+        CATELOGUE: "/user/:uid/pg/catelogue"
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",
         UPDATE : "/updatePg",
-        DELETE: "/deleteRoom"
+        DELETE: "/deleteRoom",
+        VIEW_ROOM_DETAILS: "/room/:id",
+        CATELOGUE: "/pg/:pgid/room/catelogue"
     },
     REVIEW: {
         GET_REVIWS_OF_PG : "/getReviews",
@@ -55,6 +84,20 @@ export const API = {
     },
     IMAGE: {
         UPLOAD: "/uploadImage",
-        DELETE: "/deleteImage"
+        DELETE: "/deleteImage",
+        MULTIDELETE: "/deleteMultipleImages"
+    },
+    WISHLIST: {
+        ADD: "/wishlist/add",
+        VIEW: "/wishlist",
+        DELETE: "/wishlist/remove"
+    },
+    BOOKING: {
+        VIEW: "/booking/:id/details",
+        ROOMLIST: "/booking/roomlist"
+    },
+    CHECKOUT: {
+        CREATE_SESSION: "/create-checkout-session",
+        CHECKOUT_INFO: "/booking/session/success"
     }
 }
