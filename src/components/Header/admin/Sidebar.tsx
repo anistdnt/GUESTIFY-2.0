@@ -75,6 +75,13 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
         iconEle: <Receipt size={20} className="me-2"/>
       }
     ],
+    tools: [
+      {
+        title: "Attractions",
+        path: `/admin/${userInfo.user_id}/tools/attractions`,
+        iconEle: <Receipt size={20} className="me-2"/>
+      }
+    ],
     account: [
       {
         title: "My Profile",

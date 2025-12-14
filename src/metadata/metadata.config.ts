@@ -32,6 +32,11 @@ export const metadataMap: Record<string, Metadata> = {
     description:
       "Monitor all your payment transactions and earnings from your paying guest properties.",
   },
+  attraction: {
+    title: "Manage your Local Attractions",
+    description:
+      "Monitor all your payment transactions and earnings from your paying guest properties.",
+  },
   pg: {
     title: "Manupulate PG | Add a New Paying Guest Property",
     description:

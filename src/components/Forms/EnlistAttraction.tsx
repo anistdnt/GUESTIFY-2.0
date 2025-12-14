@@ -11,25 +11,8 @@ import {
 } from "@/data/countryPhone";
 import Tooltip from "./Tooltip";
 import ImagePicker from "./imagePicker";
-import dynamic from "next/dynamic";
 
-// Dynamically import both CKEditor and ClassicEditor together
-const CKEditorWrapper = dynamic(
-  () =>
-    Promise.all([
-      import("@ckeditor/ckeditor5-react"),
-      import("@ckeditor/ckeditor5-build-classic"),
-    ]).then(([{ CKEditor }, ClassicEditor]) => {
-      return {
-        default: function CKEditorComponent(props: any) {
-          return <CKEditor editor={ClassicEditor.default} {...props} />;
-        },
-      };
-    }),
-  { ssr: false }
-);
-
-export default function PGForm({
+export default function EnlistAttractionForm({
   caption,
   disabledField,
 }: {
@@ -268,34 +251,6 @@ export default function PGForm({
         </div>
 
         <br />
-
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">
-            Mention any Instruction or Rules for PG <span className="text-red-600 font-semibold">*</span>
-          </label>
-          <CKEditorWrapper
-            data={values.rules || ""}
-            onChange={(event: any, editor: any) => {
-              setFieldValue("rules", editor.getData());
-            }}
-            config={{
-              placeholder: "e.g. Not allowed within PG after 10 P.M",
-            }}
-            onReady={(editor: any) => {
-              editor.editing.view.change((writer: any) => {
-                const editableElement = editor.editing.view.document.getRoot();
-                writer.setStyle("min-height", "140px", editableElement);
-                writer.setStyle("max-height", "140px", editableElement);
-                writer.setStyle("overflow-y", "auto", editableElement);
-              });
-            }}
-          />
-          <ErrorMessage
-            name="rules"
-            component="div"
-            className="text-red-500 text-sm"
-          />
-        </div>
 
         <div>
           <label className="block mb-1 font-medium">
