@@ -345,7 +345,16 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
                       </div>
                       <div>
                         <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Start Date</p>
-                        <p className="font-semibold text-gray-900 text-lg">{previewData.start_date}</p>
+                        {/* <p className="font-semibold text-gray-900 text-lg">{previewData.start_date}</p> */}
+                        <p className="font-semibold text-gray-900 text-lg">
+                          {previewData.start_date
+                            ? new Date(previewData.start_date).toLocaleDateString("en-IN", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : ""}
+                        </p>
                       </div>
                     </div>
 

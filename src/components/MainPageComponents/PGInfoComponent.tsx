@@ -101,8 +101,6 @@ const PGInfoComponent = ({
     return (sum / reviewData.length).toFixed(1);
   };
 
-  console.log("Rendering PGInfoComponent with pginfo:", pginfo);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header with back button */}
