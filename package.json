@@ -27,7 +27,7 @@
     "maplibre-gl": "^5.6.2",
     "maplibre-gl-style-flipper": "^1.0.9",
     "mongoose": "^8.10.1",
-    "next": "^15.0.4",
+    "next": "^15.0.5",
     "react": "^19.0.0",
     "react-calendar": "^6.0.0",
     "react-dom": "^19.0.0",

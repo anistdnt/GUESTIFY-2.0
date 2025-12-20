@@ -2,6 +2,7 @@
 
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
+import { Calendar, ClockAfternoon, HourglassMedium } from "@phosphor-icons/react";
 import { FileDoc } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -80,34 +81,76 @@ export const ViewBooking = ({ booking_id }: { booking_id: string }) => {
 
   if (loading || !data) return <Skeleton />;
 
-  const { room_id, duration, persons, remarks } = data;
+  const { accepted_at , payment_at , start_date , duration, persons, remarks } = data;
 
   return (
     <div className="space-y-6 max-h-[70vh] pr-2">
-      {/* Room Info */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-800">
-          Room Information
-        </h2>
-        <div className="bg-gray-50 p-3 rounded-lg mt-2 border text-gray-700">
-          <p>
-            <span className="font-medium">Room ID:</span> {room_id}
-          </p>
-        </div>
-      </div>
+      
 
-      {/* Duration */}
+      {/* Booking Timeline */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-800">
-          Booking Duration
-        </h2>
-        <div className="bg-gray-50 p-3 rounded-lg mt-2 border text-gray-700 flex gap-4">
-          <p>
-            <span className="font-medium">Years:</span> {duration?.year}
-          </p>
-          <p>
-            <span className="font-medium">Months:</span> {duration?.month}
-          </p>
+        <h2 className="text-lg font-semibold text-gray-800">Booking Timeline</h2>
+
+        <div className="bg-gray-50 p-4 rounded-xl mt-3 border text-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            {/* Start Date */}
+            <div className="flex items-start gap-3">
+              <Calendar size={22} className="text-blue-600 mt-1" />
+              <div>
+                <p className="font-medium">Start Date</p>
+                <p className="text-sm text-gray-600">
+                  {new Date(start_date).toLocaleString("en-IN", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </p>
+              </div>
+            </div>
+
+            {/* Accepted At */}
+            <div className="flex items-start gap-3">
+              <ClockAfternoon size={22} className="text-green-600 mt-1" />
+              <div>
+                <p className="font-medium">Accepted At</p>
+                <p className="text-sm text-gray-600">
+                  {accepted_at
+                    ? new Date(accepted_at).toLocaleString("en-IN", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })
+                    : "—"}
+                </p>
+              </div>
+            </div>
+
+            {/* Payment At */}
+            <div className="flex items-start gap-3">
+              <ClockAfternoon size={22} className="text-purple-600 mt-1" />
+              <div>
+                <p className="font-medium">Payment At</p>
+                <p className="text-sm text-gray-600">
+                  {payment_at
+                    ? new Date(payment_at).toLocaleString("en-IN", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })
+                    : "—"}
+                </p>
+              </div>
+            </div>
+
+            {/* Duration */}
+            <div className="flex items-start gap-3">
+              <HourglassMedium size={22} className="text-orange-600 mt-1" />
+              <div>
+                <p className="font-medium">Duration</p>
+                <p className="text-sm text-gray-600">
+                  {duration?.year} years • {duration?.month} months
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

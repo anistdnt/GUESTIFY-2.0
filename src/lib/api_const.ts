@@ -34,7 +34,16 @@ export const API = {
             CHANGE_STATUS: "/booking/:id/status",
             DELETE: "/booking",
             CLOSE_PAYMENT_SESSION: "/booking/:id/payment/close",
-            CREATE_PAYMENT_SESSION: "/booking/:id/payment/create-session"
+            CREATE_PAYMENT_SESSION: "/booking/:id/payment/create-session",
+            PAYMENTS: "/booking/:id/payment/logs"
+        },
+        PAYMENTS:{
+            LOGS: "/admin/payment/logs",
+            TRANSACTION_STATS: "/payment/transaction/stats",
+            TRANSACTION_SUMMARY: "/payment/transaction/summary"
+        },
+        ATTRACTIONS: {
+            LIST: "/admin/attractions"
         }
     },
     COLLEGE: {

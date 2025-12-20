@@ -162,8 +162,8 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                       </span>
                       <span>{room?.room_rent}</span>
                     </p>
-                    {room?.booked_by && <span data-tooltip={room?.booking_status}>
-                      <Users size={15} weight="fill" className="text-green-700"/>
+                    {room?.booked_by && <span data-tooltip={room?.booking_status === "booked" ? "Room is Booked" : "Payment Pending"}>
+                      <Users size={15} weight="fill" className={`${room?.booking_status === "booked" ? 'text-green-800' : 'text-yellow-600'}`}/>
                     </span>}
                   </div>
                 </div>

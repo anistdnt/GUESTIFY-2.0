@@ -1,6 +1,7 @@
 "use client";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { NavItemsType, UserInfo } from "@/types/admin";
+import { Receipt } from "@phosphor-icons/react";
 import {
   BuildingApartment,
   CaretDown,
@@ -48,7 +49,7 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
         iconEle: <HouseLine size={20} className="me-2" />,
       },
       {
-        title: "Discovered PGs",
+        title: "Discover PGs",
         iconEle: <Compass size={22} className="me-2" />,
         children: [
           {
@@ -68,6 +69,18 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
         path: `/admin/${userInfo.user_id}/bookings`,
         iconEle: <BuildingApartment size={20} className="me-2" />,
       },
+      {
+        title: "Payments",
+        path: `/admin/${userInfo.user_id}/payments`,
+        iconEle: <Receipt size={20} className="me-2"/>
+      }
+    ],
+    tools: [
+      {
+        title: "Attractions",
+        path: `/admin/${userInfo.user_id}/tools/attractions`,
+        iconEle: <Receipt size={20} className="me-2"/>
+      }
     ],
     account: [
       {
@@ -125,13 +138,13 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
                     </button>
 
                     {openAccordion === item.title && (
-                      <ul className="pl-8 mt-2 flex flex-col gap-1">
+                      <ul className="mt-2 ms-6 flex flex-col gap-1 border-s-2 border-gray-400 transition-all duration-200">
                         {item.children.map((child, cidx) =>
                           child.path ? (
                             <Link
                               key={cidx}
                               href={child.path}
-                              className={`flex items-center py-2 px-4 rounded-md text-gray-600 ${
+                              className={`flex items-center ms-1 py-2 px-4 rounded-md text-gray-600 ${
                                 pathname === child.path
                                   ? "bg-yellow-600 text-white"
                                   : "hover:text-yellow-600"

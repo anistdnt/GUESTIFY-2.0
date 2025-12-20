@@ -42,6 +42,7 @@ export default function AdminLayoutComponent({ children }: Props) {
     dispatch(setLoading({ loading: true }));
     const res: ApiReturn<any> = await api_caller<any>("GET", API.USER.LOGOUT);
     if (res.success) {
+      // deleteCookie("authToken");
       deleteCookie("authToken");
       dispatch(setUserData({}));
       setuserInfo(null);
@@ -95,7 +96,7 @@ export default function AdminLayoutComponent({ children }: Props) {
   return (
     <div>
       {/* Sidebar - Always visible */}
-      <div className="fixed left-0 top-0 w-64 h-full bg-[#f8f4f3] p-4 z-40 shadow-md shadow-black/5">
+      <div className="fixed left-0 top-0 w-64 h-full bg-white p-4 z-40 shadow-[2px_0_10px_rgba(0,0,0,0.12)]">
         <Link href="/" className="flex shrink-0 items-center">
           <Image
             src={"/assets/logo-bg-removed.png"}

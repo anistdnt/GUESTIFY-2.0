@@ -1,7 +1,6 @@
 "use client";
 import { Field, ErrorMessage, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import Select from "react-select";
 import {
   yesNoOptions,
@@ -12,8 +11,23 @@ import {
 } from "@/data/countryPhone";
 import Tooltip from "./Tooltip";
 import ImagePicker from "./imagePicker";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import dynamic from "next/dynamic";
+
+// Dynamically import both CKEditor and ClassicEditor together
+const CKEditorWrapper = dynamic(
+  () =>
+    Promise.all([
+      import("@ckeditor/ckeditor5-react"),
+      import("@ckeditor/ckeditor5-build-classic"),
+    ]).then(([{ CKEditor }, ClassicEditor]) => {
+      return {
+        default: function CKEditorComponent(props: any) {
+          return <CKEditor editor={ClassicEditor.default} {...props} />;
+        },
+      };
+    }),
+  { ssr: false }
+);
 
 export default function PGForm({
   caption,
@@ -33,7 +47,11 @@ export default function PGForm({
   },[values?.wifi_available])
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   if (!mounted) return null;
 
   return (
@@ -60,7 +78,7 @@ export default function PGForm({
             name="pg_name"
             placeholder="eg : Shyam Residence"
             className="p-2 border rounded w-full"
-            disabled={disabledField && disabledField?.includes("pg_name")}
+            disabled={disabledField?.includes("pg_name")}
           />
           <ErrorMessage
             name="pg_name"
@@ -107,10 +125,8 @@ export default function PGForm({
           </label>
           <Select
             options={districtOptions}
-            value={districtOptions?.find(
-              (opt) => opt.value === values?.district
-            )}
-            onChange={(option) => setFieldValue("district", option?.value)}
+            value={districtOptions?.find(opt => opt.value === values?.district)}
+            onChange={option => setFieldValue("district", option?.value)}
             placeholder="Select District"
           />
           <ErrorMessage
@@ -126,8 +142,8 @@ export default function PGForm({
           </label>
           <Select
             options={stateOptions}
-            value={stateOptions?.find((opt) => opt.value === values?.state)}
-            onChange={(option) => setFieldValue("state", option?.value)}
+            value={stateOptions?.find(opt => opt.value === values?.state)}
+            onChange={option => setFieldValue("state", option?.value)}
             placeholder="Select State"
           />
           <ErrorMessage
@@ -157,12 +173,12 @@ export default function PGForm({
           <label className="flex items-center gap-1 mb-1 font-medium">
             <span>Type of PG</span>
             <span className="text-red-600 font-semibold">*</span>
-            <Tooltip text="Who can accomodate this PG" />
+            <Tooltip text="Who can accommodate this PG" />
           </label>
           <Select
             options={PGType}
-            value={PGType.find((opt) => opt.value === values.pg_type)}
-            onChange={(option) => setFieldValue("pg_type", option?.value)}
+            value={PGType.find(opt => opt.value === values.pg_type)}
+            onChange={option => setFieldValue("pg_type", option?.value)}
             placeholder="Select Type of PG"
           />
           <ErrorMessage
@@ -174,17 +190,12 @@ export default function PGForm({
 
         <div>
           <label className="block mb-1 font-medium">
-            WiFi Availability{" "}
-            <span className="text-red-600 font-semibold">*</span>
+            WiFi Availability <span className="text-red-600 font-semibold">*</span>
           </label>
           <Select
             options={yesNoOptions}
-            value={yesNoOptions.find(
-              (opt) => opt.value === values.wifi_available
-            )}
-            onChange={(option) =>
-              setFieldValue("wifi_available", option?.value)
-            }
+            value={yesNoOptions.find(opt => opt.value === values.wifi_available)}
+            onChange={option => setFieldValue("wifi_available", option?.value)}
             placeholder="Whether Wifi Available"
           />
           <ErrorMessage
@@ -197,9 +208,7 @@ export default function PGForm({
         {values.wifi_available === "yes" && (
           <div>
             <label className="block mb-1 font-medium">
-              Wifi-Network Speed{" "}
-              <span className="text-gray-600">(In Mbps)</span>{" "}
-              <span className="text-red-600 font-semibold">*</span>
+              Wifi-Network Speed <span className="text-gray-600">(In Mbps)</span> <span className="text-red-600 font-semibold">*</span>
             </label>
             <Field
               name="wifi_speed"
@@ -217,8 +226,7 @@ export default function PGForm({
         {values.wifi_available === "yes" && (
           <div>
             <label className="block mb-1 font-medium">
-              Additional Wifi-Charge{" "}
-              <span className="text-red-600 font-semibold">*</span>
+              Additional Wifi-Charge <span className="text-red-600 font-semibold">*</span>
             </label>
             <div className="flex items-center gap-2 w-full">
               <Field
@@ -229,12 +237,8 @@ export default function PGForm({
               <Select
                 options={depositOptions}
                 className="w-3/12"
-                value={depositOptions.find(
-                  (opt) => opt.value === values.charge_duration
-                )}
-                onChange={(option) =>
-                  setFieldValue("charge_duration", option?.value)
-                }
+                value={depositOptions.find(opt => opt.value === values.charge_duration)}
+                onChange={option => setFieldValue("charge_duration", option?.value)}
                 placeholder="Duration"
               />
             </div>
@@ -248,17 +252,12 @@ export default function PGForm({
 
         <div>
           <label className="block mb-1 font-medium">
-            Food Availability{" "}
-            <span className="text-red-600 font-semibold">*</span>
+            Food Availability <span className="text-red-600 font-semibold">*</span>
           </label>
           <Select
             options={yesNoOptions}
-            value={yesNoOptions.find(
-              (opt) => opt.value === values.food_available
-            )}
-            onChange={(option) =>
-              setFieldValue("food_available", option?.value)
-            }
+            value={yesNoOptions.find(opt => opt.value === values.food_available)}
+            onChange={option => setFieldValue("food_available", option?.value)}
             placeholder="Whether Food Available"
           />
           <ErrorMessage
@@ -272,21 +271,18 @@ export default function PGForm({
 
         <div className="mb-4">
           <label className="block mb-1 font-medium">
-            Mention any Instruction or Rules for PG{" "}
-            <span className="text-red-600 font-semibold">*</span>
+            Mention any Instruction or Rules for PG <span className="text-red-600 font-semibold">*</span>
           </label>
-          <CKEditor
-            editor={ClassicEditor as any}
+          <CKEditorWrapper
             data={values.rules || ""}
-            onChange={(event, editor) => {
-              const data = editor.getData();
-              setFieldValue("rules", data);
+            onChange={(event: any, editor: any) => {
+              setFieldValue("rules", editor.getData());
             }}
             config={{
               placeholder: "e.g. Not allowed within PG after 10 P.M",
             }}
-            onReady={(editor) => {
-              editor.editing.view.change((writer) => {
+            onReady={(editor: any) => {
+              editor.editing.view.change((writer: any) => {
                 const editableElement = editor.editing.view.document.getRoot();
                 writer.setStyle("min-height", "140px", editableElement);
                 writer.setStyle("max-height", "140px", editableElement);
@@ -303,63 +299,10 @@ export default function PGForm({
 
         <div>
           <label className="block mb-1 font-medium">
-            PG Image
-            <span className="text-red-600 font-semibold ms-1">*</span>
+            PG Image <span className="text-red-600 font-semibold ms-1">*</span>
           </label>
           <ImagePicker imageKey="pg_image_url" {...{ setFieldValue, values }} />
         </div>
-
-        {/* <div className="">
-          <label className="block mb-1 font-medium">
-            PG Image
-            <span className="text-red-600 font-semibold ms-1">*</span>
-          </label>
-          <div
-            {...getRootProps()}
-            className={`relative cursor-pointer group border-2 border-dashed rounded-md p-1 w-full h-[250px] flex justify-center
-      ${
-        values["pg_image_url"]
-          ? "border-transparent"
-          : "border-gray-400 hover:border-gray-600"
-      }`}
-          >
-            <input {...getInputProps()} />
-
-            {values["pg_image_url"] ? (
-              <div className="relative inline-block">
-                <img
-                  src={values["pg_image_url"]}
-                  alt="Uploaded preview"
-                  className="max-w-[300px] max-h-[200px] object-contain rounded-md"
-                />
-
-                
-                <div className="absolute inset-0 bg-black bg-opacity-40 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <button
-                    type="button"
-                    className="bg-black bg-opacity-50 text-white font-semibold px-4 py-2 rounded shadow"
-                  >
-                    Change Image
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center">
-                <p className="text-center text-sm text-gray-500">
-                  Drag & drop or click to upload
-                </p>
-              </div>
-            )}
-          </div>
-          <span className="text-sm text-yellow-600">
-            {"("}Note : Image must be in ( jpg / jpeg / png ) format{")"}
-          </span>
-          <ErrorMessage
-            name="pg_image_url"
-            component="div"
-            className="text-red-500 text-sm"
-          />
-        </div> */}
       </div>
     </>
   );

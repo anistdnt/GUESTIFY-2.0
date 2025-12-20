@@ -39,3 +39,35 @@ export interface Person {
   image: string;
   identity_image: string;
 }
+
+export type NearbyPlaceType =
+  | "museum"
+  | "park"
+  | "medical"
+  | "market"
+  | "grocery"
+  | "cafe";
+
+export interface AttractionPlace {
+  _id: string;
+
+  place_name: string;
+  address: string;
+  description?: string;
+
+  image_url?: string;
+  image_id?: string;
+
+  state: string;
+  country: string;
+
+  /** Time taken to reach from PG (in minutes) */
+  time_taken_minutes: number;
+
+  type: NearbyPlaceType;
+
+  createdBy: string | null;
+
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+}

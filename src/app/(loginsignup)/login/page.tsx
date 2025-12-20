@@ -7,7 +7,7 @@ import { Eye, EyeSlash } from "@phosphor-icons/react/dist/ssr";
 import { LoginFormData } from "@/types/auth_type";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { setCookie } from "cookies-next/client";
+import { deleteCookie, getCookie, setCookie } from "cookies-next/client";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { useDispatch } from "react-redux";
@@ -55,15 +55,17 @@ const Login = () => {
       formData
     );
     if (res.success) {
+      const callback_url = getCookie("callback_url");
       let redirectUrl = "";
       if (res?.data?.is_admin) {
-        redirectUrl = `/admin/${res?.data?.user_id}/dashboard`;
+        redirectUrl = callback_url || `/admin/${res?.data?.user_id}/dashboard`;
       } else {
-        redirectUrl = "/";
+        redirectUrl = callback_url || "/";
       }
-      setCookie("authToken", res.data?.token, {
-        maxAge: 2 * 60 * 60, //2 hours
+      setCookie("authToken", res?.data?.token, {
+        maxAge: 2 * 60 * 60, // 2 hours
       });
+
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
       setLoginLoading(false);
       dispatch(setModalVisibility({
@@ -71,6 +73,7 @@ const Login = () => {
         type: "signingin"
       }))
       router?.push(redirectUrl);
+      deleteCookie("callback_url");
       toast.success(res.message || "Loggged In successfully");
     } else {
       setLoginLoading(false);
@@ -80,7 +83,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="min-h-[85vh] flex flex-col lg:flex-row  items-center justify-evenly bg-gray-100 py-10">
+      <div className="min-h-[calc(100vh-64px)] flex flex-col lg:flex-row  items-center justify-evenly bg-gray-100 py-10">
         <Image
           src="/assets/login_illustration.webp"
           height={600}
@@ -156,8 +159,9 @@ const Login = () => {
                 <label htmlFor="rememberMe">Remember Me</label>
               </div>
               <p
-                className="text-buttons text-sm cursor-pointer"
+                className={`text-buttons text-sm cursor-pointer ${loginloading ? "cursor-not-allowed" : ""}`}
                 onClick={() => {
+                  // console.log("Forgot Password clicked");
                   if(!loginloading){
                     dispatch(setModalVisibility({ open: true, type: "reset" }));
                   }
