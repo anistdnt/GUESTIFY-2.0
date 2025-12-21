@@ -43,7 +43,10 @@ export const API = {
             TRANSACTION_SUMMARY: "/payment/transaction/summary"
         },
         ATTRACTIONS: {
-            LIST: "/admin/attractions"
+            LIST: "/admin/attractions",
+            ENLSIT: "/attraction/new",
+            DELETE: "/pg/attraction/:id",
+            TOGGLE: "/pg/:id/attraction/toggle"
         }
     },
     COLLEGE: {
