@@ -45,7 +45,8 @@ export const API = {
         ATTRACTIONS: {
             LIST: "/admin/attractions",
             ENLSIT: "/attraction/new",
-            DELETE: "/pg/attraction/:id"
+            DELETE: "/pg/attraction/:id",
+            TOGGLE: "/pg/:id/attraction/toggle"
         }
     },
     COLLEGE: {

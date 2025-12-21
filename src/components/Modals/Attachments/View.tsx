@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import EnlistAttractionForm from "@/components/Forms/EnlistAttraction";
+import AssignToPG from "./components/AssignToPG";
 
 type ModalType = {
   setshowModal: (show: boolean) => void;
@@ -61,7 +62,7 @@ export default function ViewAttachments({ setshowModal, modalData }: ModalType) 
         {/* Content Area */}
         <div className="overflow-y-auto max-h-[65vh] mt-2 pr-1">
           {activeTab === "attractions" && (
-            <EnlistAttractionForm />
+            <AssignToPG local_attachments={modalData?.attractions} pg_id={modalData?.rowid}/>
           )}
         </div>
       </div>

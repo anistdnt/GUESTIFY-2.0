@@ -43,7 +43,7 @@ export default function LocalAttractionsComp() {
     label: "All",
     value: "all",
   });
-  const [attractions, setAttractions] = useState<AttractionPlace[]>();
+  const [attractions, setAttractions] = useState<AttractionPlace[]>([]);
 
   const isRefetch = useSelector(
     (state: RootState) => state.modal_slice.isRefetch

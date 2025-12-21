@@ -19,7 +19,8 @@ import GenericConfirmationModal from "./GenericConfirmationModal";
 import PaymentSessionModal from "./PaymentSessionModal";
 import SigningInModal from "./SigningInModal";
 import RoomImagePrevModal from "./RoomImagePrevModal";
-import EnlistNewAttraction from "./Attachments/Enlist";
+import EnlistNewAttraction from "./Attachments/components/Enlist";
+import ViewAttachments from "./Attachments/View";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -84,6 +85,9 @@ export default function DefaultModal() {
           )}
           { type === "enlistattraction" && (
             <EnlistNewAttraction setshowModal={setshowModal} modalData={modalData} />
+          )}
+          { type === "viewattachments" && (
+            <ViewAttachments setshowModal={setshowModal} modalData={modalData} />
           )}
         </div>
       )}
