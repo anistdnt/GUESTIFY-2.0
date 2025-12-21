@@ -13,6 +13,13 @@ const Select = dynamic(() => import("react-select"), {
 import NoDataFound from "../NoDataFound/NoDataFound";
 import { AttractionCard } from "../Attraction/AttractionCard";
 import { AttractionSkeleton } from "../Attraction/Skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteSuccess,
+  setModalVisibility,
+  triggerRefetch,
+} from "@/redux/slices/modalSlice";
+import { RootState } from "@/redux/store";
 
 interface Options {
   label: string;
@@ -38,6 +45,15 @@ export default function LocalAttractionsComp() {
   });
   const [attractions, setAttractions] = useState<AttractionPlace[]>();
 
+  const isRefetch = useSelector(
+    (state: RootState) => state.modal_slice.isRefetch
+  );
+  const isDeleted = useSelector(
+    (state: RootState) => state.modal_slice.isDeleted
+  );
+
+  const dispatch = useDispatch();
+
   async function fetchAttractions(type?: string) {
     setLoading(true);
     try {
@@ -60,9 +76,30 @@ export default function LocalAttractionsComp() {
     }
   }
 
+  function onDelete(id: string) {
+    dispatch(
+      setModalVisibility({
+        open: true,
+        type: "genericConfirmation",
+        modalData: {
+          caption: "Delete Attraction",
+          placeholder: "delete this attraction?",
+          btnText: "Delete",
+          endpoint: API.ADMIN.ATTRACTIONS.DELETE.replace(
+            ":id",
+            id
+          ),
+          method: "DELETE",
+        },
+      })
+    );
+  }
+
   useEffect(() => {
     fetchAttractions(selectedOption?.value as string);
-  }, [selectedOption?.value]);
+    dispatch(triggerRefetch(false));
+    dispatch(deleteSuccess(true));
+  }, [selectedOption?.value, isRefetch, isDeleted]);
 
   return (
     <div className="p-6 space-y-6">
@@ -83,7 +120,20 @@ export default function LocalAttractionsComp() {
 
       <div>
         <div className="flex justify-between items-center">
-          <button className="px-3 py-2 bg-buttons hover:bg-buttonsHover text-white rounded-md flex items-center justify-center gap-1">
+          <button
+            onClick={() => {
+              dispatch(
+                setModalVisibility({
+                  open: true,
+                  type: "enlistattraction",
+                  modalData: {
+                    caption: "Enlist Attraction for your Paying Guest House",
+                  },
+                })
+              );
+            }}
+            className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md flex items-center justify-center gap-1"
+          >
             <Plus size={20} />
             <span>Add New</span>
           </button>
@@ -116,7 +166,7 @@ export default function LocalAttractionsComp() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {attractions?.map((attraction) => (
-                <AttractionCard key={attraction._id} attraction={attraction} />
+                <AttractionCard key={attraction._id} attraction={attraction} onDelete={onDelete}/>
               ))}
             </div>
           )}

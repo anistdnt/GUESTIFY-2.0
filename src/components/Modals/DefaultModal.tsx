@@ -19,6 +19,7 @@ import GenericConfirmationModal from "./GenericConfirmationModal";
 import PaymentSessionModal from "./PaymentSessionModal";
 import SigningInModal from "./SigningInModal";
 import RoomImagePrevModal from "./RoomImagePrevModal";
+import EnlistNewAttraction from "./Attachments/Enlist";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -80,6 +81,9 @@ export default function DefaultModal() {
           )}
           { type === "roomimageprev" && (
             <RoomImagePrevModal setshowModal={setshowModal} modalData={modalData} />
+          )}
+          { type === "enlistattraction" && (
+            <EnlistNewAttraction setshowModal={setshowModal} modalData={modalData} />
           )}
         </div>
       )}

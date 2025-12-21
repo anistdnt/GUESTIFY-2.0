@@ -1,34 +1,26 @@
 "use client";
+
 import { Field, ErrorMessage, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 import Select from "react-select";
-import {
-  yesNoOptions,
-  PGType,
-  districtOptions,
-  stateOptions,
-  depositOptions,
-} from "@/data/countryPhone";
 import Tooltip from "./Tooltip";
 import ImagePicker from "./imagePicker";
+import { stateOptions } from "@/data/countryPhone";
+
+export const attractionTypeOptions = [
+  { label: "Medical", value: "medical" },
+  { label: "Restaurant", value: "restaurant" },
+  { label: "ATM", value: "atm" },
+  { label: "Police Station", value: "police" },
+  { label: "Hospital", value: "hospital" },
+];
 
 export default function EnlistAttractionForm({
   caption,
-  disabledField,
 }: {
   caption?: string;
-  disabledField?: string[];
 }) {
   const { setFieldValue, values } = useFormikContext<any>();
-
-  useEffect(()=>{
-    if(values?.wifi_available === "no"){
-      setFieldValue("wifi_speed",0);
-      setFieldValue("additional_wifi_charges",0);
-      setFieldValue("charge_duration","quarterly");
-    }
-  },[values?.wifi_available])
-
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -39,224 +31,154 @@ export default function EnlistAttractionForm({
 
   return (
     <>
-      <div className="mb-10">
-        <div className="flex items-center gap-2 mb-1">
-          <h2 className="text-3xl font-bold text-gray-800">
-            {caption ?? "PG Registration Form"}
-          </h2>
+      {/* IMAGE UPLOAD – PROMINENT */}
+      <div className="mb-8 p-4 border rounded-lg bg-gray-50">
+        <label className="block mb-2 font-semibold text-lg">
+          Place Image <span className="text-red-600">*</span>
+        </label>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <ImagePicker
+            imageKey="image_url"
+            single={true}
+            {...{ setFieldValue, values }}
+          />
+
+          {/* Upload Instructions */}
+          <div className="text-sm text-gray-600 leading-relaxed">
+            <p className="font-medium text-gray-800 mb-1">
+              Image upload guidelines:
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Upload a clear image of the place</li>
+              <li>Avoid blurry or dark photos</li>
+              <li>Image should represent the actual location</li>
+              <li>Only one image is allowed</li>
+            </ul>
+          </div>
         </div>
-        <p className="text-gray-600">
-          Please fill out the details carefully. Fields marked with{" "}
-          <span className="text-red-600 font-semibold">*</span> are mandatory.
-        </p>
+
+        <ErrorMessage
+          name="image_url"
+          component="span"
+          className="text-red-500 text-sm mt-1 block"
+        />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+      {/* MAIN FORM */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Place Name – MOST IMPORTANT */}
         <div>
           <label className="mb-1 font-medium flex items-center gap-1">
-            <span>Name of the Paying Guest House</span>
-            <span className="text-red-600 font-semibold">*</span>
-            <Tooltip text="The end user will see this name on map" />
+            Place Name <span className="text-red-600">*</span>
+            <Tooltip text="This name will be visible to users" />
           </label>
           <Field
-            name="pg_name"
-            placeholder="eg : Shyam Residence"
-            className="p-2 border rounded w-full"
-            disabled={disabledField?.includes("pg_name")}
-          />
-          <ErrorMessage
-            name="pg_name"
-            component="span"
-            className="text-red-500 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">
-            House Number <span className="text-red-600 font-semibold">*</span>
-          </label>
-          <Field
-            name="house_no"
-            placeholder="eg : 72"
+            name="place_name"
+            placeholder="eg: Blue Print Medical Shop"
             className="p-2 border rounded w-full"
           />
           <ErrorMessage
-            name="house_no"
+            name="place_name"
             component="span"
             className="text-red-500 text-sm"
           />
         </div>
 
+        {/* Type */}
         <div>
-          <label className="block mb-1 font-medium">
-            Street Name <span className="text-red-600 font-semibold">*</span>
+          <label className="mb-1 font-medium flex items-center gap-1">
+            Type <span className="text-red-600">*</span>
+            <Tooltip text="This is used to specify the type of attrcation user found" />
+          </label>
+          <Select
+            options={attractionTypeOptions}
+            value={attractionTypeOptions.find(
+              opt => opt.value === values.type
+            )}
+            onChange={option => setFieldValue("type", option?.value)}
+            placeholder="Select type"
+          />
+          <ErrorMessage
+            name="type"
+            component="span"
+            className="text-red-500 text-sm"
+          />
+        </div>
+
+        {/* Address */}
+        <div className="md:col-span-2">
+          <label className="mb-1 font-medium">
+            Address <span className="text-red-600">*</span>
           </label>
           <Field
-            name="street_name"
-            placeholder="eg : Bipin Bihari Street"
+            name="address"
+            placeholder="Full address"
             className="p-2 border rounded w-full"
           />
           <ErrorMessage
-            name="street_name"
+            name="address"
             component="span"
             className="text-red-500 text-sm"
           />
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">
-            District <span className="text-red-600 font-semibold">*</span>
-          </label>
-          <Select
-            options={districtOptions}
-            value={districtOptions?.find(opt => opt.value === values?.district)}
-            onChange={option => setFieldValue("district", option?.value)}
-            placeholder="Select District"
-          />
-          <ErrorMessage
-            name="district"
-            component="span"
-            className="text-red-500 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">
-            State <span className="text-red-600 font-semibold">*</span>
-          </label>
-          <Select
-            options={stateOptions}
-            value={stateOptions?.find(opt => opt.value === values?.state)}
-            onChange={option => setFieldValue("state", option?.value)}
-            placeholder="Select State"
-          />
-          <ErrorMessage
-            name="state"
-            component="span"
-            className="text-red-500 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium">
-            Pincode <span className="text-red-600 font-semibold">*</span>
+        {/* Description */}
+        <div className="md:col-span-2">
+          <label className="mb-1 font-medium">
+            Description <span className="text-red-600">*</span>
           </label>
           <Field
-            name="pincode"
-            placeholder="eg : 700001"
+            as="textarea"
+            rows={3}
+            name="description"
+            placeholder="Short description about the place"
             className="p-2 border rounded w-full"
           />
           <ErrorMessage
-            name="pincode"
+            name="description"
             component="span"
             className="text-red-500 text-sm"
           />
         </div>
 
+        {/* Time Taken */}
         <div>
-          <label className="flex items-center gap-1 mb-1 font-medium">
-            <span>Type of PG</span>
-            <span className="text-red-600 font-semibold">*</span>
-            <Tooltip text="Who can accommodate this PG" />
+          <label className="mb-1 font-medium">
+            Time Taken (minutes) <span className="text-red-600">*</span>
           </label>
-          <Select
-            options={PGType}
-            value={PGType.find(opt => opt.value === values.pg_type)}
-            onChange={option => setFieldValue("pg_type", option?.value)}
-            placeholder="Select Type of PG"
+          <Field
+            type="number"
+            name="time_taken_minutes"
+            placeholder="eg: 2"
+            className="p-2 border rounded w-full"
           />
           <ErrorMessage
-            name="pg_type"
+            name="time_taken_minutes"
             component="span"
             className="text-red-500 text-sm"
           />
         </div>
 
+        {/* State */}
         <div>
-          <label className="block mb-1 font-medium">
-            WiFi Availability <span className="text-red-600 font-semibold">*</span>
+          <label className="mb-1 font-medium">
+            State <span className="text-red-600">*</span>
           </label>
-          <Select
-            options={yesNoOptions}
-            value={yesNoOptions.find(opt => opt.value === values.wifi_available)}
-            onChange={option => setFieldValue("wifi_available", option?.value)}
-            placeholder="Whether Wifi Available"
-          />
-          <ErrorMessage
-            name="wifi_available"
-            component="span"
-            className="text-red-500 text-sm"
-          />
+          <Select options={stateOptions} value={stateOptions[0]} isDisabled />
         </div>
 
-        {values.wifi_available === "yes" && (
-          <div>
-            <label className="block mb-1 font-medium">
-              Wifi-Network Speed <span className="text-gray-600">(In Mbps)</span> <span className="text-red-600 font-semibold">*</span>
-            </label>
-            <Field
-              name="wifi_speed"
-              placeholder="eg : 30 Mbps"
-              className="p-2 border rounded w-full"
-            />
-            <ErrorMessage
-              name="wifi_speed"
-              component="span"
-              className="text-red-500 text-sm"
-            />
-          </div>
-        )}
-
-        {values.wifi_available === "yes" && (
-          <div>
-            <label className="block mb-1 font-medium">
-              Additional Wifi-Charge <span className="text-red-600 font-semibold">*</span>
-            </label>
-            <div className="flex items-center gap-2 w-full">
-              <Field
-                name="additional_wifi_charges"
-                placeholder="eg : 300"
-                className="p-2 border rounded w-9/12"
-              />
-              <Select
-                options={depositOptions}
-                className="w-3/12"
-                value={depositOptions.find(opt => opt.value === values.charge_duration)}
-                onChange={option => setFieldValue("charge_duration", option?.value)}
-                placeholder="Duration"
-              />
-            </div>
-            <ErrorMessage
-              name="additional_wifi_charges"
-              component="span"
-              className="text-red-500 text-sm"
-            />
-          </div>
-        )}
-
+        {/* Country */}
         <div>
-          <label className="block mb-1 font-medium">
-            Food Availability <span className="text-red-600 font-semibold">*</span>
+          <label className="mb-1 font-medium">
+            Country <span className="text-red-600">*</span>
           </label>
-          <Select
-            options={yesNoOptions}
-            value={yesNoOptions.find(opt => opt.value === values.food_available)}
-            onChange={option => setFieldValue("food_available", option?.value)}
-            placeholder="Whether Food Available"
+          <Field
+            name="country"
+            className="p-2 border rounded w-full bg-gray-100"
+            disabled
           />
-          <ErrorMessage
-            name="food_available"
-            component="span"
-            className="text-red-500 text-sm"
-          />
-        </div>
-
-        <br />
-
-        <div>
-          <label className="block mb-1 font-medium">
-            PG Image <span className="text-red-600 font-semibold ms-1">*</span>
-          </label>
-          <ImagePicker imageKey="pg_image_url" {...{ setFieldValue, values }} />
         </div>
       </div>
     </>
