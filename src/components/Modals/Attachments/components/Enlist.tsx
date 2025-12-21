@@ -68,7 +68,7 @@ const FormikSchema = {
 
     image_url: Yup.string().required("Image is required"),
 
-    // image_id: Yup.string().required("Image ID is required"),
+    image_id: Yup.string().required("Image ID is required"),
 
     state: Yup.string().oneOf(["West Bengal"], "Invalid state").required(),
 

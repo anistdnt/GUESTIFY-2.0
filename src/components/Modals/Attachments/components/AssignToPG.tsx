@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { triggerRefetch } from "@/redux/slices/modalSlice";
+import { Minus, Plus } from "@phosphor-icons/react/dist/ssr";
 
 type Props = {
   pg_id: string;
@@ -27,7 +28,7 @@ function AttractionSkeleton() {
   );
 }
 
-function ButtonLoader({text}:{text: string}) {
+function ButtonLoader({ text }: { text: string }) {
   return (
     <span className="flex items-center gap-1">
       <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -133,7 +134,14 @@ export default function AssignToPG({ local_attachments = [], pg_id }: Props) {
                         }
                         className="px-3 py-1 text-sm rounded-md bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
                       >
-                        {actionLoading === attraction._id ? <ButtonLoader text="Removing" /> : "Remove"}
+                        {actionLoading === attraction._id ? (
+                          <ButtonLoader text="Removing" />
+                        ) : (
+                          <p className="flex justify-center items-center gap-1">
+                            <Minus size={13} weight="bold" />
+                            Remove
+                          </p>
+                        )}
                       </button>
                     ) : (
                       <button
@@ -141,7 +149,14 @@ export default function AssignToPG({ local_attachments = [], pg_id }: Props) {
                         onClick={() => toggleAttraction(attraction._id, "add")}
                         className="px-3 py-1 text-sm rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
                       >
-                        {actionLoading === attraction._id ? <ButtonLoader text="Adding" /> : "Add"}
+                        {actionLoading === attraction._id ? (
+                          <ButtonLoader text="Adding" />
+                        ) : (
+                          <p className="flex justify-center items-center gap-1">
+                            <Plus size={13} weight="bold" />
+                            Add
+                          </p>
+                        )}
                       </button>
                     )}
                   </span>

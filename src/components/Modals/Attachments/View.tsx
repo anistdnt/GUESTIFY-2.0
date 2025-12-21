@@ -25,7 +25,7 @@ export default function ViewAttachments({ setshowModal, modalData }: ModalType) 
         {/* Header */}
         <div className="flex justify-between items-center">
           <h3 className="text-xl font-semibold">
-            View Details
+            View Attachments
           </h3>
           <button onClick={() => setshowModal(false)}>
             <X size={22} />

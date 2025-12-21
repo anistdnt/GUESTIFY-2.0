@@ -66,6 +66,9 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
         if(single && imageKey === "identity_image" && values?.identity_image){
             setImages([{ url: values.identity_image, public_id: values.identity_image_id }]);
         }
+        if(single && imageKey === "image_url" && values?.image_url){
+            setImages([{ url: values.image_url, public_id: values.image_id }]);
+        }
     }, [values?.pg_images, imageKey, room?.room_images, values?.image]);
 
     // Upload function (✅ fixed: skip adding temp preview if editing)
@@ -185,6 +188,10 @@ const ImagePicker = ({ values, setFieldValue, imageKey, room, index, single = fa
         if (imageKey === "image" && single) {
             setFieldValue(`persons.${index}.image`, newImages[0]?.url || "");
             setFieldValue(`persons.${index}.image_id`, newImages[0]?.public_id || "");
+        }
+        if(imageKey === "image_url" && single){
+            setFieldValue('image_url', newImages[0]?.url || "");
+            setFieldValue('image_id', newImages[0]?.public_id || "");
         }
         if (imageKey === "identity_image" && single) {
             setFieldValue( `persons.${index}.identity_image`, newImages[0]?.url || "");
