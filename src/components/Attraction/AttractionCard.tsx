@@ -9,7 +9,7 @@ interface AttractionCardProps {
 
 export function AttractionCard({ attraction, onDelete }: AttractionCardProps) {
   return (
-    <div className="relative h-[400px] bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+    <div className="relative h-[420px] bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
       
       {/* IMAGE */}
       <div className="relative w-full h-48 bg-gray-100">
@@ -75,7 +75,7 @@ export function AttractionCard({ attraction, onDelete }: AttractionCardProps) {
           </div>
 
           {attraction.description && (
-            <p className="text-sm text-gray-600 line-clamp-2 mt-2">
+            <p className="text-sm text-gray-600 line-clamp-2 mt-2 mb-2">
               {attraction.description}
             </p>
           )}

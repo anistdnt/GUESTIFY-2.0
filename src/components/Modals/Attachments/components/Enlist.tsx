@@ -138,7 +138,9 @@ function EnlistNewAttraction({ setshowModal, modalData }: ModalType) {
         >
           {({ isSubmitting }) => (
             <Form className="space-y-4">
-              <EnlistAttractionForm />
+              <div className="overflow-y-scroll max-h-96">
+                <EnlistAttractionForm />
+              </div>
 
               {/* Buttons */}
               <div className="flex justify-end gap-2 mt-4">
