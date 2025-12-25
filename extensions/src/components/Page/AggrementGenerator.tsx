@@ -29,6 +29,10 @@ export default function AgreementGenerator() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [user, setUser] = useState<JWTUser | null>(null);
 
+  const [error, setError] = useState<string>(
+    ""
+  );
+
   // Ref for AbortController
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -145,6 +149,7 @@ export default function AgreementGenerator() {
         console.log("Generation stopped by user.");
       } else {
         console.error(err);
+        setError(err.message || "Something went wrong while generating");
       }
       setQueue("");
       setLoading(false);
@@ -164,8 +169,7 @@ export default function AgreementGenerator() {
   };
 
   const handleDiscard = () => {
-    setDraftOutput(""); // drop edits
-    setMode("preview"); // revert view
+    setDraftOutput(output); // drop edits
   };
 
   const html = marked(output);
@@ -216,7 +220,7 @@ export default function AgreementGenerator() {
             {isStreaming && (
               <button
                 onClick={stopGeneration}
-                className="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700"
+                className=" bg-red-600 text-white py-2 rounded hover:bg-red-700 px-2"
               >
                 Stop
               </button>
@@ -250,22 +254,6 @@ export default function AgreementGenerator() {
               className="border bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800"
             >
               Edit
-            </button>
-          )}
-          {output && mode === "edit" && (
-            <button
-              onClick={() => handleDone()}
-              className="border bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800"
-            >
-              Done
-            </button>
-          )}
-          {output && mode === "edit" && (
-            <button
-              onClick={() => handleDiscard()}
-              className="border bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800"
-            >
-              Discard Changes
             </button>
           )}
         </div>
@@ -330,10 +318,12 @@ export default function AgreementGenerator() {
 
         {/* Preview */}
         {!loading && mode === "preview" && output && (
-          <div
-            className="agreement-editor"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
+          <div className="bg-white p-4 rounded-xl shadow-[0_0_10px_rgba(0,0,0,0.12)]">
+            <div
+              className="agreement-editor"
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          </div>
         )}
 
         {/* Edit */}
@@ -344,13 +334,17 @@ export default function AgreementGenerator() {
               const md = turndown.turndown(newHtml);
               setDraftOutput(md);
             }}
+            handleDone={handleDone}
+            handleDiscard={handleDiscard}
+            output={output}
+            draftOuput={draftOutput}
           />
         )}
 
         {!loading && !output && (
           <div className="text-zinc-400 flex justify-center items-center h-[80vh]">
             <div className="flex flex-col gap-2">
-              <div>
+              <div className="flex flex-col items-center gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 64 64"
@@ -359,6 +353,7 @@ export default function AgreementGenerator() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  className="w-64 h-64"
                 >
                   <path d="M14 2h26l10 10v46a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" />
                   <path d="M40 2v10h10" />
@@ -372,8 +367,13 @@ export default function AgreementGenerator() {
 
                   <path d="M42 48l4 4 8-8" />
                 </svg>
+                <span>Agreement will appear here…</span>
               </div>
-              <span>Agreement will appear here…</span>
+              {error && (
+                <div className="mt-5 bg-red-300 text-red-900 border border-red-900 rounded-lg px-3 py-2 font-semibold">
+                  {error}
+                </div>
+              )}
             </div>
           </div>
         )}

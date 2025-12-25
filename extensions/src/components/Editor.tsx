@@ -11,9 +11,20 @@ import { FONT_SIZES, transformSelection } from "@/utils/Generator";
 type Props = {
   html: string | Promise<string>;
   onChange: (html: string) => void;
+  handleDone: () => void;
+  handleDiscard: () => void;
+  output: string;
+  draftOuput: string;
 };
 
-export default function AgreementEditor({ html, onChange }: Props) {
+export default function AgreementEditor({
+  html,
+  onChange,
+  handleDiscard,
+  handleDone,
+  draftOuput,
+  output
+}: Props) {
   const [, forceUpdate] = useState(0);
 
   const editor = useEditor({
@@ -149,6 +160,25 @@ export default function AgreementEditor({ html, onChange }: Props) {
               .run()
           }
         />
+
+        <div className="mx-2 h-5 w-px bg-zinc-300" />
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleDone()}
+            className="border bg-gray-700 text-white px-2 py-1 rounded-md hover:bg-gray-800"
+          >
+            Done
+          </button>
+
+          <button
+            onClick={() => handleDiscard()}
+            className="border bg-red-700 text-white px-2 py-1 rounded-md hover:bg-red-800"
+            disabled={output === draftOuput}
+          >
+            Discard Changes
+          </button>
+        </div>
       </div>
 
       {/* Document */}
