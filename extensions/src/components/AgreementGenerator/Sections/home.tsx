@@ -1,19 +1,33 @@
 "use client";
 import React, { Dispatch, SetStateAction } from "react";
-import { RobotIcon, StopCircleIcon } from "@phosphor-icons/react";
+import {
+  ClockCounterClockwiseIcon,
+  RobotIcon,
+  StopCircleIcon,
+  SwapIcon,
+} from "@phosphor-icons/react";
 
 type Props = {
-    name: string;
-    email: string;
-    prompt: string;
-    setPrompt: Dispatch<SetStateAction<string>>;
-    isStreaming: boolean;
-    handleGenerate: () => Promise<void>;
-    promptHistory: string[];
-    stopGeneration: () => void;
+  name: string;
+  email: string;
+  prompt: string;
+  setPrompt: Dispatch<SetStateAction<string>>;
+  isStreaming: boolean;
+  handleGenerate: () => Promise<void>;
+  promptHistory: string[];
+  stopGeneration: () => void;
 };
 
-export default function HomeSection({email, handleGenerate, isStreaming, name, prompt, setPrompt, promptHistory, stopGeneration}: Props) {
+export default function HomeSection({
+  email,
+  handleGenerate,
+  isStreaming,
+  name,
+  prompt,
+  setPrompt,
+  promptHistory,
+  stopGeneration,
+}: Props) {
   return (
     <div>
       <div className="my-4">
@@ -59,15 +73,20 @@ export default function HomeSection({email, handleGenerate, isStreaming, name, p
 
       {/* Prompt History */}
       <div className="mt-4 flex-1 flex flex-col">
-        <h3 className="text-sm font-medium mb-2">Prompt History</h3>
-        <ul className="text-sm space-y-2 overflow-auto flex-1">
+        <h3 className="flex flex-row justify-start items-center gap-2 text-sm font-medium mb-3 text-gray-700">
+          <ClockCounterClockwiseIcon size={22} weight="fill" />
+          <span>Prompt History</span>
+        </h3>
+        <ul className="text-sm text-gray-600 space-y-2 overflow-y-scroll h-52">
           {promptHistory.map((p, i) => (
             <li
               key={i}
-              onClick={() => setPrompt(p)}
-              className="cursor-pointer p-2 bg-zinc-50 rounded hover:bg-zinc-200 break-words"
+              className="cursor-pointer p-2 bg-zinc-50 rounded break-words flex justify-between items-center"
             >
-              {p}
+              <span>{p}</span>
+              <span onClick={() => setPrompt(p)} className="cursor-pointer">
+                <SwapIcon size={20} weight="fill" />
+              </span>
             </li>
           ))}
         </ul>

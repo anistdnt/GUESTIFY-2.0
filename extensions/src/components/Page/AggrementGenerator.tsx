@@ -8,8 +8,9 @@ import { API } from "@/app/api/_api_const";
 import Link from "next/link";
 import Image from "next/image";
 import HomeSection from "../AgreementGenerator/Sections/home";
-import { HouseIcon, ListDashesIcon } from "@phosphor-icons/react";
+import { HouseIcon, InfoIcon, ListDashesIcon } from "@phosphor-icons/react";
 import ListSection from "../AgreementGenerator/Sections/list";
+import Preview from "../AgreementGenerator/Preview";
 
 const AgreementEditor = dynamic(() => import("../AgreementGenerator/Editor"), {
   ssr: false,
@@ -168,54 +169,59 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
       <div className="w-1/3 p-3 flex flex-row gap-4">
         <div className="bg-white py-3 px-2 h-full shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-lg flex flex-col gap-4">
           <div onClick={() => setSection("home")} className="cursor-pointer">
-            <HouseIcon size={28} weight="fill" className={section === "home" ? "text-gray-600" : "text-gray-400"} />
+            <HouseIcon
+              size={28}
+              weight="fill"
+              className={section === "home" ? "text-gray-600" : "text-gray-400"}
+            />
           </div>
           <hr />
           <div onClick={() => setSection("list")} className="cursor-pointer">
-            <ListDashesIcon size={28} weight="fill" className={section === "list" ? "text-gray-600" : "text-gray-400"} />
+            <ListDashesIcon
+              size={28}
+              weight="fill"
+              className={section === "list" ? "text-gray-600" : "text-gray-400"}
+            />
           </div>
         </div>
         <div className="bg-white py-3 px-4 h-full shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-2xl flex-1">
-          <Link href="/" className="flex shrink-0 items-center mb-1">
-            <Image
-              src={"/logo-bg-removed.png"}
-              alt="Logo"
-              width={130}
-              height={50}
-              loading="eager"
-            />
-          </Link>
+          <div className="flex justify-between items-center">
+            <Link href="/" className="flex shrink-0 items-center mb-1">
+              <Image
+                src={"/logo-bg-removed.png"}
+                alt="Logo"
+                width={130}
+                height={50}
+                loading="eager"
+              />
+            </Link>
+            <p className="text-xs text-gray-600 bg-gray-200 border border-gray-600 px-2 py-1 rounded-lg flex justify-center items-center gap-1">
+              <span><InfoIcon size={14} weight="fill" /></span>
+              <span>{mode === "edit" ? "Editor Mode" : "Preview Mode"}</span>
+            </p>
+          </div>
           <hr />
-          
-          {/* Sections */}
-          {section === "home" && <HomeSection
-            email={email as string}
-            name={name}
-            handleGenerate={handleGenerate}
-            isStreaming={isStreaming}
-            prompt={prompt}
-            setPrompt={setPrompt}
-            promptHistory={promptHistory}
-            stopGeneration={stopGeneration}
-          />}
 
-          {section === "list" && <ListSection/>}
+          {/* Sections */}
+          {section === "home" && (
+            <HomeSection
+              email={email as string}
+              name={name}
+              handleGenerate={handleGenerate}
+              isStreaming={isStreaming}
+              prompt={prompt}
+              setPrompt={setPrompt}
+              promptHistory={promptHistory}
+              stopGeneration={stopGeneration}
+            />
+          )}
+
+          {section === "list" && <ListSection />}
         </div>
       </div>
 
       {/* RIGHT — Agreement */}
       <div className="w-2/3 p-8 overflow-auto bg-zinc-100">
-        <div className="flex justify-start mb-2">
-          {output && mode === "preview" && (
-            <button
-              onClick={() => handleEdit()}
-              className="border bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800"
-            >
-              Edit
-            </button>
-          )}
-        </div>
-
         {/* Thinking animation */}
         {loading && (
           <div className="flex justify-center items-center text-zinc-400 h-[80vh]">
@@ -275,14 +281,11 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         )}
 
         {/* Preview */}
-        {!loading && mode === "preview" && output && (
-          <div className="bg-white p-4 rounded-xl shadow-[0_0_10px_rgba(0,0,0,0.12)]">
-            <div
-              className="agreement-editor"
-              dangerouslySetInnerHTML={{ __html: html }}
-            />
-          </div>
-        )}
+        <div className="flex justify-start mb-2">
+          {!loading && mode === "preview" && output && (
+            <Preview handleEdit={handleEdit} html={html} />
+          )}
+        </div>
 
         {/* Edit */}
         {!loading && mode === "edit" && (

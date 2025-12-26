@@ -7,6 +7,7 @@ import Underline from "@tiptap/extension-underline";
 import { TextStyle, FontSize } from "@tiptap/extension-text-style";
 import { ToolbarButton } from "./ToolbarButton";
 import { FONT_SIZES, transformSelection } from "@/utils/Generator";
+import { ArrowCounterClockwiseIcon, CheckCircleIcon } from "@phosphor-icons/react";
 
 type Props = {
   html: string | Promise<string>;
@@ -166,17 +167,19 @@ export default function AgreementEditor({
         <div className="flex gap-2">
           <button
             onClick={() => handleDone()}
-            className="border bg-gray-700 text-white px-2 py-1 rounded-md hover:bg-gray-800"
+            className="border bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded-md flex justify-center items-center gap-1 text-sm"
           >
-            Done
+            <span><CheckCircleIcon size={15} weight="fill" /></span>
+            <span>Done</span>
           </button>
 
           <button
             onClick={() => handleDiscard()}
-            className="border bg-red-700 text-white px-2 py-1 rounded-md hover:bg-red-800"
+            className="border bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 flex justify-center items-center gap-1 text-sm"
             disabled={output === draftOuput}
           >
-            Discard Changes
+            <span><ArrowCounterClockwiseIcon size={15} weight="fill" /></span>
+            <span>Discard Changes</span>
           </button>
         </div>
       </div>
