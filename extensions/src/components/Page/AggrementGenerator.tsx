@@ -4,21 +4,30 @@ import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { marked } from "marked";
 import TurndownService from "turndown";
-import { jwtDecode } from "jwt-decode";
+import { API } from "@/app/api/_api_const";
 import Link from "next/link";
 import Image from "next/image";
+import HomeSection from "../AgreementGenerator/Sections/home";
+import { HouseIcon, InfoIcon, ListDashesIcon } from "@phosphor-icons/react";
+import ListSection from "../AgreementGenerator/Sections/list";
+import Preview from "../AgreementGenerator/Preview";
 
-const AgreementEditor = dynamic(() => import("../Editor"), { ssr: false });
+const AgreementEditor = dynamic(() => import("../AgreementGenerator/Editor"), {
+  ssr: false,
+});
 const turndown = new TurndownService();
 
 type Mode = "preview" | "edit";
 
-interface JWTUser {
+type Sections = "home" | "list" | "settings";
+
+interface CompProps {
   name: string;
   email?: string;
+  token: string;
 }
 
-export default function AgreementGenerator() {
+export default function AgreementGenerator({ name, token, email }: CompProps) {
   const [prompt, setPrompt] = useState("");
   const [promptHistory, setPromptHistory] = useState<string[]>([]);
   const [output, setOutput] = useState(""); // markdown
@@ -26,25 +35,13 @@ export default function AgreementGenerator() {
   const [queue, setQueue] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<Mode>("preview");
+  const [section, setSection] = useState<Sections>("home");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [user, setUser] = useState<JWTUser | null>(null);
+
+  const [error, setError] = useState<string>("");
 
   // Ref for AbortController
   const abortControllerRef = useRef<AbortController | null>(null);
-
-  /* ---------------- Decode JWT from URL ---------------- */
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode<JWTUser>(token);
-        setUser(decoded);
-      } catch (error) {
-        console.error("Invalid token");
-      }
-    }
-  }, []);
 
   /* ---------------- Smooth streaming typing ---------------- */
   useEffect(() => {
@@ -86,28 +83,24 @@ export default function AgreementGenerator() {
     abortControllerRef.current = abortController;
 
     try {
-      const res = await fetch(
-        "http://localhost:3001/backend/aggrement/generate",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sessionId: "abcdefgh",
-            payload: {
-              /* ... payload ... */
-            },
-            instruction: prompt,
-          }),
-          signal: abortController.signal, // attach signal
-          cache: "no-store",
-        }
-      );
+      const res = await fetch(`/api/generateAgreement?token=${token}`, {
+        method: "POST",
+        body: JSON.stringify({
+          url: API.ADMIN.EXTENSION.GENERATE_AGREEMENT,
+          sessionId: "abcdefgh",
+          payload: {},
+          instruction: prompt,
+        }),
+        signal: abortController.signal,
+        cache: "no-store",
+      });
 
       setPrompt("");
 
-      if (!res.body) {
+      if (!res.body || !res.ok) {
         setLoading(false);
         setIsStreaming(false);
+        setError(res.statusText || "Something went wrong while generating");
         return;
       }
 
@@ -145,6 +138,7 @@ export default function AgreementGenerator() {
         console.log("Generation stopped by user.");
       } else {
         console.error(err);
+        setError(err.message || "Something went wrong while generating");
       }
       setQueue("");
       setLoading(false);
@@ -152,7 +146,7 @@ export default function AgreementGenerator() {
     }
   };
 
-  // Actions
+  // -------- Actions-----------
   const handleEdit = () => {
     setDraftOutput(output); // snapshot
     setMode("edit");
@@ -164,8 +158,7 @@ export default function AgreementGenerator() {
   };
 
   const handleDiscard = () => {
-    setDraftOutput(""); // drop edits
-    setMode("preview"); // revert view
+    setDraftOutput(output); // drop edits
   };
 
   const html = marked(output);
@@ -173,103 +166,62 @@ export default function AgreementGenerator() {
   return (
     <div className="flex h-screen bg-zinc-100">
       {/* LEFT — Welcome, Prompt & History */}
-      <div className="w-1/3 p-3 flex flex-col gap-4">
-        {/* <div className="bg-white py-3 px-4 shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-2xl">
-          <Link href="/" className="flex shrink-0 items-center">
-            <Image
-              src={"/logo-bg-removed.png"}
-              alt="Logo"
-              width={130}
-              height={50}
-              loading="eager"
+      <div className="w-1/3 p-3 flex flex-row gap-4">
+        <div className="bg-white py-3 px-2 h-full shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-lg flex flex-col gap-4">
+          <div onClick={() => setSection("home")} className="cursor-pointer">
+            <HouseIcon
+              size={28}
+              weight="fill"
+              className={section === "home" ? "text-gray-600" : "text-gray-400"}
             />
-          </Link>
-        </div> */}
-        <div className="bg-white py-3 px-4 h-full shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-2xl">
-          {user && (
-            <div className="my-4">
-              <h4 className="text-lg font-medium text-gray-500 mb-1">
-                Welcome,
-              </h4>
-              <h2 className="text-3xl font-medium text-gray-800">
-                {user.name || "Arkabrata Chandra"}
-              </h2>
-            </div>
+          </div>
+          <hr />
+          <div onClick={() => setSection("list")} className="cursor-pointer">
+            <ListDashesIcon
+              size={28}
+              weight="fill"
+              className={section === "list" ? "text-gray-600" : "text-gray-400"}
+            />
+          </div>
+        </div>
+        <div className="bg-white py-3 px-4 h-full shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-2xl flex-1">
+          <div className="flex justify-between items-center">
+            <Link href="/" className="flex shrink-0 items-center mb-1">
+              <Image
+                src={"/logo-bg-removed.png"}
+                alt="Logo"
+                width={130}
+                height={50}
+                loading="eager"
+              />
+            </Link>
+            <p className="text-xs text-gray-600 bg-gray-200 border border-gray-600 px-2 py-1 rounded-lg flex justify-center items-center gap-1">
+              <span><InfoIcon size={14} weight="fill" /></span>
+              <span>{mode === "edit" ? "Editor Mode" : "Preview Mode"}</span>
+            </p>
+          </div>
+          <hr />
+
+          {/* Sections */}
+          {section === "home" && (
+            <HomeSection
+              email={email as string}
+              name={name}
+              handleGenerate={handleGenerate}
+              isStreaming={isStreaming}
+              prompt={prompt}
+              setPrompt={setPrompt}
+              promptHistory={promptHistory}
+              stopGeneration={stopGeneration}
+            />
           )}
 
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            disabled={isStreaming}
-            placeholder="Add custom instructions..."
-            className="w-full h-28 border rounded p-3 text-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-gray-200"
-          />
-
-          <div className="flex gap-2">
-            <button
-              onClick={handleGenerate}
-              disabled={isStreaming || !prompt.trim()}
-              className="flex-1 bg-black text-white py-2 rounded disabled:opacity-50"
-            >
-              {isStreaming ? "Generating..." : "Generate"}
-            </button>
-            {isStreaming && (
-              <button
-                onClick={stopGeneration}
-                className="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700"
-              >
-                Stop
-              </button>
-            )}
-          </div>
-
-          {/* Prompt History */}
-          <div className="mt-4 flex-1 flex flex-col">
-            <h3 className="text-sm font-medium mb-2">Prompt History</h3>
-            <ul className="text-sm space-y-2 overflow-auto flex-1">
-              {promptHistory.map((p, i) => (
-                <li
-                  key={i}
-                  onClick={() => setPrompt(p)}
-                  className="cursor-pointer p-2 bg-zinc-50 rounded hover:bg-zinc-200 break-words"
-                >
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {section === "list" && <ListSection />}
         </div>
       </div>
 
       {/* RIGHT — Agreement */}
       <div className="w-2/3 p-8 overflow-auto bg-zinc-100">
-        <div className="flex justify-start mb-2">
-          {output && mode === "preview" && (
-            <button
-              onClick={() => handleEdit()}
-              className="border bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800"
-            >
-              Edit
-            </button>
-          )}
-          {output && mode === "edit" && (
-            <button
-              onClick={() => handleDone()}
-              className="border bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800"
-            >
-              Done
-            </button>
-          )}
-          {output && mode === "edit" && (
-            <button
-              onClick={() => handleDiscard()}
-              className="border bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800"
-            >
-              Discard Changes
-            </button>
-          )}
-        </div>
-
         {/* Thinking animation */}
         {loading && (
           <div className="flex justify-center items-center text-zinc-400 h-[80vh]">
@@ -329,12 +281,11 @@ export default function AgreementGenerator() {
         )}
 
         {/* Preview */}
-        {!loading && mode === "preview" && output && (
-          <div
-            className="agreement-editor"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        )}
+        <div className="flex justify-start mb-2">
+          {!loading && mode === "preview" && output && (
+            <Preview handleEdit={handleEdit} html={html} />
+          )}
+        </div>
 
         {/* Edit */}
         {!loading && mode === "edit" && (
@@ -344,13 +295,17 @@ export default function AgreementGenerator() {
               const md = turndown.turndown(newHtml);
               setDraftOutput(md);
             }}
+            handleDone={handleDone}
+            handleDiscard={handleDiscard}
+            output={output}
+            draftOuput={draftOutput}
           />
         )}
 
         {!loading && !output && (
           <div className="text-zinc-400 flex justify-center items-center h-[80vh]">
             <div className="flex flex-col gap-2">
-              <div>
+              <div className="flex flex-col items-center gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 64 64"
@@ -359,6 +314,7 @@ export default function AgreementGenerator() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  className="w-64 h-64"
                 >
                   <path d="M14 2h26l10 10v46a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" />
                   <path d="M40 2v10h10" />
@@ -372,8 +328,13 @@ export default function AgreementGenerator() {
 
                   <path d="M42 48l4 4 8-8" />
                 </svg>
+                <span>Agreement will appear here…</span>
               </div>
-              <span>Agreement will appear here…</span>
+              {error && (
+                <div className="mt-5 bg-red-300 text-red-900 border border-red-900 rounded-lg px-3 py-2 font-semibold">
+                  {error}
+                </div>
+              )}
             </div>
           </div>
         )}
