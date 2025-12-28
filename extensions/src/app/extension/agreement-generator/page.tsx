@@ -4,14 +4,15 @@ import { decodeToken, tokenIsVerified } from "@/utils/Token";
 import { JwtPayload } from "jsonwebtoken";
 
 type PageProps = {
-  searchParams: {
+  searchParams?: Promise<{
     token?: string;
-  };
+  }>;
 };
 
 
-export default function Page({ searchParams }: PageProps) {
-  const token = searchParams?.token;
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const token = params?.token;
 
   if (!token) {
     return (
