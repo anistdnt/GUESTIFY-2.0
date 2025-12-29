@@ -41,6 +41,17 @@ export const API = {
             LOGS: "/admin/payment/logs",
             TRANSACTION_STATS: "/payment/transaction/stats",
             TRANSACTION_SUMMARY: "/payment/transaction/summary"
+        },
+        ATTRACTIONS: {
+            LIST: "/admin/attractions",
+            ENLSIT: "/attraction/new",
+            DELETE: "/pg/attraction/:id",
+            TOGGLE: "/pg/:id/attraction/toggle"
+        },
+        EXTENSIONS: {
+            LIST: "/extension/list",
+            INSTALL: "/extension/:ext_id/install",
+            UNINSTALL: "/extension/:ext_id/uninstall",
         }
     },
     COLLEGE: {

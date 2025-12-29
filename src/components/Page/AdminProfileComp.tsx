@@ -122,8 +122,9 @@ const AdminProfileComponent = () => {
           setCookie("authToken", res.data?.updated_token, {
             maxAge: 2 * 60 * 60, //2 hours
           });
+          await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
           dispatch(setLoading({ loading: false }));
-          router.push("/");
+          router.back();
           toast.success(res.message || "Loggged In successfully");
         } else {
           dispatch(setLoading({ loading: false }));

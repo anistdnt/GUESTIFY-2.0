@@ -6,15 +6,11 @@ import { useEffect, useState } from "react";
 import { PGData } from "@/types/pg_type";
 import { Room } from "@/types/pg_type";
 import { ProfileType } from "@/types/profile_type";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import FadedImageSlider from "./FadedImageSlider";
 import { Heart } from "@phosphor-icons/react/dist/ssr";
-import { api_caller } from "@/lib/api_caller";
-import { API } from "@/lib/api_const";
-import toast from "react-hot-toast";
-import { RootState } from "@/redux/store";
-import { setWishlistData, removeWishlistData } from "@/redux/slices/userSlice";
+import { useWishlist } from "@/lib/hook/useWishlist";
 
 type Props = {
   item?: PGData;
@@ -32,14 +28,16 @@ export default function DisplayCard({
   const router = useRouter();
   const dispatch = useDispatch();
   const { pginfo, rooms } = item || { pginfo: {}, rooms: [] };
-  console.log(pginfo, "pginfo");
-  const profile_info = useSelector(
-    (state: RootState) => state.user_slice.userData
-  );
-  console.log(profile_info, "profile");
+
+  // console.log(pginfo, "pginfo");
+  // console.log(profile_info, "profile");
+
   // Utility to extract coordinates from query string
   const [college_longitude, setLongitude] = useState<number | null>(null);
   const [college_latitude, setLatitude] = useState<number | null>(null);
+
+  // Wishlist handler Hook
+  const { addToWishlist, isUserLoggedIn, wishlistArray } = useWishlist();
 
   const params = useSearchParams();
   const clg_coords = params.get("coordinates");
@@ -48,56 +46,21 @@ export default function DisplayCard({
   const clg_pin = params.get("clg_pin");
   const clg_id = params.get("clg_id") || "";
 
-  const addToWishlist = async (pgId: string) => {
-    const isNotAddToWishlistPg = profile_info?.wishlist?.includes(pginfo?._id);
-
-    if (isNotAddToWishlistPg) {
-      dispatch(removeWishlistData(pgId));
-    } else {
-      dispatch(setWishlistData(pgId));
-    }
-
-    try {
-      // Determine endpoint and payload
-      const endpoint = !isNotAddToWishlistPg
-        ? API.WISHLIST.ADD
-        : `${API.WISHLIST.DELETE}/${pgId}`;
-      const method = !isNotAddToWishlistPg ? "POST" : "DELETE";
-
-      const payload = !isNotAddToWishlistPg ? { pg_id: pgId } : undefined;
-
-      const response = await api_caller(method, endpoint, payload);
-
-      if (!response.success) {
-        if (isNotAddToWishlistPg) {
-          dispatch(setWishlistData(pgId));
-        } else {
-          dispatch(removeWishlistData(pgId));
-        }
-        toast.error(
-          response.error || "Something went wrong. Please try again."
-        );
-      } else {
-        toast.success(response.message);
-      }
-    } catch (err) {
-      toast.error("Unable to update wishlist. Try again later.");
-    }
-  };
 
   return (
     <>
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
         <div className="relative">
+          {isUserLoggedIn &&
           <button
             className={`absolute top-2 left-2 bg-white/90 hover:bg-white rounded-full p-2 shadow-sm transition-colors z-30 ${
-              profile_info?.wishlist?.includes(pginfo?._id)
+              wishlistArray?.includes(pginfo?._id)
                 ? "heart-animate"
                 : ""
             }`}
             onClick={() => addToWishlist(pginfo?._id)}
             aria-label={
-              profile_info?.wishlist?.includes(pginfo?._id)
+              wishlistArray?.includes(pginfo?._id)
                 ? "Remove from wishlist"
                 : "Add to wishlist"
             }
@@ -105,18 +68,18 @@ export default function DisplayCard({
             <Heart
               size={22}
               weight={
-                profile_info?.wishlist?.includes(pginfo?._id)
+                wishlistArray?.includes(pginfo?._id)
                   ? "fill"
                   : "regular"
               }
               color={
-                profile_info?.wishlist?.includes(pginfo?._id)
+                wishlistArray?.includes(pginfo?._id)
                   ? "#e0245e"
                   : "#888"
               }
               className="transition-all duration-300"
             />
-          </button>
+          </button>}
           <FadedImageSlider images={pginfo?.pg_images} />
           {/* PG Type Badge */}
           <span
@@ -222,11 +185,7 @@ export default function DisplayCard({
                     router.push(
                       `/pg/${pginfo?._id}?clg_coords=${encodeURIComponent(
                         clg_coords
-                      )}&clg_name=${encodeURIComponent(
-                        clg_name
-                      )}&clg_addr=${encodeURIComponent(
-                        clg_addr
-                      )}&clg_pin=${clg_pin}&clg_id=${clg_id}`
+                      )}&clg_id=${clg_id}`
                     );
                   } else {
                     router?.push(`/pg/${pginfo?._id}`);

@@ -1,12 +1,12 @@
 export interface NavItemsType {
-    title: string;
-    path?: string;
-    icon?: string;
-    iconEle?: any;
-    disabled?: boolean; 
-    onClick?: () => void | Promise<void>;
-    class?: string;
-    children?: NavItemsType[];
+  title: string;
+  path?: string;
+  icon?: string;
+  iconEle?: any;
+  disabled?: boolean;
+  onClick?: () => void | Promise<void>;
+  class?: string;
+  children?: NavItemsType[];
 }
 
 interface UserInfo {
@@ -19,7 +19,7 @@ interface UserInfo {
 }
 
 export interface GetNotification_Type {
-  notification: string
+  notification: string;
 }
 
 export interface Duration {
@@ -38,4 +38,56 @@ export interface Person {
   identity_id: string;
   image: string;
   identity_image: string;
+}
+
+export type NearbyPlaceType =
+  | "museum"
+  | "park"
+  | "medical"
+  | "market"
+  | "grocery"
+  | "cafe";
+
+export interface AttractionPlace {
+  _id: string;
+
+  place_name: string;
+  address: string;
+  description?: string;
+
+  image_url?: string;
+  image_id?: string;
+
+  state: string;
+  country: string;
+
+  /** Time taken to reach from PG (in minutes) */
+  time_taken_minutes: number;
+
+  type: NearbyPlaceType;
+
+  createdBy: string | null;
+
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+}
+
+export interface ExtensionResponseType {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image_url: string;
+  users: {
+    user: string;
+    installed_at: string;
+  }[];
+  install_count: number;
+  display: true;
+  version: string;
+  category: string;
+  __v: number;
+  is_installed: boolean;
+  createdAt: string; 
+  updatedAt: string;
 }
