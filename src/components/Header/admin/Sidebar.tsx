@@ -1,7 +1,7 @@
 "use client";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { NavItemsType, UserInfo } from "@/types/admin";
-import { PuzzlePieceIcon, Receipt } from "@phosphor-icons/react";
+import { PuzzlePiece, Receipt } from "@phosphor-icons/react";
 import {
   BuildingApartment,
   CaretDown,
@@ -84,7 +84,7 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
       {
         title: "Extensions",
         path: `/admin/${userInfo.user_id}/tools/extensions`,
-        iconEle: <PuzzlePieceIcon size={20} className="me-2"/>
+        iconEle: <PuzzlePiece size={20} className="me-2"/>
       }
     ],
     account: [
