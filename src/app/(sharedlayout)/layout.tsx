@@ -8,6 +8,7 @@ import { ReduxProvider } from "@/redux/Provider";
 import GlobalLoaderWrapper from "@/components/Loader/GlobalLoaderWrapper";
 import DefaultModal from "@/components/Modals/DefaultModal";
 import { metadataMap } from "@/metadata/metadata.config";
+import ChatBot from "@/components/Chatbot/ChatBot";
 // import { API } from "@/lib/api_const";
 // import { api_caller } from "@/lib/api_caller";
 // import {GetNotification_Type} from "@/components/Header/Header"
@@ -39,6 +40,7 @@ export default function RootLayout({
           <main className="">
             <Toaster />
             {children}
+            <ChatBot />
           </main>
           <Footer />
         </ReduxProvider>

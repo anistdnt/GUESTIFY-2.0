@@ -7,6 +7,9 @@ export const API = {
         DELETE_NOTIFICATION : "/deleteNotification",
         DELETE_NOTIFICATIONS : "/deleteNotifications",
     },
+    CHATBOT:{
+        CHAT: "/chat",
+    },
     USER: {
         LOGIN : "/loginUser",
         LOGOUT : "/logoutUser",
