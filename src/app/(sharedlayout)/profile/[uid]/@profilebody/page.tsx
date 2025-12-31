@@ -79,7 +79,7 @@ const Page = () => {
       if (!isEditing) {
         setIsEditing(true);
       } else {
-        console.log("Form submitted", values);
+        // console.log("Form submitted", values);
         const formData = new FormData();
 
         formData.append("first_name", formik.values.first_name);

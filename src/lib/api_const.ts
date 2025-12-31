@@ -50,6 +50,11 @@ export const API = {
             ENLSIT: "/attraction/new",
             DELETE: "/pg/attraction/:id",
             TOGGLE: "/pg/:id/attraction/toggle"
+        },
+        EXTENSIONS: {
+            LIST: "/extension/list",
+            INSTALL: "/extension/:ext_id/install",
+            UNINSTALL: "/extension/:ext_id/uninstall",
         }
     },
     COLLEGE: {

@@ -21,7 +21,8 @@ const USER_ONLY_ROUTES = ["/profile/*", "/thankyou"];
 export function middleware(req: NextRequest) {
 
   // Getting pathname and auth token from cookies
-  const { pathname } = req.nextUrl;
+  const { pathname, search } = req.nextUrl;
+  const fullPath = pathname + search;
   const authToken = req.cookies.get("authToken")?.value;
 
   let role = null;
@@ -67,7 +68,17 @@ export function middleware(req: NextRequest) {
   // If admin route and role is not admin, redirect to login
   if (isAdminRoute) {
     if(role === null){
-        return NextResponse.redirect(new URL("/login", req.url));
+        const redirectRes = NextResponse.redirect(new URL("/login", req.url));
+
+        if (!fullPath.includes(undefined)) {
+          redirectRes.cookies.set("callback_url", fullPath, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+          });
+        }
+
+        return redirectRes;
     }
     else if (role !== "admin") {
         return NextResponse.redirect(new URL(`/profile/${id}`, req.url));
@@ -77,7 +88,17 @@ export function middleware(req: NextRequest) {
   // If user route and role is not user, redirect to login
   if (isUserRoute) {
     if(role === null){
-        return NextResponse.redirect(new URL("/login", req.url));
+        const redirectRes = NextResponse.redirect(new URL("/login", req.url));
+
+        if (!fullPath.includes(undefined)) {
+          redirectRes.cookies.set("callback_url", fullPath, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+          });
+        }
+
+        return redirectRes;
     }
     else if (role !== "user") {
         return NextResponse.redirect(new URL(`/admin/${id}/dashboard`, req.url));

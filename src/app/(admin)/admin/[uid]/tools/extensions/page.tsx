@@ -1,4 +1,4 @@
-import AggrementGenerator from '@/components/Page/AggrementGenerator'
+import ExtensionComp from '@/components/Page/ExtensionComp'
 import React from 'react'
 
 type Props = {}
@@ -6,7 +6,7 @@ type Props = {}
 export default function Page({}: Props) {
   return (
     <div>
-        <AggrementGenerator/>
+      <ExtensionComp />
     </div>
   )
 }
