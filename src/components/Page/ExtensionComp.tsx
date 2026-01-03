@@ -60,8 +60,7 @@ export default function ExtensionComp() {
           </span>
         </h1>
         <p className="text-gray-500 mt-2">
-          Explore verified essentials and popular attractions around your PG,
-          ensuring comfort, convenience, and peace of mind
+          Empower your platform with modular extensions that help manage operations, improve communication,<br/> and optimize day-to-day workflows
         </p>
       </div>
 
@@ -79,7 +78,7 @@ export default function ExtensionComp() {
           ) : extensions?.length === 0 ? (
             <NoDataFound text="No Extensions are Enlisted" />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {extensions?.map((extension: ExtensionResponseType) => (
                 <Card key={extension._id} extension={extension} fetchExtensions={fetchExtensions}/>
               ))}

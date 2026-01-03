@@ -31,8 +31,10 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
         return "Payments";
       case "bookings":
         return "Bookings";
-      case "tools":
+      case "tools/attractions":
         return "Attractions and Essentials";
+      case "tools/extensions":
+        return "Extensions";
       default:
         return "";
     }
