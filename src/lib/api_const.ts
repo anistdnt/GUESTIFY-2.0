@@ -70,7 +70,8 @@ export const API = {
         GET_PG_NEAR_ME : "/getPgNearMe",
         GET_PG_NEAR_PG : "/getPgNearPg",
         GET_PG_STATS: "/statistics/:uid/pg",
-        CATELOGUE: "/user/:uid/pg/catelogue"
+        CATELOGUE: "/user/:uid/pg/catelogue",
+        ATTRACTIONS: "/pg/:pg_id/attractions"
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",
