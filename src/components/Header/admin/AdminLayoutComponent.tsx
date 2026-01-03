@@ -35,7 +35,7 @@ export default function AdminLayoutComponent({ children }: Props) {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const tabValue = pathname.split("/")[3];
+  const tabValue = pathname.split("/").slice(3).join("/");
 
   //Sign-out function
   const logout_user = async () => {
