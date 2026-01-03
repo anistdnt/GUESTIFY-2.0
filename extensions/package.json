@@ -21,7 +21,8 @@
     "next": "15.0.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "turndown": "^7.2.2"
+    "turndown": "^7.2.2",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@types/node": "^20",

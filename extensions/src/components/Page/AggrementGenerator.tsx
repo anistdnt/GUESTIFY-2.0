@@ -68,7 +68,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   };
 
   /* ---------------- Generate Agreement ---------------- */
-  const handleGenerate = async () => {
+  const handleGenerate = async (payload?: any) => {
     if (!prompt.trim()) return;
 
     setPromptHistory((prev) => [prompt, ...prev]);
@@ -88,7 +88,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         body: JSON.stringify({
           url: API.ADMIN.EXTENSION.GENERATE_AGREEMENT,
           sessionId: "abcdefgh",
-          payload: {},
+          payload: payload || {},
           instruction: prompt,
         }),
         signal: abortController.signal,

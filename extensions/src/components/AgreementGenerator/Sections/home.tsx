@@ -1,11 +1,18 @@
 "use client";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import {
   ClockCounterClockwiseIcon,
+  NoteIcon,
+  PlusCircleIcon,
   RobotIcon,
   StopCircleIcon,
   SwapIcon,
+  XIcon,
 } from "@phosphor-icons/react";
+import AgreementModal from "./AgreementModal";
+import { AgreementSchema } from "@/utils/Generator/form.validation";
+
+type AgreementFormValues = typeof AgreementSchema.initialValues;
 
 type Props = {
   name: string;
@@ -13,7 +20,7 @@ type Props = {
   prompt: string;
   setPrompt: Dispatch<SetStateAction<string>>;
   isStreaming: boolean;
-  handleGenerate: () => Promise<void>;
+  handleGenerate: (payload?: any) => Promise<void>;
   promptHistory: string[];
   stopGeneration: () => void;
 };
@@ -28,6 +35,17 @@ export default function HomeSection({
   promptHistory,
   stopGeneration,
 }: Props) {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [agreementPayload, setAgreementPayload] = useState<any>({});
+
+  const handleModalSubmit = (values: AgreementFormValues) => {
+    const payload = {
+      ...values,
+    };
+    setAgreementPayload(payload);
+    setIsModalOpen(false);
+  };
+
   return (
     <div>
       <div className="my-4">
@@ -40,6 +58,34 @@ export default function HomeSection({
         </p>
       </div>
 
+      {/* Attched Payload for Agreement Generation: (Make a Note type secion)*/}
+      {Object.keys(agreementPayload).length > 0 && (
+        <div className="my-2 p-2 bg-gray-100 rounded">
+          <div className="bg-white p-3 rounded text-sm text-gray-800 overflow-x-auto flex items-center gap-3 relative">
+            {/* Icon */}
+            <NoteIcon size={45} className="w-2/6 text-gray-600" />
+
+            {/* Summary */}
+            <div className="text-sm w-4/6">
+              {`Owner: ${agreementPayload.owner_name}, Tenant: ${agreementPayload.tenant_name}, PG: ${agreementPayload.pg_name}, Rent: ₹${agreementPayload.rent}`.substring(
+                0,
+                100
+              )}
+              ...
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setAgreementPayload({})}
+              className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 text-sm hover:bg-red-600"
+              title="Remove agreement"
+            >
+              <XIcon size={10} weight="bold" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
@@ -50,9 +96,16 @@ export default function HomeSection({
 
       <div className="flex gap-2">
         <button
-          onClick={handleGenerate}
-          disabled={isStreaming || !prompt.trim()}
-          className="flex-1 flex flex-row items-center justify-center gap-2 bg-black text-white py-2 rounded disabled:opacity-50"
+          className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded-lg disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => setIsModalOpen(true)}
+          disabled={isStreaming || Object.keys(agreementPayload).length > 0}
+        >
+          <PlusCircleIcon size={26} />
+        </button>
+        <button
+          onClick={() => handleGenerate(agreementPayload)}
+          disabled={isStreaming || Object.keys(agreementPayload).length === 0}
+          className="flex-1 flex flex-row items-center justify-center gap-2 bg-gray-700 text-white py-2 rounded disabled:opacity-50"
         >
           {isStreaming ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -77,7 +130,7 @@ export default function HomeSection({
           <ClockCounterClockwiseIcon size={22} weight="fill" />
           <span>Prompt History</span>
         </h3>
-        <ul className="text-sm text-gray-600 space-y-2 overflow-y-scroll h-52">
+        <ul className="text-sm text-gray-600 space-y-2 overflow-y-scroll h-full">
           {promptHistory.map((p, i) => (
             <li
               key={i}
@@ -91,6 +144,15 @@ export default function HomeSection({
           ))}
         </ul>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <AgreementModal
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleModalSubmit}
+        />
+      )}
     </div>
   );
 }
