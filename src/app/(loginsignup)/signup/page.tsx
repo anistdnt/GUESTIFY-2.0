@@ -118,8 +118,8 @@ const SignUp = () => {
           alt="illustration"
         ></Image>
         <div className="bg-white p-8 rounded-lg w-full max-w-md mx-5">
-          <h2 className="text-3xl font-bold text-center text-gray-800">
-            Register
+          <h2 className="text-3xl font-semibold text-center text-gray-700">
+            Register As
           </h2>
           <SlidingSignupForm
             formData={formData}

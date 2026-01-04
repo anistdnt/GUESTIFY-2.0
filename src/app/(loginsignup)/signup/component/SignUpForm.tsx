@@ -56,7 +56,7 @@ export default function SlidingSignupForm({
             isAdmin ? "text-white" : "text-gray-600"
           }`}
         >
-          Admin
+          Owner
         </button>
       </div>
 
@@ -106,7 +106,7 @@ export default function SlidingSignupForm({
               type="submit"
               className="w-full bg-buttons text-white py-2 mt-3 rounded-lg hover:bg-buttonsHover transition"
             >
-              Register as Admin
+              Register as Owner
             </button>
           </form>
         </div>
