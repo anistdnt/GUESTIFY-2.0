@@ -1,11 +1,17 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Formik, Form, Field } from "formik";
 import { XIcon } from "@phosphor-icons/react";
-import { AgreementSchema, sampleAgreementPayload } from "@/utils/Generator/form.validation";
+import {
+  AgreementSchema,
+  sampleAgreementPayload,
+} from "@/utils/Generator/form.validation";
 import { numberToWords } from "@/utils/Generator";
 import { Input, Textarea, Section } from "../FormComponents";
+import toast from "react-hot-toast";
+import Select from "react-select";
+import { Option } from "@/types/AgreementGenerator";
 
 type AgreementFormValues = typeof AgreementSchema.initialValues;
 
@@ -18,7 +24,51 @@ type Props = {
 export default function AgreementModal({ open, onClose, onSubmit }: Props) {
   if (!open) return null;
 
+  const [pgs, setPGs] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [habitates, setHabitates] = useState<any[]>([]);
+
+  const [selectedPG, setSelectedPG] = useState<Option>({ value: "", label: "" });
+  const [selectedRoom, setSelectedRoom] = useState<Option>({ value: "", label: "" });
+  const [selectedHabitate, setSelectedHabitate] = useState<Option>({ value: "", label: "" });
+
   const formikRef = useRef<any>(null);
+
+  // Fetch Paying Guest Catelogue , Room Catalogue and Habbitate Catalogue from backend to autofill respective fields
+  function fetchPGCatelogue() {
+    try {
+      setPGs([
+        {
+          id: "pg1",
+          name: "Sunrise Boys PG",
+          address: "123, MG Road, Kolkata, West Bengal, 700001",
+          owner_name: "Mr. Rajesh Kumar",
+          owner_address: "456, Park Street, Kolkata, West Bengal, 700002",
+        },
+      ]);
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch PG Catelogue");
+    }
+  }
+  function fetchRoomCatelogue() {
+    try {
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch Room Catelogue");
+    }
+  }
+  function fetchHabitatCatelogue() {
+    try {
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch Habitate Catelogue");
+    }
+  }
+
+  useEffect(() => {
+    // Fetch the catalogues on modal open
+    fetchPGCatelogue();
+    fetchRoomCatelogue();
+    fetchHabitatCatelogue();
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex justify-center items-center">
@@ -49,6 +99,52 @@ export default function AgreementModal({ open, onClose, onSubmit }: Props) {
           </button>
         </div>
 
+        {/* Autofill respective fields based on selected pg , room , habitate */}
+        {/* Making three select boxes for selecting pg, room, and habitate */}
+        <div className="mx-5 my-2 rounded-md px-2 py-3 bg-gray-100">
+          <p className="text-lg font-semibold text-gray-600 mb-2">
+            Import from Respective PG, Room and Habbitate
+          </p>
+          <hr />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+            <div className="flex flex-row gap-2 justify-center items-center">
+              <label className="text-sm text-nowrap font-medium text-gray-800">
+                Select PG
+              </label>
+              <Select
+                className="w-full p-2 rounded-md text-gray-800 placeholder:text-gray-600"
+                placeholder="Select"
+                options={pgs.map((pg) => ({ value: pg.id, label: pg.name }))}
+                value={selectedPG}
+                onChange={(selectedOption: any) => {
+                  const selectedPG = pgs.find(
+                    (pg) => pg.id === selectedOption?.value
+                  );
+                  setSelectedPG(selectedOption || { value: "", label: "" });
+                  if (formikRef.current) {
+                    formikRef.current.setFieldValue("pg_name", selectedPG?.name || "");
+                    formikRef.current.setFieldValue(
+                      "pg_full_address",
+                      selectedPG?.address || ""
+                    );
+                    formikRef.current.setFieldValue(
+                      "owner_name",
+                      selectedPG?.owner_name || ""
+                    );
+                    formikRef.current.setFieldValue(
+                      "owner_address",
+                      selectedPG?.owner_address || ""
+                    );
+                  }
+                }}
+                isClearable
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* FORM */}
         <Formik
           initialValues={AgreementSchema.initialValues}
           validationSchema={AgreementSchema.validationSchema}
@@ -274,6 +370,7 @@ export default function AgreementModal({ open, onClose, onSubmit }: Props) {
                       handleSubmit();
                     }
                   }}
+                  type="button"
                   className="px-5 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-md"
                 >
                   Submit Agreement

@@ -8,19 +8,16 @@ import { API } from "@/app/api/_api_const";
 import Link from "next/link";
 import Image from "next/image";
 import HomeSection from "../AgreementGenerator/Sections/home";
-import { HouseIcon, InfoIcon, ListDashesIcon } from "@phosphor-icons/react";
+import { ClockCounterClockwiseIcon, HouseIcon, InfoIcon, List, ListDashesIcon } from "@phosphor-icons/react";
 import ListSection from "../AgreementGenerator/Sections/list";
 import Preview from "../AgreementGenerator/Preview";
+import { Mode, Sections } from "@/types/AgreementGenerator";
+import SavedAssets from "../AgreementGenerator/Sections/saved";
 
 const AgreementEditor = dynamic(() => import("../AgreementGenerator/Editor"), {
   ssr: false,
 });
 const turndown = new TurndownService();
-
-type Mode = "preview" | "edit";
-
-type Sections = "home" | "list" | "settings";
-
 interface CompProps {
   name: string;
   email?: string;
@@ -68,8 +65,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   };
 
   /* ---------------- Generate Agreement ---------------- */
-  const handleGenerate = async (payload?: any) => {
-    if (!prompt.trim()) return;
+  const handleGenerate = async (payload?: any, sessionId?: string) => {
 
     setPromptHistory((prev) => [prompt, ...prev]);
     setOutput("");
@@ -87,7 +83,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         method: "POST",
         body: JSON.stringify({
           url: API.ADMIN.EXTENSION.GENERATE_AGREEMENT,
-          sessionId: "abcdefgh",
+          sessionId: sessionId || "",
           payload: payload || {},
           instruction: prompt,
         }),
@@ -177,10 +173,18 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
           </div>
           <hr />
           <div onClick={() => setSection("list")} className="cursor-pointer">
-            <ListDashesIcon
+            <ClockCounterClockwiseIcon
               size={28}
               weight="fill"
               className={section === "list" ? "text-gray-600" : "text-gray-400"}
+            />
+          </div>
+          <hr />
+          <div onClick={() => setSection("saved")} className="cursor-pointer">
+            <ListDashesIcon
+              size={28}
+              weight="fill"
+              className={section === "saved" ? "text-gray-600" : "text-gray-400"}
             />
           </div>
         </div>
@@ -196,7 +200,9 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
               />
             </Link>
             <p className="text-xs text-gray-600 bg-gray-200 border border-gray-600 px-2 py-1 rounded-lg flex justify-center items-center gap-1">
-              <span><InfoIcon size={14} weight="fill" /></span>
+              <span>
+                <InfoIcon size={14} weight="fill" />
+              </span>
               <span>{mode === "edit" ? "Editor Mode" : "Preview Mode"}</span>
             </p>
           </div>
@@ -211,12 +217,23 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
               isStreaming={isStreaming}
               prompt={prompt}
               setPrompt={setPrompt}
-              promptHistory={promptHistory}
               stopGeneration={stopGeneration}
             />
           )}
 
-          {section === "list" && <ListSection />}
+          {section === "list" && (
+            <ListSection
+              promptHistory={promptHistory}
+              setPrompt={setPrompt}
+              setSection={setSection}
+            />
+          )}
+
+          {section === "saved" && (
+            <SavedAssets 
+              setSection={setSection}
+            />
+          )}
         </div>
       </div>
 
