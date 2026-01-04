@@ -13,6 +13,7 @@ import ListSection from "../AgreementGenerator/Sections/list";
 import Preview from "../AgreementGenerator/Preview";
 import { Mode, Sections } from "@/types/AgreementGenerator";
 import SavedAssets from "../AgreementGenerator/Sections/saved";
+import { setCookie } from "cookies-next/client";
 
 const AgreementEditor = dynamic(() => import("../AgreementGenerator/Editor"), {
   ssr: false,
@@ -39,6 +40,13 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
   // Ref for AbortController
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    // Setting token in the cookies for further API calls
+    setCookie("extensionAccessToken", token, {
+      maxAge: 2 * 60 * 60, // 2 hours
+    });
+  }, [token]);
 
   /* ---------------- Smooth streaming typing ---------------- */
   useEffect(() => {

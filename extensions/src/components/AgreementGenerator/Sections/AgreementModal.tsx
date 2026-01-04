@@ -26,48 +26,60 @@ export default function AgreementModal({ open, onClose, onSubmit }: Props) {
 
   const [pgs, setPGs] = useState<any[]>([]);
   const [rooms, setRooms] = useState<any[]>([]);
-  const [habitates, setHabitates] = useState<any[]>([]);
+  const [pgloading, setPgLoading] = useState<boolean>(false);
+  const [roomloading, setRoomLoading] = useState<boolean>(false);
 
   const [selectedPG, setSelectedPG] = useState<Option>({ value: "", label: "" });
   const [selectedRoom, setSelectedRoom] = useState<Option>({ value: "", label: "" });
-  const [selectedHabitate, setSelectedHabitate] = useState<Option>({ value: "", label: "" });
 
   const formikRef = useRef<any>(null);
 
   // Fetch Paying Guest Catelogue , Room Catalogue and Habbitate Catalogue from backend to autofill respective fields
-  function fetchPGCatelogue() {
+  async function fetchPGCatelogue() {
     try {
-      setPGs([
-        {
-          id: "pg1",
-          name: "Sunrise Boys PG",
-          address: "123, MG Road, Kolkata, West Bengal, 700001",
-          owner_name: "Mr. Rajesh Kumar",
-          owner_address: "456, Park Street, Kolkata, West Bengal, 700002",
-        },
-      ]);
+      setPgLoading(true);
+      const res = await fetch("/api/pg/catelogue");
+      const finalres = await res.json();
+      if(finalres.success){
+        setPGs(finalres.data || []);
+      } else {
+        throw new Error(finalres.message || "Failed to fetch PG Catelogue");
+      }
     } catch (error) {
       toast.error(error.message || "Failed to fetch PG Catelogue");
+    } finally {
+      setPgLoading(false);
     }
   }
-  function fetchRoomCatelogue() {
+  async function fetchRoomCatelogue(pg_id?: string) {
     try {
+      setRoomLoading(true);
+      if(!pg_id) {
+        setSelectedRoom({ value: "", label: "" });
+        setRooms([]);
+        return;
+      }
+      const res = await fetch(`/api/pg/${pg_id}/room/catelogue?status=booked`);
+      const finalres = await res.json();
+      if(finalres.success){
+        setRooms(finalres.data || []);
+      } else {
+        throw new Error(finalres.message || "Failed to fetch PG Catelogue");
+      }
     } catch (error) {
-      toast.error(error.message || "Failed to fetch Room Catelogue");
+      toast.error(error.message || "Failed to fetch PG Catelogue");
+    } finally {
+      setRoomLoading(false);
     }
   }
-  function fetchHabitatCatelogue() {
-    try {
-    } catch (error) {
-      toast.error(error.message || "Failed to fetch Habitate Catelogue");
-    }
-  }
+
+  useEffect(()=>{
+    fetchRoomCatelogue(selectedPG?.value);
+  },[selectedPG]);
 
   useEffect(() => {
     // Fetch the catalogues on modal open
     fetchPGCatelogue();
-    fetchRoomCatelogue();
-    fetchHabitatCatelogue();
   }, []);
 
   return (
@@ -103,7 +115,7 @@ export default function AgreementModal({ open, onClose, onSubmit }: Props) {
         {/* Making three select boxes for selecting pg, room, and habitate */}
         <div className="mx-5 my-2 rounded-md px-2 py-3 bg-gray-100">
           <p className="text-lg font-semibold text-gray-600 mb-2">
-            Import from Respective PG, Room and Habbitate
+            Import from Respective PG and Room
           </p>
           <hr />
 
@@ -115,22 +127,24 @@ export default function AgreementModal({ open, onClose, onSubmit }: Props) {
               <Select
                 className="w-full p-2 rounded-md text-gray-800 placeholder:text-gray-600"
                 placeholder="Select"
-                options={pgs.map((pg) => ({ value: pg.id, label: pg.name }))}
+                options={pgs.map((pg) => ({ value: pg._id, label: pg.pg_name }))}
                 value={selectedPG}
                 onChange={(selectedOption: any) => {
                   const selectedPG = pgs.find(
-                    (pg) => pg.id === selectedOption?.value
+                    (pg) => pg._id === selectedOption?.value
                   );
                   setSelectedPG(selectedOption || { value: "", label: "" });
                   if (formikRef.current) {
-                    formikRef.current.setFieldValue("pg_name", selectedPG?.name || "");
+                    formikRef.current.setFieldValue("pg_name", selectedPG?.pg_name || "");
+                    formikRef.current.setFieldValue("agreement_city", selectedPG?.district || "");
+                    formikRef.current.setFieldValue("agreement_state", selectedPG?.state || "");
                     formikRef.current.setFieldValue(
                       "pg_full_address",
-                      selectedPG?.address || ""
+                      (selectedPG?.address || "")
                     );
                     formikRef.current.setFieldValue(
                       "owner_name",
-                      selectedPG?.owner_name || ""
+                      (selectedPG?.owner_fname || "")+" "+(selectedPG?.owner_lname || "")
                     );
                     formikRef.current.setFieldValue(
                       "owner_address",
@@ -139,6 +153,45 @@ export default function AgreementModal({ open, onClose, onSubmit }: Props) {
                   }
                 }}
                 isClearable
+                isLoading={pgloading}
+              />
+            </div>
+
+            <div className="flex flex-row gap-2 justify-center items-center">
+              <label className="text-sm text-nowrap font-medium text-gray-800">
+                Select Room
+              </label>
+              <Select
+                className="w-full p-2 rounded-md text-gray-800 placeholder:text-gray-600"
+                placeholder="Select"
+                options={rooms.map((room) => ({ value: room._id, label: `${room.room_type?.toUpperCase()} Bed (${room?.room_rent})`}))}
+                value={selectedRoom}
+                onChange={(selectedOption: any) => {
+                  const selectedRoom = rooms.find(
+                    (room) => room._id === selectedOption?.value
+                  );
+                  setSelectedRoom(selectedOption || { value: "", label: "" });
+                  if (formikRef.current) {
+                    formikRef.current.setFieldValue("room_details", `${selectedRoom.room_type?.toUpperCase()} Bed room with rent ₹${selectedRoom.room_rent} and deposit duration ${selectedRoom?.deposit_duration}. The amenities include ${selectedRoom.aminities?.join(", ") || "N/A"}.`);
+                    formikRef.current.setFieldValue("rent", `${selectedRoom?.room_rent}` || "");
+                    formikRef.current.setFieldValue("rent_words", `${numberToWords(selectedRoom?.room_rent)}` || "");
+                    formikRef.current.setFieldValue("common_areas", selectedRoom?.aminities?.join(", ") || "");
+                    formikRef.current.setFieldValue("utilities_included", selectedRoom?.aminities?.join(", ") || "");
+                    formikRef.current.setFieldValue("duration", `${selectedRoom?.duration_year} Years , ${selectedRoom?.duration_month} Month` || "11 months");
+                    
+                    // Calculate end date based on duration_year and duration_month
+                    const computedDate = new Date(selectedRoom?.start_date || "");
+                    formikRef.current.setFieldValue("start_date", computedDate?.toISOString().split("T")[0] || "");
+
+                    computedDate.setFullYear(computedDate.getFullYear() + (selectedRoom?.duration_year || 0));
+                    computedDate.setMonth(computedDate.getMonth() + (selectedRoom?.duration_month || 0));
+
+                    formikRef.current.setFieldValue("end_date", computedDate.toISOString().split("T")[0] || ""); 
+                    formikRef.current.setFieldValue("agreement_date", new Date(selectedRoom?.accepted_at || "").toISOString().split("T")[0] || "");                   
+                  }
+                }}
+                isClearable
+                isLoading={roomloading}
               />
             </div>
           </div>
