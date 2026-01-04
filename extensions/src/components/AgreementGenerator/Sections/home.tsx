@@ -1,11 +1,17 @@
 "use client";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
-  ClockCounterClockwiseIcon,
+  NoteIcon,
+  PlusCircleIcon,
   RobotIcon,
   StopCircleIcon,
-  SwapIcon,
+  XIcon,
 } from "@phosphor-icons/react";
+import AgreementModal from "./AgreementModal";
+import { AgreementSchema } from "@/utils/Generator/form.validation";
+import { v4 as uuidv4 } from 'uuid';
+
+type AgreementFormValues = typeof AgreementSchema.initialValues;
 
 type Props = {
   name: string;
@@ -13,8 +19,7 @@ type Props = {
   prompt: string;
   setPrompt: Dispatch<SetStateAction<string>>;
   isStreaming: boolean;
-  handleGenerate: () => Promise<void>;
-  promptHistory: string[];
+  handleGenerate: (payload?: any, sessionId?: string) => Promise<void>;
   stopGeneration: () => void;
 };
 
@@ -25,9 +30,28 @@ export default function HomeSection({
   name,
   prompt,
   setPrompt,
-  promptHistory,
   stopGeneration,
 }: Props) {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [agreementPayload, setAgreementPayload] = useState<any>({});
+  const [newsessionId, setNewSessionId] = useState<string>("");
+
+  const handleModalSubmit = (values: AgreementFormValues) => {
+    const payload = {
+      ...values,
+    };
+    setAgreementPayload(payload);
+    setIsModalOpen(false);
+  };
+
+  // Generating a new sesssion ID whenever a new payload is set
+  useEffect(() => {
+    if (Object.keys(agreementPayload).length > 0) {
+      const uniqueSessionId = uuidv4();
+      setNewSessionId(uniqueSessionId);
+    }
+  }, [agreementPayload]);
+
   return (
     <div>
       <div className="my-4">
@@ -40,6 +64,34 @@ export default function HomeSection({
         </p>
       </div>
 
+      {/* Attched Payload for Agreement Generation: (Make a Note type secion)*/}
+      {Object.keys(agreementPayload).length > 0 && (
+        <div className="my-2 p-2 bg-gray-100 rounded">
+          <div className="bg-white p-3 rounded text-sm text-gray-800 overflow-x-auto flex items-center gap-3 relative">
+            {/* Icon */}
+            <NoteIcon size={45} className="w-2/6 text-gray-600" />
+
+            {/* Summary */}
+            <div className="text-sm w-4/6">
+              {`Owner: ${agreementPayload.owner_name}, Tenant: ${agreementPayload.tenant_name}, PG: ${agreementPayload.pg_name}, Rent: ₹${agreementPayload.rent}`.substring(
+                0,
+                100
+              )}
+              ...
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setAgreementPayload({})}
+              className="absolute top-2 right-2 bg-gray-800 text-white rounded-full p-1 text-sm hover:bg-red-600"
+              title="Remove agreement"
+            >
+              <XIcon size={10} weight="bold" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
@@ -50,9 +102,16 @@ export default function HomeSection({
 
       <div className="flex gap-2">
         <button
-          onClick={handleGenerate}
-          disabled={isStreaming || !prompt.trim()}
-          className="flex-1 flex flex-row items-center justify-center gap-2 bg-black text-white py-2 rounded disabled:opacity-50"
+          className="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded-lg disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => setIsModalOpen(true)}
+          disabled={isStreaming || Object.keys(agreementPayload).length > 0}
+        >
+          <PlusCircleIcon size={26} />
+        </button>
+        <button
+          onClick={() => handleGenerate(agreementPayload, newsessionId)}
+          disabled={isStreaming || Object.keys(agreementPayload).length === 0}
+          className="flex-1 flex flex-row items-center justify-center gap-2 bg-gray-700 text-white py-2 rounded disabled:opacity-50"
         >
           {isStreaming ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -71,26 +130,19 @@ export default function HomeSection({
         )}
       </div>
 
-      {/* Prompt History */}
-      <div className="mt-4 flex-1 flex flex-col">
-        <h3 className="flex flex-row justify-start items-center gap-2 text-sm font-medium mb-3 text-gray-700">
-          <ClockCounterClockwiseIcon size={22} weight="fill" />
-          <span>Prompt History</span>
-        </h3>
-        <ul className="text-sm text-gray-600 space-y-2 overflow-y-scroll h-52">
-          {promptHistory.map((p, i) => (
-            <li
-              key={i}
-              className="cursor-pointer p-2 bg-zinc-50 rounded break-words flex justify-between items-center"
-            >
-              <span>{p}</span>
-              <span onClick={() => setPrompt(p)} className="cursor-pointer">
-                <SwapIcon size={20} weight="fill" />
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <p className="text-sm text-gray-500 mt-3">
+        Note: You can only generate agreements once you have filled the form and
+        attached it.
+      </p>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <AgreementModal
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleModalSubmit}
+        />
+      )}
     </div>
   );
 }
