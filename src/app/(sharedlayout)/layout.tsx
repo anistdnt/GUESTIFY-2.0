@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Header from "@/components/Header/Header";
@@ -9,42 +8,37 @@ import GlobalLoaderWrapper from "@/components/Loader/GlobalLoaderWrapper";
 import DefaultModal from "@/components/Modals/DefaultModal";
 import { metadataMap } from "@/metadata/metadata.config";
 import ChatBot from "@/components/Chatbot/ChatBot";
-// import { API } from "@/lib/api_const";
-// import { api_caller } from "@/lib/api_caller";
-// import {GetNotification_Type} from "@/components/Header/Header"
-// import {ApiReturn} from "@/lib/api_caller"
-export const metadata: Metadata = metadataMap['global'];
+import Script from "next/script";
 
-const MAPMYINDIA_LICENSE_KEY = process.env.NEXT_PUBLIC_MAPMYINDIA_LICENSE_KEY;
-// const notification_response : ApiReturn<GetNotification_Type>= await api_caller<GetNotification_Type>("GET" , API.NOTIFICATION.ALL_NOTIFICATIONS)
+export const metadata = metadataMap["global"];
 
-export default function RootLayout({
+const MAPMYINDIA_LICENSE_KEY =
+  process.env.NEXT_PUBLIC_MAPMYINDIA_LICENSE_KEY;
+
+export default function SharedLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-
-
+}) {
   return (
-    <html lang="en">
-      <head>
-        <script
-          src={`https://apis.mapmyindia.com/advancedmaps/v1/${MAPMYINDIA_LICENSE_KEY}/map_load?v=1.3`}></script>
-      </head>
-      <body className="">
-        <ReduxProvider>
-          <DefaultModal />
-          <GlobalLoaderWrapper />
-          <Header />
-          {/* <MapmyIndiaScriptLoader /> */}
-          <main className="">
-            <Toaster />
-            {children}
-            <ChatBot />
-          </main>
-          <Footer />
-        </ReduxProvider>
-      </body>
-    </html>
+    <>
+      {/* MapMyIndia script — safe & correct in App Router */}
+      <Script
+        src={`https://apis.mapmyindia.com/advancedmaps/v1/${MAPMYINDIA_LICENSE_KEY}/map_load?v=1.3`}
+        strategy="beforeInteractive"
+      />
+
+      <ReduxProvider>
+        <DefaultModal />
+        <GlobalLoaderWrapper />
+        <Header />
+        <main>
+          <Toaster />
+          {children}
+          <ChatBot />
+        </main>
+        <Footer />
+      </ReduxProvider>
+    </>
   );
 }

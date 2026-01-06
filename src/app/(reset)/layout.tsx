@@ -5,24 +5,20 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import { ReduxProvider } from "@/redux/Provider";
 import { metadataMap } from "@/metadata/metadata.config";
 
-export const metadata = metadataMap['thankyou'];
+export const metadata = metadataMap["thankyou"];
 
-export default function RootLayout({
+export default function ResetLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="">
-        <ReduxProvider>
-          <GlobalLoaderWrapper />
-          <main className="">
-            <Toaster />
-            {children}
-          </main>
-        </ReduxProvider>
-      </body>
-    </html>
+    <ReduxProvider>
+      <GlobalLoaderWrapper />
+      <main>
+        <Toaster />
+        {children}
+      </main>
+    </ReduxProvider>
   );
 }
