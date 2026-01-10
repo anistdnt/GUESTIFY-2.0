@@ -9,10 +9,11 @@ import { stateOptions } from "@/data/countryPhone";
 
 export const attractionTypeOptions = [
   { label: "Medical", value: "medical" },
-  { label: "Restaurant", value: "restaurant" },
-  { label: "ATM", value: "atm" },
-  { label: "Police Station", value: "police" },
-  { label: "Hospital", value: "hospital" },
+  { label: "Museum", value: "museum" },
+  { label: "Park", value: "park" },
+  { label: "Market", value: "market" },
+  { label: "Grocery", value: "grocery" },
+  { label: "Cafe", value: "cafe" },
 ];
 
 export default function EnlistAttractionForm({
