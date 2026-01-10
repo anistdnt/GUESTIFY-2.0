@@ -30,7 +30,7 @@ export const Districts = () => {
   }, [selected, router]);
 
   return (
-    <div className="mx-auto w-full max-w-screen-md p-4 relative">
+    <div className="mx-auto w-full max-w-screen-md p-4 relative" data-aos="fade-up" suppressHydrationWarning={true}>
 
       {/* 🔥 Custom Prev Button */}
       <button
