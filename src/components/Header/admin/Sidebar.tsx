@@ -102,7 +102,8 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
         title: "Delete Account",
         iconEle: <Trash size={20} className="me-2" />,
         onClick: handleDeleteAccount,
-        class: "text-red-500 hover:text-red-600",
+        disabled: true,
+        class: "text-red-500 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed",
       },
     ],
   };
@@ -174,6 +175,7 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
                   </div>
                 ) : item.onClick ? (
                   <button
+                    disabled={item.disabled || false}
                     onClick={item.onClick}
                     className={`flex font-semibold items-center w-full py-2 px-4 rounded-md transition-all text-gray-600 hover:text-yellow-600 ${
                       item?.class || ""
