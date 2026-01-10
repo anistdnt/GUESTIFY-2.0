@@ -31,6 +31,10 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
         return "Payments";
       case "bookings":
         return "Bookings";
+      case "tools/attractions":
+        return "Attractions and Essentials";
+      case "tools/extensions":
+        return "Extensions";
       default:
         return "";
     }
@@ -64,7 +68,7 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
                         {userInfo?.full_name}
                         <br />
                         <span className="text-xs text-gray-500 float-end">
-                          ADMIN
+                          OWNER
                         </span>
                       </span>
                       <button
