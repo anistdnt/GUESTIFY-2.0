@@ -118,7 +118,7 @@ const Searchbar = () => {
   );
 
   return (
-    <div>
+    <div data-aos="fade-up" suppressHydrationWarning={true}>
       {/* <Districts /> */}
       <div className="mx-auto flex flex-col p-2 lg:w-3/5 bg-white rounded-md">
         <div className="flex items-center border w-full rounded-lg px-4 gap-2">

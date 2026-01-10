@@ -334,9 +334,17 @@ const Feedback = forwardRef<HTMLDivElement, FeedbackProp>(({ reviewData, id }, r
           <button
             disabled={submitLoading}
             type="submit"
-            className="bg-gradient-to-r from-buttonsSecondary to-buttons text-white py-3 px-6 rounded-full cursor-pointer font-bold text-base uppercase tracking-wide transition-opacity duration-300 mt-4 hover:opacity-80"
+            className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-3 px-6 rounded-full cursor-pointer font-bold text-base uppercase tracking-wide transition-opacity duration-300 mt-4 hover:opacity-80"
           >
-            Submit Feedback
+            {/* Loading Spinner when submitting */}
+            {submitLoading ? (
+              <span className="flex items-center justify-center">
+                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                Submitting...
+              </span>
+            ) : (
+              "Submit Feedback"
+            )}
           </button>
         </form>
       </div>
