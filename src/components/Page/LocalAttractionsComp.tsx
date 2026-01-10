@@ -31,10 +31,12 @@ const filterOptions: Options[] = [
     label: "All",
     value: "all",
   },
-  {
-    label: "Park",
-    value: "park",
-  },
+  { label: "Medical", value: "medical" },
+  { label: "Museum", value: "museum" },
+  { label: "Park", value: "park" },
+  { label: "Market", value: "market" },
+  { label: "Grocery", value: "grocery" },
+  { label: "Cafe", value: "cafe" },
 ];
 
 export default function LocalAttractionsComp() {
