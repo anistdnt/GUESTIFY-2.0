@@ -1,40 +1,26 @@
-import type { Metadata } from "next";
 import "../(sharedlayout)/globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Header from "@/components/Header/Header";
-import Footer from "@/components/Footer/Footer";
 import { Toaster } from "react-hot-toast";
 import { ReduxProvider } from "@/redux/Provider";
 import GlobalLoaderWrapper from "@/components/Loader/GlobalLoaderWrapper";
-import DefaultModal from "@/components/Modals/DefaultModal";
 import { metadataMap } from "@/metadata/metadata.config";
-// import { API } from "@/lib/api_const";
-// import { api_caller } from "@/lib/api_caller";
-// import {GetNotification_Type} from "@/components/Header/Header"
-// import {ApiReturn} from "@/lib/api_caller"
-export const metadata: Metadata = metadataMap['login_signup'];
 
-export default function RootLayout({
+export const metadata = metadataMap["login_signup"];
+
+export default function LoginSignupLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-
-
+}) {
   return (
-    <html lang="en">
-      <body className="">
-        <ReduxProvider>
-          {/* <DefaultModal /> */}
-          <GlobalLoaderWrapper />
-          <Header />
-          <main className="">
-            <Toaster />
-            {children}
-          </main>
-          {/* <Footer /> */}
-        </ReduxProvider>
-      </body>
-    </html>
+    <ReduxProvider>
+      <GlobalLoaderWrapper />
+      <Header />
+      <main>
+        <Toaster />
+        {children}
+      </main>
+    </ReduxProvider>
   );
 }
