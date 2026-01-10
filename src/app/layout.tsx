@@ -1,3 +1,4 @@
+import AOSProvider from "@/components/Wrapper/AOSProvider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AOSProvider>
+          {children}
+        </AOSProvider>
+      </body>
     </html>
   );
 }

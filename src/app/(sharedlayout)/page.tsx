@@ -9,7 +9,7 @@ import Searchbar from "@/components/Searchbar/Searchbar";
 
 export default function Home() {
   return (
-    <>
+    <div suppressHydrationWarning={true}>
       {/* Hero Section  */}
       <HeroSection />
 
@@ -26,19 +26,21 @@ export default function Home() {
           </div>
 
           <div>
-            <Districts/>
+            <Districts />
           </div>
 
-          <div className="bg-gray-100 py-10">
-            <Searchbar />
+          <div>
+            <div className="bg-gray-100 py-10">
+              <Searchbar />
+            </div>
+            <PopularSearches />
           </div>
-          <PopularSearches />
         </div>
       </div>
       <HowItWorks />
-      <Statistics/>
-      <Testimonials/>
-      <CTASection/>
-    </>
+      <Statistics />
+      <Testimonials />
+      <CTASection />
+    </div>
   );
 }
