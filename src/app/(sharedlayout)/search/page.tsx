@@ -9,7 +9,7 @@ export const metadata = metadataMap['search_pg'];
 export default function SearchPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   return (
     <>

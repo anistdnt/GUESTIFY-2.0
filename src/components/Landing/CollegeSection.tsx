@@ -24,16 +24,9 @@ type CollegeDoc = {
 export default async function CollegeSection({
   searchParams,
 }: {
-  searchParams: {
-    coordinates?: string;
-    clg_name?: string;
-    clg_addr?: string;
-    clg_pin?: string;
-    clg_id?: string;
-    kmradi?: string;
-  };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { clg_id } = searchParams;
+  const { clg_id } = await searchParams;
 
   // If no college selected
   if (!clg_id) {
