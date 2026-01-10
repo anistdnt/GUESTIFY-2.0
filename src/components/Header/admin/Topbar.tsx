@@ -68,7 +68,7 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
                         {userInfo?.full_name}
                         <br />
                         <span className="text-xs text-gray-500 float-end">
-                          ADMIN
+                          OWNER
                         </span>
                       </span>
                       <button
