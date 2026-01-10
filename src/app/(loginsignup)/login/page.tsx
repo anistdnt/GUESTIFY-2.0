@@ -68,10 +68,10 @@ const Login = () => {
 
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay
       setLoginLoading(false);
-      dispatch(setModalVisibility({
-        open: true,
-        type: "signingin"
-      }))
+      // dispatch(setModalVisibility({
+      //   open: true,
+      //   type: "signingin"
+      // }))
       router?.push(redirectUrl);
       deleteCookie("callback_url");
       toast.success(res.message || "Loggged In successfully");

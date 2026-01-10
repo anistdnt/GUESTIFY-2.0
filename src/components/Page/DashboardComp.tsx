@@ -206,7 +206,7 @@ export default function Dashboard() {
         <h1 className="text-gray-500">
           <span>Welcome to your</span> <br />{" "}
           <span className="text-4xl font-semibold text-gray-700">
-            Admin <span className="text-yellow-700">Dashboard</span>
+            Owner <span className="text-yellow-700">Dashboard</span>
           </span>
         </h1>
         <p className="text-gray-500 mt-2">

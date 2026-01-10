@@ -7,7 +7,7 @@ import DefaultModal from "@/components/Modals/DefaultModal";
 import AdminLayoutComponent from "@/components/Header/admin/AdminLayoutComponent";
 import { metadataMap } from "@/metadata/metadata.config";
 
-export const metadata = metadataMap['global'];
+export const metadata = metadataMap["global"];
 
 export default function AdminLayout({
   children,
@@ -15,20 +15,13 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="">
-        <ReduxProvider>
-          <GlobalLoaderWrapper />
-          <DefaultModal />
-          <main className="">
-            <Toaster />
-
-            <AdminLayoutComponent>
-                {children}
-            </AdminLayoutComponent>
-          </main>
-        </ReduxProvider>
-      </body>
-    </html>
+    <ReduxProvider>
+      <GlobalLoaderWrapper />
+      <DefaultModal />
+      <main>
+        <Toaster />
+        <AdminLayoutComponent>{children}</AdminLayoutComponent>
+      </main>
+    </ReduxProvider>
   );
 }

@@ -2,11 +2,13 @@ import { AxiosRequestConfig, isAxiosError } from "axios";
 import { axios_ins, axios_base } from "./axios_ins";
 import { shouldSkipAuthCheck, tokenIsVerified } from "./decodeToken";
 import { deleteCookie, getCookie } from "cookies-next/client";
+import { stat } from "fs";
 
 interface BaseApiResponse<T> {
   status: number;
   message: string;
   data: T;
+  statusCode?: number;
 }
 
 export interface ApiReturn<T> {
@@ -16,6 +18,7 @@ export interface ApiReturn<T> {
   message?: string;
   error?: string;
   status?: number;
+  status_code?: number;
 }
 
 const handleApiRequest = async <T>(
@@ -33,6 +36,7 @@ const handleApiRequest = async <T>(
 
     return {
       success: true,
+      status_code: response.data.statusCode || 200,
       data: response.data.data as T,
       message: response.data.message,
       status: response.status,
@@ -47,6 +51,16 @@ const handleApiRequest = async <T>(
       status = err.response?.status || 500;
       errorMessage = err.response?.data?.message || err.message || errorMessage;
       CauseError = err.response?.data?.error;
+
+      if (status === 401 || err.response.data.statusCode === 401) {
+        // Remove cookie
+        deleteCookie("authToken");
+
+        // Redirect
+        if (window !== undefined) {
+          window.location.href = "/login";
+        }
+      }
     } else if (err instanceof Error) {
       errorMessage = err.message;
     }
@@ -76,17 +90,17 @@ export const api_caller = async <T, R = unknown>(
     });
   
   // Check if the Cookie is valid or not for non exempted urls
-  if (!shouldSkipAuthCheck(url)) {
-    if (!tokenIsVerified(getCookie("authToken") || "")) {
-      // Remove cookie
-      deleteCookie("authToken");
+  // if (!shouldSkipAuthCheck(url)) {
+  //   if (!tokenIsVerified(getCookie("authToken") || "")) {
+  //     // Remove cookie
+  //     deleteCookie("authToken");
 
-      // Redirect
-      if(window !== undefined){
-        window.location.href = "/login";
-      }
-    }
-  }
+  //     // Redirect
+  //     if(window !== undefined){
+  //       window.location.href = "/login";
+  //     }
+  //   }
+  // }
 
   if (result.success) {
     // console.log("Success:", result.data);

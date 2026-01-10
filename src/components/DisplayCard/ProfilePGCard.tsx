@@ -5,6 +5,7 @@ import {
   CurrencyInr,
   MapPin,
   Pencil,
+  Plus,
   Trash,
   Users,
 } from "@phosphor-icons/react/dist/ssr";
@@ -188,9 +189,28 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                 Created At : {formatDate(pginfo?.createdAt as string)}
               </span>
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <button
                 className="bg-slate-500 hover:bg-slate-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
+                data-tooltip="Attachments to this PG"
+                onClick={() => {
+                  dispatch(
+                    setModalVisibility({
+                      open: true,
+                      type: "viewattachments",
+                      modalData: {
+                        rowid: pginfo?._id as string,
+                        attractions: pginfo?.attractions || []
+                      },
+                    })
+                  );
+                }}
+              >
+                <Plus size={20} color="#ffffff" />
+              </button>
+              <button
+                className="bg-slate-500 hover:bg-slate-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
+                data-tooltip="Edit PG Details"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -205,10 +225,10 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                 }}
               >
                 <Pencil size={20} color="#ffffff" weight="fill" />
-                <span>Edit PG</span>
               </button>
               <button
                 className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
+                data-tooltip="Delete Paying Guest House"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -228,7 +248,6 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                 }}
               >
                 <Trash size={20} color="#ffffff" weight="fill" />
-                <span>Delete PG</span>
               </button>
             </div>
           </div>

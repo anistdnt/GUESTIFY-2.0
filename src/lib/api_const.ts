@@ -7,6 +7,9 @@ export const API = {
         DELETE_NOTIFICATION : "/deleteNotification",
         DELETE_NOTIFICATIONS : "/deleteNotifications",
     },
+    CHATBOT:{
+        CHAT: "/chat",
+    },
     USER: {
         LOGIN : "/loginUser",
         LOGOUT : "/logoutUser",
@@ -43,7 +46,15 @@ export const API = {
             TRANSACTION_SUMMARY: "/payment/transaction/summary"
         },
         ATTRACTIONS: {
-            LIST: "/admin/attractions"
+            LIST: "/admin/attractions",
+            ENLSIT: "/attraction/new",
+            DELETE: "/pg/attraction/:id",
+            TOGGLE: "/pg/:id/attraction/toggle"
+        },
+        EXTENSIONS: {
+            LIST: "/extension/list",
+            INSTALL: "/extension/:ext_id/install",
+            UNINSTALL: "/extension/:ext_id/uninstall",
         }
     },
     COLLEGE: {
@@ -62,7 +73,8 @@ export const API = {
         GET_PG_NEAR_ME : "/getPgNearMe",
         GET_PG_NEAR_PG : "/getPgNearPg",
         GET_PG_STATS: "/statistics/:uid/pg",
-        CATELOGUE: "/user/:uid/pg/catelogue"
+        CATELOGUE: "/user/:uid/pg/catelogue",
+        ATTRACTIONS: "/pg/:pg_id/attractions"
     },
     ROOM: {
         GET_ROOM_BY_ID : "/getPg",

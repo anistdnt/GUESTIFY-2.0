@@ -5,7 +5,7 @@ import { CardSkeleton } from "@/components/Loader/CardSkeleton";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
-import { deleteSuccess } from "@/redux/slices/modalSlice";
+import { deleteSuccess, triggerRefetch } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
 import { Plus } from "@phosphor-icons/react";
 import { useParams, useRouter } from "next/navigation";
@@ -23,6 +23,9 @@ const PGComponent = () => {
   const dispatch = useDispatch();
   const isDeleted = useSelector(
     (state: RootState) => state.modal_slice.isDeleted
+  );
+  const isRefetch = useSelector(
+    (state: RootState) => state.modal_slice.isRefetch
   );
 
   function handleRoute() {
@@ -56,45 +59,52 @@ const PGComponent = () => {
     );
   }
 
+  const fetchPgs_ByUser = async () => {
+    setloading(true);
+    const res: ApiReturn<any> = await api_caller<any>(
+      "GET",
+      `${API.USER.GET_PGs}/${param?.uid}`
+    );
+    if (res.success) {
+      setCards(res?.data);
+    } else {
+      toast.error(`${res.message} : ${res.error}`);
+      setCards([]);
+    }
+    setloading(false);
+  };
+
+  const fetchPgs_Stats = async () => {
+    setStatLoading(true);
+    const res: ApiReturn<any> = await api_caller<any>(
+      "GET",
+      `${API.PG.GET_PG_STATS?.replace(":uid", param?.uid as string)}`
+    );
+    if (res.success) {
+      setStatBox(res?.data);
+    } else {
+      toast.error(`${res.message} : ${res.error}`);
+      setStatBox({});
+    }
+    setStatLoading(false);
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [isDeleted]);
 
   useEffect(() => {
-    const fetchPgs_ByUser = async () => {
-      setloading(true);
-      const res: ApiReturn<any> = await api_caller<any>(
-        "GET",
-        `${API.USER.GET_PGs}/${param?.uid}`
-      );
-      if (res.success) {
-        setCards(res?.data);
-      } else {
-        toast.error(`${res.message} : ${res.error}`);
-        setCards([]);
-      }
-      setloading(false);
-    };
-
-    const fetchPgs_Stats = async () => {
-      setStatLoading(true);
-      const res: ApiReturn<any> = await api_caller<any>(
-        "GET",
-        `${API.PG.GET_PG_STATS?.replace(":uid", param?.uid as string)}`
-      );
-      if (res.success) {
-        setStatBox(res?.data);
-      } else {
-        toast.error(`${res.message} : ${res.error}`);
-        setStatBox({});
-      }
-      setStatLoading(false);
-    };
-
     fetchPgs_ByUser();
     fetchPgs_Stats();
     dispatch(deleteSuccess(false));
-  }, [isDeleted]);
+  }, [isDeleted, isRefetch]);
+
+  useEffect(() => {
+    if (isRefetch) {
+      fetchPgs_ByUser();
+      dispatch(triggerRefetch(false));
+    }
+  }, [isRefetch]);
 
   return (
     <div className="p-6">

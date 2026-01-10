@@ -34,6 +34,7 @@ import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { CameraPlus, Trash } from "@phosphor-icons/react/dist/ssr";
 import { useWishlist } from "@/lib/hook/useWishlist";
+import Attractions from "./Attractions";
 
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 const Feedback = lazy(() => import("@/components/Feedback/Feedback"));
@@ -437,6 +438,15 @@ const PGInfoComponent = ({
                 );
               })}
           </div>
+        </div>
+
+        {/* Attractions Section */}
+        <div className="animate-slideUp mb-12">
+          <Suspense fallback={<SimilarPGsSkeleton />}>
+            <Attractions
+              id={pginfo?._id}
+            />
+          </Suspense>
         </div>
 
         {/* Map Section */}
