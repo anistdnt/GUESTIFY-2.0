@@ -1,11 +1,8 @@
 import AOSProvider from "@/components/Wrapper/AOSProvider";
+import { SEO_DEFAULTS } from "@/metadata/metadata.seo";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+export const metadata: Metadata = SEO_DEFAULTS;
 
 export default function RootLayout({
   children,
