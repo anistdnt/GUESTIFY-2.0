@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { SITE_INFO } from ".";
 
-
+// Global SEO Metadata Defaults
 export const SEO_DEFAULTS: Metadata = {
-  title: "Guestify | Find the Best PGs & Paying Guest in West Bengal",
-  description:
-    "Guestify helps students and working professionals find verified PG and paying guest accommodations across West Bengal. Search, compare, and book rooms easily.",
+  metadataBase: new URL(SITE_INFO.url),
+
+  title: SITE_INFO.title,
+  description: SITE_INFO.description,
 
   keywords: [
     "Guestify",
@@ -38,53 +40,55 @@ export const SEO_DEFAULTS: Metadata = {
   ],
 
   icons: {
-    icon: "/favicon.ico",
+    icon: SITE_INFO.fabicon || "/favicon.ico",
   },
 
   verification: {
     google: "49inOYESHgjCwmk-03BMUdHzy0E7HV3KjDAfuyS3uUg",
   },
 
-//   robots: {
-//     index: true,
-//     follow: true,
-//     googleBot: {
-//       index: true,
-//       follow: true,
-//       "max-video-preview": -1,
-//       "max-image-preview": "large",
-//       "max-snippet": -1,
-//     },
-//   },
+  // For Google SEO Robot Crawlers
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 
-//   openGraph: {
-//     title: "Guestify – Smart PG & Paying Guest Platform",
-//     description:
-//       "Find verified PGs and paying guest accommodations for students and working professionals across West Bengal.",
-//     url: "https://guestify.in",
-//     siteName: "Guestify",
-//     images: [
-//       {
-//         url: "/og-image.png",
-//         width: 1200,
-//         height: 630,
-//         alt: "Guestify PG Rental Platform",
-//       },
-//     ],
-//     locale: "en_IN",
-//     type: "website",
-//   },
+  // Appearence to be shown while sharing the link on Social Media
+  openGraph: {
+    title: SITE_INFO.title,
+    description:
+      "Find verified PGs and paying guest accommodations for students and working professionals across West Bengal.",
+    url: SITE_INFO.url,
+    siteName: SITE_INFO.name,
+    images: [
+      {
+        url: SITE_INFO.images[0],
+        width: 1200,
+        height: 630,
+        alt: "Guestify PG Rental Platform",
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
 
-//   twitter: {
-//     card: "summary_large_image",
-//     title: "Guestify – Find the Best PGs in West Bengal",
-//     description:
-//       "Search, compare, and book verified PG accommodations for students & professionals.",
-//     images: ["/og-image.png"],
-//   },
+  // Appearence to be shown while sharing the link on Twitter
+  twitter: {
+    card: "summary_large_image",
+    title: "Guestify | Smart PG & Paying Guest Platform",
+    description:
+      "Search, compare, and book verified PG accommodations for students & professionals.",
+    images: SITE_INFO.images,
+  },
 
 //   alternates: {
 //     canonical: "https://guestify.in",
 //   },
 };;
-
