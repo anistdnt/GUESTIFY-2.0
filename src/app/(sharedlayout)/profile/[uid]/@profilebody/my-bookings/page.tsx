@@ -8,6 +8,7 @@
     Calendar,
     CheckCircle,
     CurrencyInr,
+    HourglassHighIcon,
     UsersThree,
   } from "@phosphor-icons/react/dist/ssr";
   import Link from "next/link";
@@ -253,7 +254,8 @@
                 <FunnelSimple size={18} className="text-gray-500" />
                 {filterStatus === "all"
                   ? "All Status"
-                  : filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
+                  : filterStatus.charAt(0).toUpperCase() +
+                    filterStatus.slice(1)}
               </span>
               <CaretDown size={14} className="text-gray-500" />
             </button>
@@ -272,17 +274,18 @@
                             setFilterStatus(s as BookingStatus | "all");
                             setDropdownOpen(false);
                           }}
-                          className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${s === filterStatus
+                          className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${
+                            s === filterStatus
                               ? "bg-yellow-100 font-medium text-yellow-800"
                               : "hover:bg-yellow-50"
-                            }`}
+                          }`}
                         >
                           {s === "all"
                             ? "All Status"
                             : s.charAt(0).toUpperCase() + s.slice(1)}
                         </button>
                       </li>
-                    )
+                    ),
                   )}
                 </ul>
               </div>
@@ -295,7 +298,10 @@
             <p className="text-gray-600 animate-pulse">Loading bookings...</p>
           </div>
         ) : (
-          <div className="h-[75vh] overflow-y-auto pr-2" ref={scrollContainerRef}>
+          <div
+            className="h-[75vh] overflow-y-auto pr-2"
+            ref={scrollContainerRef}
+          >
             {bookings.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -307,10 +313,12 @@
                       {/* Room Image Slider */}
                       <div className="relative w-full h-48 overflow-hidden rounded-xl">
                         <FadedImageSlider
-                          images={booking.room_details.room_images.map((img) => ({
-                            pg_image_url: img.room_image_url,
-                            pg_image_id: img.room_image_id,
-                          }))}
+                          images={booking.room_details.room_images.map(
+                            (img) => ({
+                              pg_image_url: img.room_image_url,
+                              pg_image_id: img.room_image_id,
+                            }),
+                          )}
                         />
                       </div>
 
@@ -320,21 +328,32 @@
                           <h4 className="font-bold text-lg text-gray-900">
                             {booking.pg_name}
                           </h4>
-                          <div
-                            data-tooltip={`${booking?.status?.toUpperCase()} on ${formatDate(
-                              booking?.status_timestamp
-                            )}`}
-                            className={`text-xs px-2 py-1 rounded-md text-white ${booking.status === "pending"
-                                ? "bg-yellow-500"
-                                : booking.status === "accepted"
-                                  ? "bg-green-500"
-                                  : booking.status === "cancelled"
-                                    ? "bg-red-500"
-                                    : "bg-gray-500"
+                          <div className="flex items-center justify-end gap-3">
+                            {booking.status === "pending" && (
+                              <div data-tooltip="Waiting for Owner Approval">
+                                {/* Pending like animation clock spin */}
+                                <HourglassHighIcon size={20} className="animate-spin text-yellow-500"/>
+                              </div>
+                            )}
+                            <div
+                              data-tooltip={`${booking?.status?.toUpperCase()} on ${formatDate(
+                                booking?.status_timestamp,
+                              )}`}
+                              className={`text-xs px-2 py-1 rounded-md text-white ${
+                                booking.status === "pending"
+                                  ? "bg-yellow-500"
+                                  : booking.status === "accepted"
+                                    ? "bg-green-500"
+                                    : booking.status === "cancelled"
+                                      ? "bg-red-500"
+                                      : "bg-gray-500"
                               }`}
-                          >
-                            {booking.status.charAt(0).toUpperCase() +
-                              booking.status.slice(1)}
+                            >
+                              <span>
+                                {booking.status.charAt(0).toUpperCase() +
+                                  booking.status.slice(1)}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
@@ -343,20 +362,20 @@
                           <p className="flex items-center gap-2">
                             <Calendar size={16} />{" "}
                             <span>
-                              {new Date(booking.booking_date).toLocaleDateString(
-                                "en-IN",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }
-                              )}
+                              {new Date(
+                                booking.booking_date,
+                              ).toLocaleDateString("en-IN", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
                             </span>
                           </p>
                           <p className="flex items-center gap-2">
-                            <UsersThree size={16} /> {booking.person_number} Person
+                            <UsersThree size={16} /> {booking.person_number}{" "}
+                            Person
                             {booking.person_number > 1 ? "s" : ""}
                           </p>
                         </div>
@@ -377,7 +396,11 @@
                         </div>
 
                         <div className="flex justify-between">
-                          <PaymentButton booking_id={booking?.booking_id} payment_at={booking?.payment_at} payment_ttl={booking?.payment_ttl} />
+                          <PaymentButton
+                            booking_id={booking?.booking_id}
+                            payment_at={booking?.payment_at}
+                            payment_ttl={booking?.payment_ttl}
+                          />
                           <button
                             data-tooltip="View Booking Details"
                             className={`mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 flex-1 rounded text-center`}
@@ -391,7 +414,7 @@
                                     booking_id: booking.booking_id,
                                     room_id: booking.room_details.id,
                                   },
-                                })
+                                }),
                               );
                             }}
                           >
