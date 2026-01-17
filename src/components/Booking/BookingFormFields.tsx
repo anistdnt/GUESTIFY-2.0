@@ -2,6 +2,7 @@
 
 import { Field, useFormikContext } from 'formik';
 import { FormField } from './FormField';
+import DatePicker from '../Forms/DatePicker';
 
 export function BookingFormFields() {
   const { values, errors, touched, setFieldValue } = useFormikContext<any>();
@@ -17,10 +18,9 @@ export function BookingFormFields() {
         required
         error={touched.start_date && errors.start_date}
       >
-        <Field
-          type="date"
-          name="start_date"
-          className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <DatePicker
+          onChange={(date: Date) => setFieldValue("start_date", date)}
+          value={values.start_date}
         />
       </FormField>
 
@@ -36,6 +36,11 @@ export function BookingFormFields() {
           placeholder="0"
           min="0"
           className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onKeyDown={(e) => {
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+              e.preventDefault();
+            }
+          }}
         />
       </FormField>
 
@@ -52,6 +57,11 @@ export function BookingFormFields() {
           min="0"
           max="11"
           className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onKeyDown={(e) => {
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+              e.preventDefault();
+            }
+          }}
         />
       </FormField>
 

@@ -54,30 +54,23 @@ const validationSchema = Yup.object().shape({
           .required("Identity type is required"),
         identity_id: Yup.string()
           .trim()
-          .when("type_of_identity", ([type_of_identity], schema) => {
-            switch (type_of_identity) {
+          .required("Identity ID is required")
+          .when("type_of_identity", ([type], schema) => {
+            switch (type) {
               case "aadhar":
-                return schema
-                  .matches(/^[2-9]{1}[0-9]{11}$/, "Invalid Aadhar number")
-                  .required("Aadhar number is required");
+                return schema.matches(/^[0-9]{12}$/, "Aadhar must be exactly 12 digits");
 
               case "pan":
-                return schema
-                  .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i, "Invalid PAN number")
-                  .required("PAN number is required");
+                return schema.matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Invalid PAN format (AAAAA9999A)");
 
               case "passport":
-                return schema
-                  .matches(/^[A-PR-WYa-pr-wy][0-9]{7}$/, "Invalid Passport number")
-                  .required("Passport number is required");
+                return schema.matches(/^[A-Z][0-9]{7}$/, "Invalid Passport format (A1234567)");
 
               case "driving_license":
-                return schema
-                  .matches(/^[A-Z]{2}[0-9]{13}$/i, "Invalid Driving License number")
-                  .required("Driving License number is required");
+                return schema.matches(/^[A-Z0-9]{15}$/, "Driving Licence must be 15 alphanumeric characters");
 
               default:
-                return schema.required("Identity ID is required");
+                return schema;
             }
           }),
         is_primary: Yup.number().oneOf([0, 1]),
@@ -352,7 +345,16 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
                       </div>
                       <div>
                         <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Start Date</p>
-                        <p className="font-semibold text-gray-900 text-lg">{previewData.start_date}</p>
+                        {/* <p className="font-semibold text-gray-900 text-lg">{previewData.start_date}</p> */}
+                        <p className="font-semibold text-gray-900 text-lg">
+                          {previewData.start_date
+                            ? new Date(previewData.start_date).toLocaleDateString("en-IN", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : ""}
+                        </p>
                       </div>
                     </div>
 
