@@ -7,8 +7,9 @@ interface Metadata {
 export const metadataMap: Record<string, Metadata> = {
   global: {
     title: "Guestify | Manage Your Paying Guest Properties Seamlessly",
+    // Fully Elaborated description for global metadata
     description:
-      "Guestify is your all-in-one solution to manage and track your paying guest properties with ease.",
+      "Guestify is your all-in-one solution to manage and track your paying guest properties with ease. From bookings to payments, our platform offers comprehensive tools to streamline your property management process. Join Guestify today and take control of your paying guest business like never before.",
     icons: {
       icon: "/favicon.ico",
     }
