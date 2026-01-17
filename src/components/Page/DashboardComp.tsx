@@ -17,6 +17,8 @@ import {
   Cell,
   LineChart,
   Line,
+  PieChart,
+  Pie,
 } from "recharts";
 
 type PGByMonth = {
@@ -45,12 +47,81 @@ type RoomGraphTypes = {
   year: string | number;
   month: string;
   count: number;
+  day?: number;
 };
 
 type BookingLineType = {
   label: string;
   value: number;
 };
+
+const COLORS = ["#a78604", "#e5e7eb"];
+
+function StatPie({
+  title,
+  centerLabel,
+  data,
+}: {
+  title: string;
+  centerLabel: string;
+  data: { name: string; value: number }[];
+}) {
+  return (
+    <div className="bg-white rounded-2xl shadow-[0_0_10px_rgba(0,0,0,0.12)] p-5 flex flex-col items-center">
+      <p className="text-gray-600 text-sm mb-3 font-medium">{title}</p>
+
+      <div className="relative w-full h-[220px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={85}
+              paddingAngle={3}
+            >
+              {data.map((_, index) => (
+                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+
+            {/* Center Text */}
+            <text
+              x="50%"
+              y="50%"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="text-xl font-bold fill-gray-800"
+            >
+              {centerLabel}
+            </text>
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Status Legend */}
+      <div className="mt-4 w-full flex flex-col gap-2">
+        {data.map((item, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-between text-sm text-gray-600"
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span>{item.name}</span>
+            </div>
+            <span className="font-semibold text-gray-800">{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function StatBoxes({ stats }: { stats: StatsResponse }) {
   const boxes = [
@@ -69,6 +140,46 @@ function StatBoxes({ stats }: { stats: StatsResponse }) {
     },
     { label: "Pending Requests", value: stats?.pendingBookings || 0 },
   ];
+
+  const occupancyData = [
+    {
+      name: "Occupied",
+      value: stats?.totalOccupants || 0,
+    },
+    {
+      name: "Vacant",
+      value: Math.max(
+        (stats?.totalRooms || 0) - (stats?.totalOccupants || 0),
+        0,
+      ),
+    },
+  ];
+
+  const bookingStatusData = [
+    {
+      name: "Pending",
+      value: stats?.pendingBookings || 0,
+    },
+    {
+      name: "Completed",
+      value: Math.max(
+        (stats?.totalRooms || 0) - (stats?.pendingBookings || 0),
+        0,
+      ),
+    },
+  ];
+
+  const bookingPercentageData = [
+    {
+      name: "Booked",
+      value: stats?.bookingPercentage || 0,
+    },
+    {
+      name: "Available",
+      value: 100 - (stats?.bookingPercentage || 0),
+    },
+  ];
+
   return (
     <>
       {/* Stat Boxes */}
@@ -82,6 +193,26 @@ function StatBoxes({ stats }: { stats: StatsResponse }) {
             <p className="text-5xl font-bold">{box.value}</p>
           </div>
         ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <StatPie
+          title="Room Occupancy"
+          centerLabel={`${stats?.totalOccupants || 0}`}
+          data={occupancyData}
+        />
+
+        <StatPie
+          title="Booking Requests"
+          centerLabel={`${stats?.pendingBookings || 0}`}
+          data={bookingStatusData}
+        />
+
+        <StatPie
+          title="Booking Percentage"
+          centerLabel={`${stats?.bookingPercentage || 0}%`}
+          data={bookingPercentageData}
+        />
       </div>
     </>
   );
@@ -100,9 +231,11 @@ export default function Dashboard() {
   const [roomgraphFilter, setRoomgraphFilter] = useState<{
     year?: number;
     pg_id?: string;
+    type?: "month" | "day";
   }>({
     pg_id: "",
     year: undefined,
+    type: "day",
   });
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -115,8 +248,9 @@ export default function Dashboard() {
   const userid = param?.uid as string;
 
   const yearCatelogue = [
-    { label: "2024", value: 2024 },
+    { label: "2026", value: 2026 },
     { label: "2025", value: 2025 },
+    { label: "2024", value: 2024 },
   ];
 
   useEffect(() => {
@@ -124,7 +258,7 @@ export default function Dashboard() {
       setLoading(true);
       const res: ApiReturn<any> = await api_caller<any>(
         "GET",
-        `${API.ADMIN.DASHBOARD.BOX?.replace(":uid", userid)}`
+        `${API.ADMIN.DASHBOARD.BOX?.replace(":uid", userid)}`,
       );
       if (res.success) {
         setStats(res?.data);
@@ -159,14 +293,22 @@ export default function Dashboard() {
   }, [userid]);
 
   useEffect(() => {
-    const fetchStats_RoomGraph = async (pg_id?: string, year?: number) => {
+    const fetchStats_RoomGraph = async (
+      pg_id?: string,
+      year?: number,
+      type?: string,
+    ) => {
       setGraphLoading(true);
       let url = `${API.ADMIN.DASHBOARD.ROOM_GRAPH?.replace(":uid", userid)}`;
       // Build Queries
       if (year) {
         url += `?year=${year}`;
-      } else if (pg_id) {
+      }
+      if (pg_id) {
         url += url?.includes("?") ? `&pg_id=${pg_id}` : `?pg_id=${pg_id}`;
+      }
+      if (type) {
+        url += url?.includes("?") ? `&type=${type}` : `?type=${type}`;
       }
       const res: ApiReturn<any> = await api_caller<any>("GET", url);
       if (res.success) {
@@ -177,8 +319,12 @@ export default function Dashboard() {
       }
       setGraphLoading(false);
     };
-    fetchStats_RoomGraph(roomgraphFilter?.pg_id, roomgraphFilter?.year);
-  }, [roomgraphFilter?.year, roomgraphFilter?.pg_id]);
+    fetchStats_RoomGraph(
+      roomgraphFilter?.pg_id,
+      roomgraphFilter?.year,
+      roomgraphFilter?.type,
+    );
+  }, [roomgraphFilter?.year, roomgraphFilter?.pg_id, roomgraphFilter?.type]);
 
   useEffect(() => {
     const fetchStats_BookingLine = async (type?: string) => {
@@ -233,43 +379,82 @@ export default function Dashboard() {
       <div className="bg-white shadow-[0_0_10px_rgba(0,0,0,0.12)] rounded-2xl p-6 transition-shadow hover:shadow-[0_0_18px_rgba(0,0,0,0.2)]">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold mb-4 text-gray-600">
-            Rooms Enlisted Per Month
+            Rooms Enlisted Per{" "}
+            {roomgraphFilter?.type === "day" ? "Day" : "Month"}
           </h2>
-          <div className="flex flex-row gap-3 justify-end items-center">
-            <Select<{ label: string; value: string }, false>
-              options={pgcatelogue}
-              value={
-                pgcatelogue.find((o) => o.value === roomgraphFilter?.pg_id) ||
-                null
-              }
-              onChange={(option) =>
-                setRoomgraphFilter((prev) => ({
-                  ...prev,
-                  pg_id: option ? option.value : "",
-                }))
-              }
-              placeholder="Select PG"
-              className="w-56"
-              isLoading={catelogueloading}
-              isClearable={true}
-            />
-            <Select<{ label: string; value: number }, false>
-              options={yearCatelogue}
-              value={
-                yearCatelogue.find((o) => o.value === roomgraphFilter?.year) ||
-                null
-              }
-              onChange={(option) =>
-                setRoomgraphFilter((prev) => ({
-                  ...prev,
-                  year: option ? option.value : undefined,
-                }))
-              }
-              placeholder="Year"
-              className="w-40"
-              isLoading={catelogueloading}
-              isClearable={true}
-            />
+          <div className="flex flex-row-reverse justify-end items-center gap-3">
+            <div className="flex flex-row gap-3 justify-end items-center">
+              <Select<{ label: string; value: string }, false>
+                options={pgcatelogue}
+                value={
+                  pgcatelogue.find((o) => o.value === roomgraphFilter?.pg_id) ||
+                  null
+                }
+                onChange={(option) =>
+                  setRoomgraphFilter((prev) => ({
+                    ...prev,
+                    pg_id: option ? option.value : "",
+                  }))
+                }
+                placeholder="Select PG"
+                className="w-56"
+                isLoading={catelogueloading}
+                isClearable={true}
+              />
+              <Select<{ label: string; value: number }, false>
+                options={yearCatelogue}
+                value={
+                  yearCatelogue.find(
+                    (o) => o.value === roomgraphFilter?.year,
+                  ) || null
+                }
+                onChange={(option) =>
+                  setRoomgraphFilter((prev) => ({
+                    ...prev,
+                    year: option ? option.value : undefined,
+                  }))
+                }
+                placeholder="Year"
+                className="w-40"
+                isLoading={catelogueloading}
+                isClearable={true}
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600">
+                <input
+                  type="radio"
+                  name="roomGraphType"
+                  value="month"
+                  checked={roomgraphFilter?.type === "month"}
+                  onChange={() =>
+                    setRoomgraphFilter((prev) => ({
+                      ...prev,
+                      type: "month",
+                    }))
+                  }
+                  className="accent-yellow-600"
+                />
+                Month
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600">
+                <input
+                  type="radio"
+                  name="roomGraphType"
+                  value="day"
+                  checked={roomgraphFilter?.type === "day"}
+                  onChange={() =>
+                    setRoomgraphFilter((prev) => ({
+                      ...prev,
+                      type: "day",
+                    }))
+                  }
+                  className="accent-yellow-600"
+                />
+                Day
+              </label>
+            </div>
           </div>
         </div>
         {graphloading && (
@@ -294,16 +479,37 @@ export default function Dashboard() {
           <ResponsiveContainer width="100%" height={300} className={"mt-8"}>
             <BarChart data={roomgraph}>
               <CartesianGrid strokeDasharray="3 3" />
+
               <XAxis
-                dataKey="month"
+                dataKey={roomgraphFilter?.type === "day" ? "day" : "month"}
                 tickFormatter={(value, index) => {
                   const item = roomgraph[index];
                   if (!item) return "";
-                  const year = item.year;
-                  return `${item.month} ${year}`;
+
+                  if (roomgraphFilter?.type === "day") {
+                    return `${item.day} ${item.month} ${item.year}`;
+                  }
+
+                  return `${item.month} ${item.year}`;
                 }}
               />
+
               <YAxis allowDecimals={false} />
+
+              <Tooltip
+                formatter={(value: number) => [`${value}`, "Rooms"]}
+                labelFormatter={(label, payload) => {
+                  const item = payload?.[0]?.payload;
+                  if (!item) return "";
+
+                  if (roomgraphFilter?.type === "day") {
+                    return `${item.day} ${item.month} ${item.year}`;
+                  }
+
+                  return `${item.month} ${item.year}`;
+                }}
+              />
+
               <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                 {roomgraph?.map((entry: any, index: number) => (
                   <Cell
@@ -313,6 +519,15 @@ export default function Dashboard() {
                   />
                 ))}
               </Bar>
+
+              <Line
+                type="monotone"
+                dataKey="count"
+                stroke="#3b2f00" // very dark brown
+                strokeWidth={1.8}
+                dot={{ r: 3, fill: "#3b2f00" }}
+                activeDot={{ r: 5, fill: "#3b2f00" }}
+              />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -323,7 +538,10 @@ export default function Dashboard() {
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold mb-4 text-gray-600">
             Booking Analytics
-            <p className="text-sm text-gray-500 font-normal">Declined, Revolked or Cancel Bookings for more than 20 days will not be considered</p>
+            <p className="text-sm text-gray-500 font-normal">
+              Declined, Revolked or Cancel Bookings for more than 20 days will
+              not be considered
+            </p>
           </h2>
           <div className="flex flex-row gap-3 justify-end items-center">
             <label className="flex items-center gap-2 cursor-pointer">
