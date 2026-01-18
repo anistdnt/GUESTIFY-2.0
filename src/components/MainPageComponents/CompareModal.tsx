@@ -33,10 +33,11 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
   const [loading, setLoading] = useState(false);
   const [showPGSelector, setShowPGSelector] = useState(false);
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
-    null
+    null,
   );
+  const [roomData, setRoomData] = useState<{ [key: string]: any[] }>({});
 
-  /** ---------------- FETCH SIMILAR PGs ---------------- */
+  /** ---------------- FETCH ---------------- */
   useEffect(() => {
     const loadSimilarPGs = async () => {
       try {
@@ -46,12 +47,12 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
 
         const res = await api_caller<any[]>(
           "GET",
-          `${API.PG.GET_PG_NEAR_PG}/${modalData?.pg_id}?coordinates=${coords}`
+          `${API.PG.GET_PG_NEAR_PG}/${modalData?.pg_id}?coordinates=${coords}`,
         );
 
         if (res.success) {
           setAvailablePGs(res?.data);
-          console.log("Available PGs:", res?.data);
+          // console.log("Available PGs:", res?.data);
         } else {
           toast.error(`${res.message} : ${res.error}`);
           setAvailablePGs([]);
@@ -68,6 +69,37 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
       loadSimilarPGs();
     }
   }, [modalData]);
+
+  useEffect(() => {
+    const fetchRoomsForPG = async (pgid: string) => {
+      try {
+        const res = await api_caller<any[]>(
+          "GET",
+          API.ROOM.CATELOGUE.replace(":pgid", pgid),
+        );
+        return res.success ? res.data : [];
+      } catch {
+        return [];
+      }
+    };
+
+    const loadRooms = async () => {
+      const newRoomMap: any = {};
+
+      for (const pg of compareList) {
+        if (pg?.pg_id && !roomData[pg.pg_id]) {
+          const rooms = await fetchRoomsForPG(pg.pg_id);
+          newRoomMap[pg.pg_id] = rooms;
+        }
+      }
+
+      if (Object.keys(newRoomMap).length) {
+        setRoomData((prev) => ({ ...prev, ...newRoomMap }));
+      }
+    };
+
+    loadRooms();
+  }, [compareList]);
 
   /** ---------------- HANDLERS ---------------- */
   const removePG = (index: number) => {
@@ -94,6 +126,8 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
       wifi: pg.wifi_available,
       food: pg.food_available,
       images: pg.pg_images,
+      additional_wifi_charges: pg.additional_wifi_charges,
+      charge_duration: pg.charge_duration,
     };
 
     setCompareList(updated);
@@ -101,6 +135,24 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
     setSelectedSlotIndex(null);
   };
 
+  const getRoomSummary = (pgid: string) => {
+    const rooms = roomData[pgid];
+    if (!rooms || rooms.length === 0) return [];
+
+    const grouped: any = {};
+
+    rooms.forEach((room) => {
+      if (!grouped[room.room_type]) {
+        grouped[room.room_type] = room.room_rent;
+      }
+    });
+
+    return Object.entries(grouped).map(
+      ([type, rent]) =>
+        `${type.charAt(0).toUpperCase() + type.slice(1)} Room @ ₹${rent}/month`,
+    );
+  };
+  
   /** ---------------- UI ---------------- */
   return (
     <>
@@ -130,9 +182,12 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
           </div>
 
           {/* ---------- TOP 4 PG SLOTS ---------- */}
-          <div className="grid grid-cols-4 gap-6 p-6 bg-gray-50 border-b">
+          <div className="grid grid-cols-5 gap-6 p-6 bg-gray-50 border-b">
             {compareList.map((pg, idx) => (
-              <div key={idx} className="relative">
+              <div
+                key={idx}
+                className={`relative ${idx === 0 ? "col-start-2" : ""}`}
+              >
                 {pg ? (
                   <div className="bg-white rounded-xl shadow-md overflow-hidden border">
                     {/* Image */}
@@ -207,7 +262,7 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
                       ? pg.food === "yes"
                         ? "Available"
                         : "Not Available"
-                      : ""
+                      : "",
                   )}
                 />
                 <ComparisonRow
@@ -220,9 +275,15 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
                   values={compareList.map((pg) =>
                     pg
                       ? pg.wifi === "yes"
-                        ? "Available"
+                        ? `Available @ ₹${pg.additional_wifi_charges ?? 0}/month`
                         : "Not Available"
-                      : ""
+                      : "",
+                  )}
+                />
+                <ComparisonRow
+                  label="WiFi Charge Duration"
+                  values={compareList.map((pg) =>
+                    pg && pg.wifi === "yes" ? pg.charge_duration || "—" : "",
                   )}
                 />
               </Section>
@@ -236,6 +297,12 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
                   label="Address"
                   values={compareList.map((pg) => (pg ? pg.address : ""))}
                   truncate
+                />
+                <ComparisonRow
+                  label="Available Room Types"
+                  values={compareList.map((pg) =>
+                    pg ? getRoomSummary(pg.pg_id) : [],
+                  )}
                 />
               </Section>
             </div>
@@ -265,7 +332,7 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
                   {availablePGs?.map((pgData) => {
                     const pg = pgData.pginfo;
                     const alreadyAdded = compareList.some(
-                      (item) => item?.pg_id === pg._id
+                      (item) => item?.pg_id === pg._id,
                     );
 
                     return (
@@ -295,7 +362,7 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
                         <div className="p-4">
                           <h4 className="font-bold">{pg.pg_name}</h4>
                           <p className="text-green-600 font-semibold">
-                            ₹{pg.minRent}/month
+                            ₹{pg.minRent || 4999}/month
                           </p>
                           <p className="text-sm text-gray-500">{pg.address}</p>
                         </div>
@@ -341,7 +408,19 @@ const ComparisonRow = ({ label, values, highlight, truncate }: any) => (
           highlight ? "font-semibold text-green-600" : "text-gray-600"
         } ${truncate ? "truncate" : ""}`}
       >
-        {val || <span className="text-gray-300">—</span>}
+        {Array.isArray(val) ? (
+          val.length > 0 ? (
+            val.map((line: string, i: number) => (
+              <p key={i} className="leading-6">
+                {line}
+              </p>
+            ))
+          ) : (
+            <span className="text-gray-300">—</span>
+          )
+        ) : (
+          val || <span className="text-gray-300">—</span>
+        )}
       </div>
     ))}
   </div>
