@@ -23,7 +23,7 @@ export default function Rating({ no_of_star }: Props) {
           <Star key={index} size={15}/>
         ))}
       </div>
-      <div className={`${ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5].color} px-2 text-xs rounded-md text-white`}>{ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5].comment}</div>
+      <div className={`${ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5]?.color} px-2 text-xs rounded-md text-white`}>{ratingConfig[no_of_star as 1 | 2 | 3 | 4 | 5]?.comment}</div>
     </div>
   );
 }
