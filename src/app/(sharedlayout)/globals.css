@@ -110,15 +110,28 @@ html {
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  background-color: rgb(31 41 55); /* Tailwind gray-800 */
+
+  /* Size */
+  width: 180px;              /* fixed width */
+  max-width: 260px;          /* optional safety */
+  white-space: normal;       /* allow wrapping */
+  text-align: center;
+
+  /* Appearance */
+  background-color: rgb(55 65 81); /* Tailwind gray-700 (lighter than gray-800) */
   color: white;
-  padding: 0.25rem 0.5rem; /* Tailwind p-1 px-2 */
-  font-size: 0.75rem; /* Tailwind text-xs */
-  border-radius: 0.375rem; /* Tailwind rounded-md */
-  white-space: nowrap;
+  padding: 0.5rem 0.75rem;   /* more breathing space */
+  font-size: 0.875rem;       /* Tailwind text-sm */
+  line-height: 1.4;
+
+  border-radius: 0.5rem;     /* slightly softer corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+  /* Behavior */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease-in-out;
+
   z-index: 50;
 }
 

@@ -169,8 +169,9 @@ export default function RoomForm({
 
                   {/* Rent */}
                   <div>
-                    <label className="block mb-1 font-medium">
-                      Rent <span className="text-red-600 font-semibold">*</span>
+                    <label className="mb-1 font-medium flex items-center gap-1">
+                      Rent (Per Month) <span className="text-red-600 font-semibold">*</span>
+                      <Tooltip text="Total Amount to be paid at the time of booking is based on the deposit duration specified" />
                     </label>
                     <Field
                       name={`rooms[${index}].room_rent`}
@@ -186,9 +187,10 @@ export default function RoomForm({
 
                   {/* Deposit */}
                   <div>
-                    <label className="block mb-1 font-medium">
+                    <label className="mb-1 font-medium flex items-center gap-1">
                       Deposit Duration{" "}
                       <span className="text-red-600 font-semibold">*</span>
+                      <Tooltip text="It Specifies the amount to be given at the time of Booking. If monthly, then the rent * 1 to be paid, If quarterly, then the rent * 3 to be paid, If half-yearly, then the rent * 6 to be paid, If yearly, then the rent * 12 to be paid." />
                     </label>
                     <Select
                       options={depositOptions}

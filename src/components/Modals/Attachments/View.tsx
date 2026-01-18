@@ -49,7 +49,8 @@ export default function ViewAttachments({ setshowModal, modalData }: ModalType) 
 
           <button
             onClick={() => setActiveTab("aggrement")}
-            className={`px-4 py-2 text-sm font-medium rounded-t-md transition-colors ${
+            disabled={true}
+            className={`px-4 py-2 text-sm font-medium rounded-t-md transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
               activeTab === "aggrement"
                 ? "border-b-2 border-yellow-700 text-yellow-700"
                 : "text-gray-500 hover:text-gray-700"

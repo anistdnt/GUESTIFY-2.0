@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /profile/
+
+Disallow: /signup
+Disallow: /api
+
+Sitemap: https://guestify.in/sitemap.xml

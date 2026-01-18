@@ -96,8 +96,9 @@ export const depositOptions = [
 ];
 
 export const roomTypeOptions = [
-  { label: "Single", value: "single" },
-  { label: "Double", value: "double" },
+  { label: "Single (1 Bed)", value: "single" },
+  { label: "Double (2 Bed)", value: "double" },
+  { label: "Triple (3 Bed)", value: "triple" },
 ];
 
 export const roomAmenitiesOptions = [

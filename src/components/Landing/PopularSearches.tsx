@@ -15,7 +15,7 @@ export default async function PopularSearches() {
     if (resData.success && resData.data) {
       const colleges = resData.data.colleges;
       return (
-        <div className="text-center">
+        <div className="text-center" data-aos="fade-up" suppressHydrationWarning={true}>
           <h3 className="text-xl font-semibold text-cardTitleCol mb-6">
             Popular Colleges
           </h3>
