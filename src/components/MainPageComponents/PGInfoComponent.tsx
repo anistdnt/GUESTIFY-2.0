@@ -114,7 +114,19 @@ const PGInfoComponent = ({
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header with back button */}
       <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-gray-700 hover:text-headingCol transition-colors duration-200 group"
+          >
+            <ArrowLeft
+              size={24}
+              className="group-hover:-translate-x-1 transition-transform duration-200"
+            />
+            <span className="font-medium">Back</span>
+          </button>
+
+
           <button
             className="border-2 font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform flex items-center justify-center gap-2"
             onClick={() => {
@@ -132,23 +144,14 @@ const PGInfoComponent = ({
                     food: pginfo?.food_available,
                     images: pginfo?.pg_images,
                     coordinates: pginfo?.location?.coordinates,
+                    additional_wifi_charges: pginfo?.additional_wifi_charges,
+                    charge_duration: pginfo?.charge_duration,
                   },
                 })
               );
             }}
           >
             <span>Add to Compare</span>
-          </button>
-
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-700 hover:text-headingCol transition-colors duration-200 group"
-          >
-            <ArrowLeft
-              size={24}
-              className="group-hover:-translate-x-1 transition-transform duration-200"
-            />
-            <span className="font-medium">Back</span>
           </button>
         </div>
       </div>
