@@ -116,6 +116,31 @@ const PGInfoComponent = ({
       <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center">
           <button
+            className="border-2 font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform flex items-center justify-center gap-2"
+            onClick={() => {
+              dispatch(
+                setModalVisibility({
+                  open: true,
+                  type: "compare",
+                  modalData: {
+                    pg_id: pginfo?._id,
+                    pg_name: pginfo?.pg_name,
+                    minRent: pginfo?.minRent,
+                    address: pginfo?.address,
+                    pg_type: pginfo?.pg_type,
+                    wifi: pginfo?.wifi_available,
+                    food: pginfo?.food_available,
+                    images: pginfo?.pg_images,
+                    coordinates: pginfo?.location?.coordinates,
+                  },
+                })
+              );
+            }}
+          >
+            <span>Add to Compare</span>
+          </button>
+
+          <button
             onClick={() => router.back()}
             className="flex items-center gap-2 text-gray-700 hover:text-headingCol transition-colors duration-200 group"
           >
