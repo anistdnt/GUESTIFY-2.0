@@ -160,8 +160,8 @@ export default function Header() {
                 <Image
                   src={"/assets/new_logo.png"}
                   alt="Logo"
-                  width={130}
-                  height={50}
+                  width={180}
+                  height={70}
                   loading="eager"
                 />
               </Link>
