@@ -120,7 +120,7 @@ const PGInfoComponent = ({
             className="flex items-center gap-2 text-gray-700 hover:text-headingCol transition-colors duration-200 group"
           >
             <ArrowLeft
-              size={24}
+              size={16}
               className="group-hover:-translate-x-1 transition-transform duration-200"
             />
             <span className="font-medium">Back</span>
@@ -128,7 +128,9 @@ const PGInfoComponent = ({
 
 
           <button
-            className="border-2 font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform flex items-center justify-center gap-2"
+            data-tooltip="Select nearby PGs to enlist them for comparison"
+            data-tooltip-pos="bottom"
+            className="border-2 text-sm text-gray-600 font-semibold py-2 px-4 rounded-xl shadow-md transition duration-300 transform flex items-center justify-center gap-2 "
             onClick={() => {
               dispatch(
                 setModalVisibility({
