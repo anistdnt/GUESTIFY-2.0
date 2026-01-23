@@ -5,8 +5,14 @@ import { SITE_INFO } from ".";
 export const SEO_DEFAULTS: Metadata = {
   metadataBase: new URL(SITE_INFO.url),
 
-  title: SITE_INFO.title,
+  title: {
+    default: "Guestify",
+    template: "%s | Guestify",
+  },
+
   description: SITE_INFO.description,
+
+  applicationName: "Guestify",
 
   keywords: [
     "Guestify",
@@ -66,7 +72,7 @@ export const SEO_DEFAULTS: Metadata = {
     description:
       "Find verified PGs and paying guest accommodations for students and working professionals across West Bengal.",
     url: SITE_INFO.url,
-    siteName: SITE_INFO.name,
+    siteName: "Guestify",
     images: [
       {
         url: SITE_INFO.images[0],
