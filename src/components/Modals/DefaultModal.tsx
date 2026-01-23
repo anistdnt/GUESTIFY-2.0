@@ -21,6 +21,7 @@ import SigningInModal from "./SigningInModal";
 import RoomImagePrevModal from "./RoomImagePrevModal";
 import EnlistNewAttraction from "./Attachments/components/Enlist";
 import ViewAttachments from "./Attachments/View";
+import CompareModal from "../MainPageComponents/CompareModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -88,6 +89,9 @@ export default function DefaultModal() {
           )}
           { type === "viewattachments" && (
             <ViewAttachments setshowModal={setshowModal} modalData={modalData} />
+          )}
+          { type === "compare" && (
+            <CompareModal setshowModal={setshowModal} modalData={modalData}/>
           )}
         </div>
       )}
