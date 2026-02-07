@@ -12,6 +12,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXV15Y8LXZ"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-KXV15Y8LXZ');
+        </script>
         {/* WebSite JSON-LD */}
         <script
           type="application/ld+json"
