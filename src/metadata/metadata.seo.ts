@@ -50,7 +50,7 @@ export const SEO_DEFAULTS: Metadata = {
   },
 
   verification: {
-    google: "49inOYESHgjCwmk-03BMUdHzy0E7HV3KjDAfuyS3uUg",
+    google: "D4IqUH9P7NlLYEKzfNIukSUYkZJyKs7F-nlHmpLpP7w",
   },
 
   // For Google SEO Robot Crawlers
