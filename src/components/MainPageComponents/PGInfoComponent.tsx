@@ -36,6 +36,7 @@ import { CameraPlus, Trash } from "@phosphor-icons/react/dist/ssr";
 import { useWishlist } from "@/lib/hook/useWishlist";
 import Attractions from "./Attractions";
 import CommonButton from "../AppComponents/CommonButton";
+import { TrendingDistrict } from "../DisplayCard/TrendingDistrict";
 
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 const Feedback = lazy(() => import("@/components/Feedback/Feedback"));
@@ -579,6 +580,8 @@ const PGInfoComponent = ({
             />
           </Suspense>
         </div>
+
+        <TrendingDistrict />
 
         {/* Feedback Section */}
         <div className="animate-slideUp pb-8">
