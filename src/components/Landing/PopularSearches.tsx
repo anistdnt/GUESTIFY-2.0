@@ -70,10 +70,10 @@ export default function PopularSearches() {
   return (
     <section suppressHydrationWarning={true}>
       <div className="container-new">
-        <div className="mb-10 text-center flex flex-col items-center">
-          <h2 className="text-h2 text-[var(--foreground)] mb-2">Popular near colleges</h2>
-          <p className="text-body-new max-w-xl">
-            Top-rated PGs within walking distance of major campuses.
+        <div className="mb-12 text-center flex flex-col items-center">
+          <h2 className="text-4xl md:text-5xl font-normal text-gray-900 mb-4 font-display tracking-tight">Top College <span className="italic-serif text-primary-600">Destinations</span></h2>
+          <p className="text-lg text-gray-600 max-w-2xl font-jakarta">
+            Popular student hubs across the country
           </p>
         </div>
 
@@ -104,7 +104,7 @@ export default function PopularSearches() {
                 spaceBetween: 24,
               },
             }}
-            className=""
+            className="pb-12"
           >
             {colleges.map((college: CollegeType, index: number) => (
               <SwiperSlide key={college._id || index}>
@@ -112,30 +112,30 @@ export default function PopularSearches() {
                   href={`/search?kmradi=20&coordinates=${college.location?.coordinates?.join(
                     ","
                   )}&clg_id=${college?._id}`}
-                  className="block group"
+                  className="block group h-full"
                 >
-                  {/* Card with subtle shadow and hover effect */}
-                  <div className="overflow-hidden transition-all duration-300">
-                    {/* Image container - 220px height for better proportions */}
-                    <div className="relative h-[220px] overflow-hidden rounded-2xl">
+                  {/* Card with uniform shadow and hover effect */}
+                  <div className="bg-white rounded-[2rem] overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.03)] hover:shadow-[0_0_30px_rgba(0,0,0,0.08)] transition-all duration-500 border border-gray-100 h-full flex flex-col">
+                    {/* Image container */}
+                    <div className="relative h-[200px] overflow-hidden">
                       <Image
                         src={college.image_url || defaultCollegeImages[index % 4]}
                         alt={college.college_name}
                         fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       {/* Listing count badge */}
-                      <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-medium shadow-lg">
+                      <div className="absolute bottom-4 left-4 bg-primary-600/90 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-[10px] font-bold shadow-lg font-jakarta uppercase tracking-wider">
                         {Math.floor(Math.random() * 100) + 50}+ Listings
                       </div>
                     </div>
-                    {/* Text section with better padding */}
-                    <div className="p-5">
-                      <h4 className="font-semibold text-md text-[var(--foreground)] mb-1 group-hover:text-[var(--primary-new)] transition-colors">
+                    {/* Text section */}
+                    <div className="p-6 flex flex-col flex-1">
+                      <h4 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition-colors font-jakarta line-clamp-1 tracking-tight">
                         {college?.college_name}
                       </h4>
-                      <p className="text-xs text-[var(--muted-foreground-new)] flex items-center gap-1">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <p className="text-sm text-gray-500 flex items-center gap-2 font-jakarta">
+                        <svg className="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>

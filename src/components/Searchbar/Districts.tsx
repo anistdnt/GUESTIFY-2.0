@@ -30,26 +30,26 @@ export const Districts = () => {
   }, [selected, router]);
 
   return (
-    <div className="mx-auto w-full max-w-screen-md p-4 relative" data-aos="fade-up" suppressHydrationWarning={true}>
+    <div className="mx-auto w-full max-w-screen-md p-4 relative" suppressHydrationWarning={true}>
 
       {/* 🔥 Custom Prev Button */}
       <button
         ref={prevRef}
-        className="absolute -left-7 top-1/3 -translate-y-1/2 z-20 w-9 h-9
-                 flex items-center justify-center rounded-full bg-white shadow-md
-                 text-yellow-700 hover:scale-105 transition"
+        className="absolute -left-7 top-1/2 -translate-y-1/2 z-20 w-10 h-10
+                 flex items-center justify-center rounded-full bg-white shadow-lg border border-gray-100
+                 text-primary-600 hover:bg-primary-600 hover:text-white transition-all duration-300 transform hover:scale-110"
       >
-        <ArrowArcLeft size={12}/>
+        <ArrowArcLeft size={16} weight="bold"/>
       </button>
 
       {/* 🔥 Custom Next Button */}
       <button
         ref={nextRef}
-        className="absolute -right-7 top-1/3 -translate-y-1/2 z-20 w-9 h-9
-                 flex items-center justify-center rounded-full bg-white shadow-md
-                 text-yellow-700 hover:scale-105 transition"
+        className="absolute -right-7 top-1/2 -translate-y-1/2 z-20 w-10 h-10
+                 flex items-center justify-center rounded-full bg-white shadow-lg border border-gray-100
+                 text-primary-600 hover:bg-primary-600 hover:text-white transition-all duration-300 transform hover:scale-110"
       >
-        <ArrowArcRight size={12}/>
+        <ArrowArcRight size={16} weight="bold"/>
       </button>
 
       {/* Swiper */}
@@ -60,8 +60,6 @@ export const Districts = () => {
           nextEl: nextRef.current,
         }}
         onBeforeInit={(swiper) => {
-          // Assign custom buttons to swiper navigation
-          // (Swiper requires this for custom buttons)
           // @ts-ignore
           swiper.params.navigation.prevEl = prevRef.current;
           // @ts-ignore
@@ -84,36 +82,36 @@ export const Districts = () => {
           const isActive = selected === district.value;
 
           return (
-            <SwiperSlide key={ind} className="flex justify-center">
+            <SwiperSlide key={ind} className="flex justify-center py-2">
               <div
                 onClick={() => setSelected(district.value)}
-                className="flex flex-col items-center justify-start w-24 cursor-pointer transition-transform duration-200 active:scale-95"
+                className="flex flex-col items-center justify-start w-24 cursor-pointer transition-all duration-300 group"
               >
                 <div
-                  className={`w-20 h-20 rounded-full overflow-hidden border flex items-center justify-center bg-white transition-all duration-300
+                  className={`w-20 h-20 rounded-full overflow-hidden border-2 flex items-center justify-center bg-white transition-all duration-500
                     ${
                       isActive
-                        ? "scale-100 border-yellow-700 shadow-lg"
-                        : "scale-95 border-gray-300"
+                        ? "scale-100 border-primary-600 shadow-xl ring-4 ring-primary-50"
+                        : "scale-90 border-gray-100 group-hover:border-primary-200 group-hover:scale-95 shadow-sm"
                     }`}
                 >
                   <Image
                     src={district.imageUrl}
-                    height={64}
-                    width={64}
+                    height={72}
+                    width={72}
                     alt={district.label}
-                    className="object-fill"
+                    className="object-cover"
                     unoptimized
                     loading="eager"
                   />
                 </div>
 
                 <p
-                  className={`mt-2 text-sm font-medium text-center transition-colors duration-300 hover:text-yellow-700
+                  className={`mt-3 text-sm font-medium text-center transition-all duration-300 font-jakarta
                     ${
                       isActive
-                        ? "text-yellow-800 font-semibold"
-                        : "text-gray-800"
+                        ? "text-primary-700 font-bold"
+                        : "text-gray-600 group-hover:text-primary-600"
                     }`}
                 >
                   {district.label}

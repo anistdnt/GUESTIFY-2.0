@@ -16,6 +16,7 @@ import { hideModal, setModalVisibility } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
 import Notification from "./Notification";
 import Noti from "./Noti";
+import CommonButton from "../AppComponents/CommonButton";
 
 const navigation: {
   name: string;
@@ -219,12 +220,13 @@ export default function Header() {
                     </div>}
                   </div>
                 ) : (
-                  <div className="hidden sm:block">
-                    <Link href="/login">
-                      <button className="bg-buttons hover:bg-buttonsHover text-white font-semibold text-sm px-4 py-2 rounded-lg">
-                        Login/Sign-Up
-                      </button>
-                    </Link>
+                  <div className="hidden sm:flex items-center gap-2">
+                    <CommonButton href="/login" variant="ghost" size="sm" className="text-lg">
+                      Login
+                    </CommonButton>
+                    <CommonButton href="/signup" variant="primary" size="sm" className="font-semibold">
+                      Sign-Up
+                    </CommonButton>
                   </div>
                 )}
 

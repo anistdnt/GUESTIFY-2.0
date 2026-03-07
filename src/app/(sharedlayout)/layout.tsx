@@ -9,6 +9,26 @@ import DefaultModal from "@/components/Modals/DefaultModal";
 import { metadataMap } from "@/metadata/metadata.config";
 import ChatBot from "@/components/Chatbot/ChatBot";
 import Script from "next/script";
+import { Inter, Outfit, Instrument_Serif } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-outfit",
+});
+
+const instrument = Instrument_Serif({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-instrument",
+  weight: ["400"],
+});
 
 export const metadata = metadataMap["global"];
 
@@ -21,7 +41,7 @@ export default function SharedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className={`${inter.variable} ${outfit.variable} ${instrument.variable} font-sans`}>
       {/* MapMyIndia script — safe & correct in App Router */}
       <Script
         src={`https://apis.mapmyindia.com/advancedmaps/v1/${MAPMYINDIA_LICENSE_KEY}/map_load?v=1.3`}
@@ -39,6 +59,6 @@ export default function SharedLayout({
         </main>
         <Footer />
       </ReduxProvider>
-    </>
+    </div>
   );
 }
