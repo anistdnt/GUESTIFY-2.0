@@ -51,7 +51,7 @@ const HeroSection = () => {
              <Image src="https://storage.googleapis.com/banani-avatars/avatar%2Ffemale%2F18-25%2FSouth%20Asian%2F1" alt="User" width={40} height={40} className="rounded-full border-2 border-white" />
              <Image src="https://storage.googleapis.com/banani-avatars/avatar%2Fmale%2F18-25%2FSouth%20Asian%2F2" alt="User" width={40} height={40} className="rounded-full border-2 border-white" />
              <Image src="https://storage.googleapis.com/banani-avatars/avatar%2Ffemale%2F18-25%2FEast%20Asian%2F3" alt="User" width={40} height={40} className="rounded-full border-2 border-white" />
-             <Image src="https://storage.googleapis.com/banani-avatars/avatar%2Fmale%2F18-25%2FSouth%20Asian%2F1" alt="User" width={40} height={40} className="rounded-full border-2 border-white" />
+             <Image src="https://storage.googleapis.com/banani-avatars/avatar%2Ffemale%2F18-25%2FSouth%20Asian%2F4" alt="User" width={40} height={40} className="rounded-full border-2 border-white" />
           </div>
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-1">
@@ -88,7 +88,7 @@ const HeroSection = () => {
             </div>
             <div className="h-64 bg-gray-100 rounded-[2.5rem] overflow-hidden shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-500">
               <Image
-                src="https://storage.googleapis.com/banani-generated-images/generated-images/8ec4f67d-d971-460b-88a5-d8ca2a6f69ca.jpg"
+                src="https://storage.googleapis.com/banani-generated-images/generated-images/41803db5-5a91-40e2-b98c-4da7d0921c41.jpg"
                 alt="Shared Space"
                 width={400}
                 height={400}

@@ -41,7 +41,7 @@ export default function Home() {
             {/* Visual Search Aids */}
             <div className="space-y-16">
               <div className="bg-white p-8 rounded-[3rem] shadow-[0_0_25px_rgba(0,0,0,0.06)] border border-gray-100">
-                <p className="text-center text-gray-500 font-medium mb-6 uppercase tracking-widest text-xs font-jakarta">Explore by <span className="italic-serif text-primary-600">District</span></p>
+                <p className="text-center text-gray-500 font-medium mb-6 uppercase tracking-widest text-xs font-jakarta">Explore by District</p>
                 <Districts />
               </div>
               

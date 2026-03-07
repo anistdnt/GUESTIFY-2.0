@@ -156,23 +156,31 @@ export default function Header() {
                 {showHamburger ? <ArrowUp size={32} /> : <List size={32} />}
               </button>
             </div>
-            <div className="flex flex-1 items-center justify-center gap-8 sm:items-stretch sm:justify-start">
-              <Link href="/" className="flex shrink-0 items-center">
-                <Image
-                  src={"/assets/new_logo.png"}
-                  alt="Logo"
-                  width={180}
-                  height={70}
-                  loading="eager"
-                />
-              </Link>
-              <div className="hidden sm:flex flex-row justify-center items-center space-x-4">
+            <div className="flex flex-1 items-center justify-between">
+              {/* Logo Section */}
+              <div className="flex shrink-0 items-center">
+                <Link href="/" className="flex items-center">
+                  <Image
+                    src={"/assets/new_logo.png"}
+                    alt="Logo"
+                    width={180}
+                    height={70}
+                    loading="eager"
+                  />
+                </Link>
+              </div>
+
+              {/* Navigation Section centered */}
+              <div className="hidden sm:flex flex-1 justify-center items-center space-x-10">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`text-sm ${item.href === pathname ? "font-semibold" : ""
-                      }`}
+                    className={`nav-link-grow text-sm font-medium transition-colors duration-300 ${
+                      item.href === pathname 
+                        ? "text-primary-600 font-semibold" 
+                        : "text-gray-600 hover:text-primary-600"
+                    }`}
                   >
                     {item.name}
                   </Link>
@@ -222,10 +230,10 @@ export default function Header() {
                 ) : (
                   <div className="hidden sm:flex items-center gap-2">
                     <CommonButton href="/login" variant="ghost" size="sm" className="text-lg">
-                      Login
+                      LOGIN
                     </CommonButton>
                     <CommonButton href="/signup" variant="primary" size="sm" className="font-semibold">
-                      Sign-Up
+                      SIGN UP
                     </CommonButton>
                   </div>
                 )}

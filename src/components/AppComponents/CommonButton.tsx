@@ -13,6 +13,7 @@ interface CommonButtonProps {
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
   animate?: boolean;
+  disabled?: boolean;
 }
 
 const CommonButton = ({
@@ -25,6 +26,7 @@ const CommonButton = ({
   icon,
   iconPosition = "right",
   animate = true,
+  disabled = false,
 }: CommonButtonProps) => {
   const baseStyles = "relative inline-flex items-center justify-center font-bold transition-all duration-300 overflow-hidden";
   
@@ -69,7 +71,7 @@ const CommonButton = ({
   }
 
   return (
-    <button onClick={onClick} className={classes}>
+    <button onClick={onClick} className={classes} disabled={disabled}>
       <ButtonContent />
     </button>
   );
