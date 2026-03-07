@@ -8,14 +8,13 @@ export const SortIcon = ({sortOrder, setSortOrder}) => {
     else setSortOrder('asc');
   };
 
-  const baseClass = "h-6 w-6 cursor-pointer transition-colors";
-
-  const activeClass = "stroke-current text-black stroke-[3]"; // bold and orange when active
-  const inactiveClass = "stroke-gray-500 hover:text-gray-700 stroke-[1.5]";
+  const baseClass = "h-5 w-5 cursor-pointer transition-all duration-300";
+  const activeClass = "stroke-current text-primary-600 stroke-[3]";
+  const inactiveClass = "stroke-gray-300 hover:text-gray-400 stroke-[2]";
 
   return (
     <div
-      className="flex flex-col h-12 px-3 py-1 bg-slate-100 rounded-md select-none items-center"
+      className="flex flex-col h-12 w-12 bg-gray-50 hover:bg-white border border-gray-100 hover:border-primary-100 rounded-full select-none items-center justify-center cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md group"
       onClick={toggleSort}
       role="button"
       aria-label="Toggle sort order"

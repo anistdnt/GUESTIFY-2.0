@@ -15,6 +15,7 @@ import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import toast from "react-hot-toast";
 import { X } from "@phosphor-icons/react/dist/ssr";
+import CommonButton from "@/components/AppComponents/CommonButton";
 const Map = dynamic(() => import("../../Map/Map"), { ssr: false }); // <-- Update this path as needed
 const SortComp = dynamic(
   () => import("@/components/Searchbar/Filter/SortComp"),
@@ -66,7 +67,7 @@ export const FilterSection = () => {
 
     const queryString = params.toString();
     const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
-    router.replace(newUrl);
+    router.replace(newUrl, { scroll: false });
   }, [
     debouncedRange,
     selectedOption,
@@ -149,57 +150,86 @@ export const FilterSection = () => {
     }
 
   return (
-    <div className="flex flex-col max-w-7xl p-4 mx-auto">
-      <div className="flex justify-between items-center">
-        <div className="w-1/2 flex justify-between items-center gap-4">
-          <RangeSlider values={values} setValues={setValues} />
-          <FilterIcon allowed_query_highlight={['pg_type', 'wifi_available', 'food_available', 'minRent', 'maxRent']} />
-          <button
-            type="button"
-            data-tooltip="Display Map"
-            onClick={() => {
-              // Handle map toggle/open here
-              setShowMap(!showMap);
-            }}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 transition"
-          >
-            <MapTrifold size={20} weight="fill" />
-            <span className="text-gray-700 font-medium">Map</span>
-          </button>
-
+    <div className="flex flex-col w-full max-w-7xl mx-auto px-4 py-8 space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-normal text-gray-900 font-display tracking-tight">
+            Refine Your <span className="text-primary-600 italic-serif">Search</span>
+          </h2>
+          <p className="text-sm text-gray-400 font-jakarta">Adjust filters to find the perfect accommodation</p>
         </div>
-        <div className="w-1/2 flex justify-end items-center gap-4">
-          <SortComp
-            selectedOption={selectedOption}
-            setSelectedOption={setSelectedOption}
-          />
-          <div className={`${!selectedOption ? "pointer-events-none" : ""}`}>
-            <SortIcon sortOrder={sortOrder} setSortOrder={setSortOrder} />
+        <div className="flex items-center gap-3">
+          <CommonButton
+            variant={showMap ? "dark" : "outline"}
+            size="md"
+            onClick={() => setShowMap(!showMap)}
+            className={`rounded-xl px-6 py-3 transition-all duration-300 ${showMap ? 'shadow-gray-900/20' : ''}`}
+            icon={<MapTrifold size={20} weight={showMap ? "fill" : "bold"} />}
+          >
+            {showMap ? "HIDE MAP" : "VIEW MAP"}
+          </CommonButton>
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:flex-row items-center bg-white/70 backdrop-blur-md p-4 lg:p-2 rounded-[1.5rem] lg:rounded-full border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] gap-4 lg:gap-2">
+        <div className="w-full lg:w-[45%] flex items-center">
+           <RangeSlider values={values} setValues={setValues} />
+        </div>
+        
+        <div className="hidden lg:block w-px h-10 bg-gray-100 mx-2"></div>
+        
+        <div className="w-full lg:flex-1 flex flex-col md:flex-row items-center gap-4 lg:gap-2">
+          <div className="w-full md:w-auto flex items-center justify-between gap-4 px-2">
+            <span className="lg:hidden text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-1">More Filters</span>
+            <FilterIcon allowed_query_highlight={['pg_type', 'wifi_available', 'food_available', 'minRent', 'maxRent']} />
+          </div>
+
+          <div className="hidden md:block w-px h-10 bg-gray-100 mx-2"></div>
+
+          <div className="w-full md:flex-1 flex items-center justify-between md:justify-end gap-4 px-2">
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Sort By</span>
+              <SortComp
+                selectedOption={selectedOption}
+                setSelectedOption={setSelectedOption}
+              />
+            </div>
+            <div className={`${!selectedOption ? "pointer-events-none opacity-30" : "opacity-100"} transition-all duration-300`}>
+              <SortIcon sortOrder={sortOrder} setSortOrder={setSortOrder} />
+            </div>
           </div>
         </div>
       </div>
+
       <div>
         <AppliedFilters />
       </div>
+
       {showMap && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          
-          <div className="relative bg-transparent w-[90%] h-[80%] max-w-5xl overflow-hidden mt-10">
-            {/* Map */}
-            <Map pgInfo={pgInfo} clg_coords={coordinates?.split(",").map(Number).reverse() as [number, number]} {...{clg_addr,clg_name,clg_id,clg_pin}} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/40 backdrop-blur-md transition-all duration-500">
+          <div className="relative bg-white w-[95%] h-[85%] max-w-6xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20">
+            {/* Map Header */}
+            <div className="absolute top-0 left-0 right-0 z-10 p-6 flex justify-between items-center pointer-events-none">
+                <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-2xl shadow-lg border border-gray-100 pointer-events-auto">
+                    <h3 className="text-lg font-display font-semibold text-gray-900">Live Map View</h3>
+                    <p className="text-xs text-gray-500 font-jakarta">Showing PGs near {clg_name || 'selected college'}</p>
+                </div>
+                <button
+                  onClick={() => setShowMap(false)}
+                  className="bg-white/90 backdrop-blur-md p-3 rounded-full shadow-lg border border-gray-100 hover:bg-gray-50 transition-all duration-300 pointer-events-auto group"
+                  aria-label="Close Map"
+                >
+                 <X size={24} weight="bold" className="text-gray-900 group-hover:scale-110 transition-transform" />
+                </button>
+            </div>
+            
+            {/* Map content */}
+            <div className="w-full h-full">
+               <Map pgInfo={pgInfo} clg_coords={coordinates?.split(",").map(Number).reverse() as [number, number]} {...{clg_addr,clg_name,clg_id,clg_pin}} />
+            </div>
           </div>
-          {/* Close Button */}
-            <button
-              onClick={() => setShowMap(false)}
-              className="float-end text-black font-bold z-10 self-start mt-8 bg-white p-2 rounded-full"
-              data-tooltip="Close Map"
-              data-tooltip-pos="bottom"
-            >
-             <X size={25} weight="bold" />
-            </button>
         </div>
       )}
-
     </div>
   );
 };
