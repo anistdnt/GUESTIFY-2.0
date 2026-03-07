@@ -113,6 +113,17 @@ export default function Header() {
     };
   }, [showProfileDropdown]);
 
+  const [isScrolled, setisScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setisScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     if (hasCookie("authToken")) {
       if (Object.keys(reduxUserData).length !== 0) {
@@ -141,7 +152,7 @@ export default function Header() {
 
   return (
     <header className="sticky z-40 top-0">
-      <nav className="bg-white">
+      <nav className={`transition-all duration-300 ${isScrolled ? "bg-white/80 backdrop-blur-md border-b border-gray-100/50 shadow-sm" : "bg-white"}`}>
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
