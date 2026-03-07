@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Eye, EyeSlash } from "@phosphor-icons/react/dist/ssr";
+import { Eye, EyeSlash, User, UserIcon, EnvelopeSimple, LockSimple, IdentificationBadge } from "@phosphor-icons/react";
+import CommonButton from "@/components/AppComponents/CommonButton";
 
 type Props = {
   formData: any;
@@ -32,30 +33,31 @@ export default function SlidingSignupForm({
 
   return (
     <div className="mt-6">
-      {/* Toggle Buttons */}
-      <div className="relative flex mb-6 bg-gray-100 rounded-lg overflow-hidden">
+      <div className="relative flex p-1.5 mb-10 bg-gray-100/50 backdrop-blur-md rounded-2xl border border-gray-100">
         <div
-          className={`absolute top-0 left-0 h-full w-1/2 bg-buttons rounded-lg transition-transform duration-500 ${
+          className={`absolute top-1.5 left-1.5 h-[calc(100%-12px)] w-[calc(50%-6px)] bg-primary-600 rounded-[0.85rem] shadow-lg shadow-primary-600/20 transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${
             isAdmin ? "translate-x-full" : "translate-x-0"
           }`}
-        ></div>
+        />
 
         <button
           type="button"
           onClick={() => setIsAdmin(false)}
-          className={`z-10 w-1/2 py-2 font-medium transition-colors ${
-            !isAdmin ? "text-white" : "text-gray-600"
+          className={`z-10 w-1/2 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${
+            !isAdmin ? "text-white" : "text-gray-400 hover:text-gray-600"
           }`}
         >
-          User
+          <User size={16} weight={!isAdmin ? "fill" : "bold"} />
+          Student
         </button>
         <button
           type="button"
           onClick={() => setIsAdmin(true)}
-          className={`z-10 w-1/2 py-2 font-medium transition-colors ${
-            isAdmin ? "text-white" : "text-gray-600"
+          className={`z-10 w-1/2 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${
+            isAdmin ? "text-white" : "text-gray-400 hover:text-gray-600"
           }`}
         >
+          <UserIcon size={16} weight={isAdmin ? "fill" : "bold"} />
           Owner
         </button>
       </div>
@@ -81,12 +83,13 @@ export default function SlidingSignupForm({
               passwordError={passwordError}
               confirmpasswordError={confirmpasswordError}
             />
-            <button
-              type="submit"
-              className="w-full bg-buttons text-white py-2 mt-3 rounded-lg hover:bg-buttonsHover transition"
+            <CommonButton
+              variant="primary"
+              size="lg"
+              className="w-full h-14 rounded-2xl shadow-lg shadow-primary-600/10 mt-6"
             >
-              Register as User
-            </button>
+              Start as Student
+            </CommonButton>
           </form>
 
           {/* ADMIN FORM */}
@@ -102,12 +105,13 @@ export default function SlidingSignupForm({
               passwordError={passwordError}
               confirmpasswordError={confirmpasswordError}
             />
-            <button
-              type="submit"
-              className="w-full bg-buttons text-white py-2 mt-3 rounded-lg hover:bg-buttonsHover transition"
+            <CommonButton
+              variant="primary"
+              size="lg"
+              className="w-full h-14 rounded-2xl shadow-lg shadow-primary-600/10 mt-6"
             >
               Register as Owner
-            </button>
+            </CommonButton>
           </form>
         </div>
       </div>
@@ -126,108 +130,103 @@ function CommonFields({
 }: any) {
   return (
     <>
-      <div className="mb-4">
-        <label className="block text-gray-700 font-medium">First name</label>
-        <input
-          type="text"
-          name="first_name"
-          value={formData.first_name}
-          onChange={handleChange}
-          required
-          placeholder="eg : John"
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">First Name</label>
+          <div className="relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-colors">
+              <IdentificationBadge size={18} weight="bold" />
+            </div>
+            <input
+              type="text"
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              required
+              placeholder="John"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border-2 border-transparent rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-400 focus:bg-white transition-all duration-300 font-jakarta text-sm text-gray-700"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Last Name</label>
+          <input
+            type="text"
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            required
+            placeholder="Doe"
+            className="w-full px-4 py-3 bg-gray-50/50 border-2 border-transparent rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-400 focus:bg-white transition-all duration-300 font-jakarta text-sm text-gray-700"
+          />
+        </div>
       </div>
 
-      <div className="mb-4">
-        <label className="block text-gray-700 font-medium">Last name</label>
-        <input
-          type="text"
-          name="last_name"
-          value={formData.last_name}
-          onChange={handleChange}
-          required
-          placeholder="eg : Doe"
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+      <div className="mb-6 space-y-2">
+        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Email Connection</label>
+        <div className="relative group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-colors">
+            <EnvelopeSimple size={18} weight="bold" />
+          </div>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder="john@example.com"
+            className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border-2 border-transparent rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-400 focus:bg-white transition-all duration-300 font-jakarta text-sm text-gray-700"
+          />
+        </div>
       </div>
 
-      <div className="mb-4">
-        <label className="block text-gray-700 font-medium">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          placeholder="eg : john@gmail.com"
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-      </div>
-
-      {/* Password */}
-      <div className="mb-4">
-        <label className="block text-gray-700 font-medium">Password</label>
-        <div className="relative">
+      <div className="mb-6 space-y-2">
+        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Security Key</label>
+        <div className="relative group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-colors">
+            <LockSimple size={18} weight="bold" />
+          </div>
           <input
             type={!showPassToggle ? "password" : "text"}
             name="password"
             value={formData.password}
             onChange={handleChange}
             required
-            placeholder="eg : Test@1234"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="••••••••"
+            className="w-full pl-12 pr-12 py-3 bg-gray-50/50 border-2 border-transparent rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-400 focus:bg-white transition-all duration-300 font-jakarta text-sm text-gray-700"
           />
-          {!showPassToggle ? (
-            <EyeSlash
-              size={22}
-              className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-              onClick={() => setshowPassToggle(true)}
-            />
-          ) : (
-            <Eye
-              size={22}
-              className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-              onClick={() => setshowPassToggle(false)}
-            />
-          )}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            {!showPassToggle ? (
+              <EyeSlash size={18} className="text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => setshowPassToggle(true)} />
+            ) : (
+              <Eye size={18} className="text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => setshowPassToggle(false)} />
+            )}
+          </div>
         </div>
         {passwordError && (
-          <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+          <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider ml-1 mt-1">{passwordError}</p>
         )}
       </div>
 
-      {/* Confirm Password */}
-      <div>
-        <label className="block text-gray-700 font-medium">
-          Confirm Password
-        </label>
-        <div className="relative">
+      <div className="mb-4 space-y-2">
+        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Confirm Identity</label>
+        <div className="relative group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-colors">
+            <LockSimple size={18} weight="bold" />
+          </div>
           <input
             type={!showPassToggle ? "password" : "text"}
             name="confirmpassword"
             value={formData.confirmpassword}
             onChange={handleChange}
             required
-            placeholder="eg : Test@1234"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="••••••••"
+            className="w-full pl-12 pr-12 py-3 bg-gray-50/50 border-2 border-transparent rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/5 focus:border-primary-400 focus:bg-white transition-all duration-300 font-jakarta text-sm text-gray-700"
           />
-          {!showPassToggle ? (
-            <EyeSlash
-              size={22}
-              className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-              onClick={() => setshowPassToggle(true)}
-            />
-          ) : (
-            <Eye
-              size={22}
-              className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-600 cursor-pointer"
-              onClick={() => setshowPassToggle(false)}
-            />
-          )}
         </div>
         {confirmpasswordError && (
-          <p className="text-red-500 text-sm mt-1">{confirmpasswordError}</p>
+          <p className="text-red-500 text-[10px] font-bold uppercase tracking-wider ml-1 mt-1">{confirmpasswordError}</p>
         )}
       </div>
     </>
