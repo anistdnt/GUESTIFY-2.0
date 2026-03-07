@@ -1,65 +1,57 @@
 import React from "react";
+import Image from "next/image";
 
 type Props = {};
 
-export default function Testimonials({}: Props) {
+export default function Testimonials({ }: Props) {
+  const testimonials = [
+    {
+      name: "Priya Sharma",
+      college: "Student, Jadavpur Univ.",
+      rating: 5,
+      review:
+        "Found the perfect PG near Jadavpur University within 2 days. The verification process gave me confidence in my choice.",
+      avatar: "https://storage.googleapis.com/banani-avatars/avatar%2Ffemale%2F18-25%2FSouth%20Asian%2F5",
+    },
+    {
+      name: "Rahul Das",
+      college: "IT Professional",
+      rating: 5,
+      review:
+        "Amazing platform! The search filters helped me find exactly what I was looking for. Highly recommended for newcomers.",
+      avatar: "https://storage.googleapis.com/banani-avatars/avatar%2Fmale%2F18-25%2FSouth%20Asian%2F6",
+    },
+    {
+      name: "Sneha Roy",
+      college: "Student, Presidency Univ.",
+      rating: 5,
+      review:
+        "Great experience using Guestify. The property details were accurate and the booking process was smooth.",
+      avatar: "https://storage.googleapis.com/banani-avatars/avatar%2Ffemale%2F18-25%2FSouth%20Asian%2F7",
+    },
+  ];
+
   return (
-    <div className="bg-white py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-headingCol mb-4">
-            What Students Say
-          </h2>
-          <p className="text-lg text-primaryText">
-            Real experiences from our community
+    <section className="bg-[var(--secondary-new)] py-20">
+      <div className="container-new">
+        <div className="flex flex-col items-center text-center gap-4 mb-12">
+          <h2 className="text-h2 text-[var(--foreground)]">Trusted by thousands</h2>
+          <p className="text-body-new">
+            Don't just take our word for it. Here's what students are saying.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              name: "Priya Sharma",
-              college: "Jadavpur University",
-              rating: 5,
-              review:
-                "Found the perfect PG near my college within hours. The verification process gave me confidence in my choice.",
-            },
-            {
-              name: "Rahul Das",
-              college: "IIT Kharagpur",
-              rating: 5,
-              review:
-                "Amazing platform! The search filters helped me find exactly what I was looking for. Highly recommended.",
-            },
-            {
-              name: "Sneha Roy",
-              college: "Presidency University",
-              rating: 5,
-              review:
-                "Great experience using Guestify. The property details were accurate and the booking process was smooth.",
-            },
-          ].map((testimonial, index) => (
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-cardsBackground rounded-lg p-6 hover:shadow-lg transition-all duration-300 group"
+              className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300"
             >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-buttons rounded-full flex items-center justify-center text-white font-semibold group-hover:bg-buttonsSecondary transition-colors duration-300">
-                  {testimonial.name.charAt(0)}
-                </div>
-                <div className="ml-4">
-                  <h4 className="font-semibold text-cardTitleCol group-hover:text-headingCol transition-colors duration-300">
-                    {testimonial.name}
-                  </h4>
-                  <p className="text-sm text-cardDesCol">
-                    {testimonial.college}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center mb-3">
+              <div className="flex items-center gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <svg
                     key={i}
-                    className="w-4 h-4 text-ratingStarCol"
+                    className="w-4 h-4 text-yellow-500"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -67,13 +59,30 @@ export default function Testimonials({}: Props) {
                   </svg>
                 ))}
               </div>
-              <p className="text-cardDesCol italic group-hover:text-primaryText transition-colors duration-300">
+              <p className="text-body-new mb-6 italic">
                 "{testimonial.review}"
               </p>
+              <div className="flex items-center gap-3">
+                <Image
+                  src={testimonial.avatar}
+                  alt={testimonial.name}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+                <div>
+                  <div className="text-label-new font-semibold text-[var(--foreground)]">
+                    {testimonial.name}
+                  </div>
+                  <div className="text-small-new text-xs">
+                    {testimonial.college}
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

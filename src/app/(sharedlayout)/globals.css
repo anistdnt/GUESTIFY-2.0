@@ -40,6 +40,7 @@ html {
 .text-cardDescription {
   font-size: 16px;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -112,19 +113,26 @@ html {
   position: absolute;
 
   /* Size */
-  width: 180px;              /* fixed width */
-  max-width: 260px;          /* optional safety */
-  white-space: normal;       /* allow wrapping */
+  width: 180px;
+  /* fixed width */
+  max-width: 260px;
+  /* optional safety */
+  white-space: normal;
+  /* allow wrapping */
   text-align: center;
 
   /* Appearance */
-  background-color: rgb(55 65 81); /* Tailwind gray-700 (lighter than gray-800) */
+  background-color: rgb(55 65 81);
+  /* Tailwind gray-700 (lighter than gray-800) */
   color: white;
-  padding: 0.5rem 0.75rem;   /* more breathing space */
-  font-size: 0.875rem;       /* Tailwind text-sm */
+  padding: 0.5rem 0.75rem;
+  /* more breathing space */
+  font-size: 0.875rem;
+  /* Tailwind text-sm */
   line-height: 1.4;
 
-  border-radius: 0.5rem;     /* slightly softer corners */
+  border-radius: 0.5rem;
+  /* slightly softer corners */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 
   /* Behavior */
@@ -179,7 +187,8 @@ input[type="radio"] {
   width: 18px;
   height: 18px;
   border: 2px solid #999;
-  border-radius: 4px; /* Change to 50% for round */
+  border-radius: 4px;
+  /* Change to 50% for round */
   background-color: white;
   cursor: pointer;
   position: relative;
@@ -194,7 +203,8 @@ input[type="checkbox"]:checked {
 
 /* Radio shape */
 input[type="radio"] {
-  border-radius: 50%; /* perfect circle */
+  border-radius: 50%;
+  /* perfect circle */
 }
 
 /* Checkmark */
@@ -234,11 +244,14 @@ textarea[aria-invalid="true"] {
 
 .swiper-pagination-bullet {
   background-color: #d0a400 !important;
-  opacity: 1; /* ensures active/inactive are visible */
+  opacity: 1;
+  /* ensures active/inactive are visible */
 }
+
 .swiper-pagination-bullet-active {
   background-color: #d0a400 !important;
-  transform: scale(1.4); /* slightly bigger active dot */
+  transform: scale(1.4);
+  /* slightly bigger active dot */
 }
 
 label.required::after {
@@ -251,9 +264,11 @@ label.required::after {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.25);
   }
+
   100% {
     transform: scale(1);
   }
@@ -275,8 +290,10 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
+  -moz-appearance: textfield;
+  /* Firefox */
 }
+
 /* Navigation button base */
 .room-image-modal .swiper-button-next,
 .room-image-modal .swiper-button-prev {
@@ -290,11 +307,13 @@ input[type="number"] {
 
 /* Pull buttons inward */
 .room-image-modal .swiper-button-prev {
-  left: 24px;   /* 👈 distance from left edge */
+  left: 24px;
+  /* 👈 distance from left edge */
 }
 
 .room-image-modal .swiper-button-next {
-  right: 24px;  /* 👉 distance from right edge */
+  right: 24px;
+  /* 👉 distance from right edge */
 }
 
 /* Hover */
@@ -320,4 +339,242 @@ input[type="number"] {
   .room-image-modal .swiper-button-next {
     right: 40px;
   }
+}
+
+/* ========================================
+   New Design System Classes
+   ======================================== */
+
+/* CSS Custom Properties for New Design */
+:root {
+  /* Brand Colors - Modernized Amber/Gold */
+  --primary-new: #d99000;
+  --primary-foreground-new: #ffffff;
+  --secondary-new: #fdf8e8;
+  --secondary-foreground-new: #8a5b00;
+  --accent-new: #f4f4f5;
+  --accent-foreground-new: #18181b;
+
+  /* UI Tokens */
+  --muted-new: #f4f4f5;
+  --muted-foreground-new: #71717a;
+  --border-new: #e4e4e7;
+
+  /* Radius Tokens */
+  --radius-sm-new: 6px;
+  --radius-md-new: 8px;
+  --radius-lg-new: 12px;
+  --radius-xl-new: 16px;
+  --radius-2xl-new: 24px;
+
+  /* Shadow Tokens */
+  --shadow-sm-new: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md-new: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg-new: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Typography Utility Classes */
+.text-h1 {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.text-h2 {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.text-h3 {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.text-body-new {
+  font-size: 16px;
+  color: var(--muted-foreground-new);
+}
+
+.text-small-new {
+  font-size: 14px;
+  color: var(--muted-foreground-new);
+}
+
+.text-label-new {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Button Components */
+.btn-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-md-new);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-primary-new {
+  background-color: var(--primary-new);
+  color: var(--primary-foreground-new);
+}
+
+.btn-primary-new:hover {
+  background-color: #c29a00;
+}
+
+.btn-secondary-new {
+  background-color: var(--secondary-new);
+  color: var(--secondary-foreground-new);
+}
+
+.btn-outline-new {
+  background-color: transparent;
+  border-color: var(--border-new);
+  color: var(--foreground);
+}
+
+.btn-outline-new:hover {
+  background-color: var(--accent-new);
+}
+
+.btn-ghost-new {
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.btn-ghost-new:hover {
+  background-color: var(--accent-new);
+}
+
+/* Card Components */
+.card-new {
+  background-color: var(--background);
+  border: 1px solid var(--border-new);
+  border-radius: var(--radius-lg-new);
+  padding: 24px;
+  transition: box-shadow 0.2s;
+}
+
+.card-hover-new:hover {
+  box-shadow: var(--shadow-md-new);
+  border-color: #d4d4d8;
+}
+
+/* Badge Component */
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: var(--muted-new);
+  color: var(--foreground);
+}
+
+/* Input Field */
+.input-field-new {
+  height: 44px;
+  width: 100%;
+  border-radius: var(--radius-md-new);
+  border: 1px solid var(--border-new);
+  padding: 0 12px;
+  font-size: 14px;
+  background: transparent;
+  color: var(--foreground);
+}
+
+.input-field-new:focus {
+  outline: none;
+  border-color: var(--primary-new);
+}
+
+/* Container */
+.container-new {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
+/* Popular Colleges Carousel Styles */
+.popular-colleges-carousel .swiper-button-next,
+.popular-colleges-carousel .swiper-button-prev {
+  width: 44px;
+  height: 44px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.popular-colleges-carousel .swiper-button-next:hover,
+.popular-colleges-carousel .swiper-button-prev:hover {
+  background: var(--primary-new);
+  transform: scale(1.1);
+}
+
+.popular-colleges-carousel .swiper-button-next::after,
+.popular-colleges-carousel .swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.popular-colleges-carousel .swiper-button-next:hover::after,
+.popular-colleges-carousel .swiper-button-prev:hover::after {
+  color: white;
+}
+
+.popular-colleges-carousel .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: #d1d5db;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.popular-colleges-carousel .swiper-pagination-bullet-active {
+  background: var(--primary-new);
+  width: 24px;
+  border-radius: 5px;
+}
+
+/* Pagination container alignment */
+.popular-colleges-carousel .swiper-pagination {
+  bottom: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  top: 20px;
+}
+
+/* Bullets */
+.popular-colleges-carousel .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: #d1d5db;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+/* Active bullet — pill style */
+.popular-colleges-carousel .swiper-pagination-bullet-active {
+  background: var(--primary-new);
+  width: 22px;
+  height: 8px;
+  border-radius: 999px;
 }

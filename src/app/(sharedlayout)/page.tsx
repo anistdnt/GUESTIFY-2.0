@@ -2,17 +2,21 @@ import CTASection from "@/components/Landing/CTASection";
 import HeroSection from "@/components/Landing/HeroSection";
 import HowItWorks from "@/components/Landing/HowItWorks";
 import PopularSearches from "@/components/Landing/PopularSearches";
-import Statistics from "@/components/Landing/Statistics";
 import Testimonials from "@/components/Landing/Testimonials";
+import TrustBanner from "@/components/Landing/TrustBanner";
 import { Districts } from "@/components/Searchbar/Districts";
 import Searchbar from "@/components/Searchbar/Searchbar";
 
 export default function Home() {
   return (
     <div suppressHydrationWarning={true}>
-      {/* Hero Section  */}
+      {/* Hero Section with integrated search */}
       <HeroSection />
 
+      {/* Trust Banner Section */}
+      <TrustBanner />
+
+      {/* College Search Section - Keeping the existing searchbar functional */}
       <div id="searchbar" className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Section Header */}
@@ -37,9 +41,14 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* How It Works Section */}
       <HowItWorks />
-      <Statistics />
+
+      {/* Testimonials Section */}
       <Testimonials />
+
+      {/* CTA Section */}
       <CTASection />
     </div>
   );
