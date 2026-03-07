@@ -6,52 +6,52 @@ type Props = {};
 export default function Testimonials({ }: Props) {
   const testimonials = [
     {
-      name: "Priya Sharma",
-      college: "Student, Jadavpur Univ.",
+      name: "Sarah Jenkins",
+      college: "Student, NYU Class of 2025",
       rating: 5,
       review:
-        "Found the perfect PG near Jadavpur University within 2 days. The verification process gave me confidence in my choice.",
+        "Finding an apartment near NYU while living in London was stressful until I found Guestify. The virtual tour and verified reviews were lifesavers.",
       avatar: "https://storage.googleapis.com/banani-avatars/avatar%2Ffemale%2F18-25%2FSouth%20Asian%2F5",
     },
     {
-      name: "Rahul Das",
-      college: "IT Professional",
+      name: "David Chen",
+      college: "UT Austin Senior",
       rating: 5,
       review:
-        "Amazing platform! The search filters helped me find exactly what I was looking for. Highly recommended for newcomers.",
+        "The easiest booking process I've ever experienced. I found a great shared house in Austin within 2 days. The roommate matching feature is a bonus!",
       avatar: "https://storage.googleapis.com/banani-avatars/avatar%2Fmale%2F18-25%2FSouth%20Asian%2F6",
     },
     {
-      name: "Sneha Roy",
-      college: "Student, Presidency Univ.",
+      name: "Marcus Thorne",
+      college: "Stanford Grad Student",
       rating: 5,
       review:
-        "Great experience using Guestify. The property details were accurate and the booking process was smooth.",
+        "As a graduate student, I needed a quiet place with good WiFi. Guestify's filters helped me find exactly what I was looking for. Highly recommended.",
       avatar: "https://storage.googleapis.com/banani-avatars/avatar%2Ffemale%2F18-25%2FSouth%20Asian%2F7",
     },
   ];
 
   return (
-    <section className="bg-[var(--secondary-new)] py-20">
-      <div className="container-new">
-        <div className="flex flex-col items-center text-center gap-4 mb-12">
-          <h2 className="text-h2 text-[var(--foreground)]">Trusted by thousands</h2>
-          <p className="text-body-new">
-            Don't just take our word for it. Here's what students are saying.
+    <section className="bg-primary-50 py-24 font-jakarta">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col items-center text-center gap-4 mb-16">
+          <h2 className="text-4xl md:text-5xl font-normal text-gray-900 font-display tracking-tight">Loved by students <span className="italic-serif text-primary-600">worldwide</span></h2>
+          <p className="text-lg text-gray-600 font-jakarta">
+            See why over 10,000+ students trust Guestify every year.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300"
+              className="bg-white rounded-[2.5rem] p-8 shadow-[0_0_15px_rgba(0,0,0,0.03)] hover:shadow-[0_0_30px_rgba(0,0,0,0.08)] transition-all duration-500 border border-primary-100/50"
             >
-              <div className="flex items-center gap-1 mb-4">
+              <div className="flex items-center gap-1 mb-6">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <svg
                     key={i}
-                    className="w-4 h-4 text-yellow-500"
+                    className="w-5 h-5 text-primary-500"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -59,22 +59,23 @@ export default function Testimonials({ }: Props) {
                   </svg>
                 ))}
               </div>
-              <p className="text-body-new mb-6 italic">
+              <p className="text-gray-600 mb-8 italic text-lg leading-relaxed font-jakarta">
                 "{testimonial.review}"
               </p>
-              <div className="flex items-center gap-3">
-                <Image
-                  src={testimonial.avatar}
-                  alt={testimonial.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
+              <div className="flex items-center gap-4">
+                <div className="relative w-12 h-12">
+                   <Image
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    fill
+                    className="rounded-full object-cover border-2 border-primary-100"
+                  />
+                </div>
                 <div>
-                  <div className="text-label-new font-semibold text-[var(--foreground)]">
+                  <div className="font-bold text-gray-900 font-display text-lg tracking-tight">
                     {testimonial.name}
                   </div>
-                  <div className="text-small-new text-xs">
+                  <div className="text-xs text-gray-500 font-jakarta">
                     {testimonial.college}
                   </div>
                 </div>

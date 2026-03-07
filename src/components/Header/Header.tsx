@@ -16,6 +16,7 @@ import { hideModal, setModalVisibility } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
 import Notification from "./Notification";
 import Noti from "./Noti";
+import CommonButton from "../AppComponents/CommonButton";
 
 const navigation: {
   name: string;
@@ -112,6 +113,17 @@ export default function Header() {
     };
   }, [showProfileDropdown]);
 
+  const [isScrolled, setisScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setisScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     if (hasCookie("authToken")) {
       if (Object.keys(reduxUserData).length !== 0) {
@@ -140,7 +152,7 @@ export default function Header() {
 
   return (
     <header className="sticky z-40 top-0">
-      <nav className="bg-white">
+      <nav className={`transition-all duration-300 ${isScrolled ? "bg-white/80 backdrop-blur-md border-b border-gray-100/50 shadow-sm" : "bg-white"}`}>
         <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
             <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -155,23 +167,31 @@ export default function Header() {
                 {showHamburger ? <ArrowUp size={32} /> : <List size={32} />}
               </button>
             </div>
-            <div className="flex flex-1 items-center justify-center gap-8 sm:items-stretch sm:justify-start">
-              <Link href="/" className="flex shrink-0 items-center">
-                <Image
-                  src={"/assets/new_logo.png"}
-                  alt="Logo"
-                  width={180}
-                  height={70}
-                  loading="eager"
-                />
-              </Link>
-              <div className="hidden sm:flex flex-row justify-center items-center space-x-4">
+            <div className="flex flex-1 items-center justify-between">
+              {/* Logo Section */}
+              <div className="flex shrink-0 items-center">
+                <Link href="/" className="flex items-center">
+                  <Image
+                    src={"/assets/new_logo.png"}
+                    alt="Logo"
+                    width={180}
+                    height={70}
+                    loading="eager"
+                  />
+                </Link>
+              </div>
+
+              {/* Navigation Section centered */}
+              <div className="hidden sm:flex flex-1 justify-center items-center space-x-10">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`text-sm ${item.href === pathname ? "font-semibold" : ""
-                      }`}
+                    className={`nav-link-grow text-sm font-medium transition-colors duration-300 ${
+                      item.href === pathname 
+                        ? "text-primary-600 font-semibold" 
+                        : "text-gray-600 hover:text-primary-600"
+                    }`}
                   >
                     {item.name}
                   </Link>
@@ -219,12 +239,13 @@ export default function Header() {
                     </div>}
                   </div>
                 ) : (
-                  <div className="hidden sm:block">
-                    <Link href="/login">
-                      <button className="bg-buttons hover:bg-buttonsHover text-white font-semibold text-sm px-4 py-2 rounded-lg">
-                        Login/Sign-Up
-                      </button>
-                    </Link>
+                  <div className="hidden sm:flex items-center gap-2">
+                    <CommonButton href="/login" variant="ghost" size="sm" className="text-lg">
+                      LOGIN
+                    </CommonButton>
+                    <CommonButton href="/signup" variant="primary" size="sm" className="font-semibold">
+                      SIGN UP
+                    </CommonButton>
                   </div>
                 )}
 

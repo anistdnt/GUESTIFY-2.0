@@ -9,23 +9,40 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        display: ["var(--font-outfit)", "sans-serif"],
+        "serif-display": ["var(--font-instrument)", "serif"],
+        jakarta: ["var(--font-inter)", "sans-serif"],
+        body: ["var(--font-inter)", "sans-serif"],
         cardTitle: ["Roboto", "sans-serif"],
       },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        buttons: "#d0a400",
-        buttonsSecondary: "#e4b500",
-        priceCol: "#c29a00",
-        buttonsHover: "#c29a00",
-        ratingStarCol: "#b39009",
-        cardsBackground: "#fcf5d6",
-        cardTitleCol: "#5b645d",
-        cardDesCol: "#788b7c",
-        headingCol: "#c29a00",
-        subheadingCol: "#c29a00",
-        primaryText: "#5B645D",
-        footerBg: "#a78604",
+        // New Redesign Palette (Amber/Gold based)
+        primary: {
+          50: "#fffbeb",
+          100: "#fef3c7",
+          200: "#fde68a",
+          300: "#fcd34d",
+          400: "#fbbf24",
+          500: "#f59e0b",
+          600: "#d97706",
+          700: "#b45309",
+          800: "#92400e",
+          900: "#78350f",
+        },
+        buttons: "#d97706", // primary-600
+        buttonsSecondary: "#f59e0b", // primary-500
+        priceCol: "#b45309", // primary-700
+        buttonsHover: "#b45309", // primary-700
+        ratingStarCol: "#f59e0b", // primary-500
+        cardsBackground: "#fffbeb", // primary-50
+        cardTitleCol: "#1f2937", // gray-800
+        cardDesCol: "#4b5563", // gray-600
+        headingCol: "#d97706", // primary-600
+        subheadingCol: "#92400e", // primary-800
+        primaryText: "#374151", // gray-700
+        footerBg: "#78350f", // primary-900
       },
       animation: {
         slideFadeIn: "slideFadeIn 0.5s ease-out forwards",

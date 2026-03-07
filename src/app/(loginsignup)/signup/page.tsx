@@ -12,6 +12,7 @@ import { API } from "@/lib/api_const";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import SlidingSignupForm from "./component/SignUpForm";
+import { ShieldCheck } from "@phosphor-icons/react";
 
 type SignUpFormData = {
   first_name: string;
@@ -110,33 +111,95 @@ const SignUp = () => {
         />
       </Head> */}
 
-      <div className="min-h-[calc(100vh-64px)] flex flex-col lg:flex-row  items-center justify-evenly bg-gray-100 py-10">
-        <Image
-          src="/assets/login_illustration.webp"
-          height={600}
-          width={600}
-          alt="illustration"
-        ></Image>
-        <div className="bg-white p-8 rounded-lg w-full max-w-md mx-5">
-          <h2 className="text-3xl font-semibold text-center text-gray-700">
-            Register As
-          </h2>
-          <SlidingSignupForm
-            formData={formData}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            showPassToggle={showPassToggle}
-            setshowPassToggle={setshowPassToggle}
-            passwordError={passwordError}
-            confirmpasswordError={confirmpasswordError}
-            onFormTypeChange={(type: "user" | "admin") => setIsAdmin(type === "admin")}
+      <div className="h-screen flex flex-col lg:flex-row bg-[#FAFAFA] font-jakarta overflow-hidden relative">
+        {/* Cinematic Left Banner */}
+        <div className="hidden lg:flex lg:w-1/2 h-full relative overflow-hidden group border-r border-gray-100">
+          <Image
+            src="https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&q=80&w=2070"
+            fill
+            alt="Community Living"
+            className="object-cover transition-transform duration-1000 group-hover:scale-110"
+            priority
           />
-          <p className="mt-4 text-center text-gray-600">
-            <span className=" me-2">Already have an account?</span>
-            <Link href="/login" className="text-buttons">
-              Login
+          <div className="absolute inset-0 bg-neutral-900/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-900/20 to-neutral-950/40" />
+          
+          <div className="absolute inset-0 p-20 flex flex-col justify-between text-white z-10">
+            <Link href="/" className="flex items-center gap-2 group/logo w-fit">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg transform transition-transform group-hover/logo:scale-110">
+                <ShieldCheck size={26} weight="fill" className="text-primary-600" />
+              </div>
+              <span className="text-3xl font-bold font-display tracking-tight">Guestify</span>
             </Link>
-          </p>
+
+            <div className="max-w-md space-y-6">
+              <h1 className="text-6xl font-semibold font-display leading-[1.1] tracking-tight">
+                Join the <span className="italic-serif text-primary-400">Student</span> Elite.
+              </h1>
+              <p className="text-white/70 text-lg font-jakarta leading-relaxed">
+                Step into a world of curated accommodations designed for the modern scholar. Your journey starts here.
+              </p>
+              
+              <div className="grid grid-cols-2 gap-8 pt-6">
+                <div>
+                  <p className="text-3xl font-bold font-display">100%</p>
+                  <p className="text-white/50 text-xs uppercase tracking-widest font-bold">Verified Hosts</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold font-display">Fast</p>
+                  <p className="text-white/50 text-xs uppercase tracking-widest font-bold">Booking Flow</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-white/40 text-sm">
+              Secured & Verified by Guestify Trust Systems.
+            </div>
+          </div>
+        </div>
+
+        {/* Right Auth Section */}
+        <div className="w-full lg:w-1/2 h-full flex flex-col p-6 lg:p-20 relative overflow-y-auto scrollbar-hide">
+          {/* Decorative shapes on mobile */}
+          <div className="absolute bottom-1/4 -left-20 w-80 h-80 bg-primary-100/50 rounded-full blur-[100px] lg:hidden" />
+
+          <div className="w-full max-w-lg mx-auto my-auto relative animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            {/* Main Card */}
+            <div className="bg-white/80 backdrop-blur-3xl p-8 lg:p-14 rounded-[2.5rem] lg:rounded-[3rem] shadow-[0_32px_80px_rgba(0,0,0,0.06)] border border-white/50 relative z-10 transition-all duration-500 hover:shadow-[0_40px_100px_rgba(0,0,0,0.08)]">
+              <div className="flex flex-col items-center text-center mb-8">
+                <div className="w-14 h-14 bg-primary-50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-primary-100 lg:hidden">
+                  <ShieldCheck size={28} weight="duotone" className="text-primary-600" />
+                </div>
+                <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 font-display tracking-tight mb-2">
+                  Join our <span className="italic-serif text-primary-600">Community</span>
+                </h2>
+                <p className="text-gray-500 font-jakarta text-sm">Elevate your living standard with Guestify</p>
+              </div>
+
+              <SlidingSignupForm
+                formData={formData}
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+                showPassToggle={showPassToggle}
+                setshowPassToggle={setshowPassToggle}
+                passwordError={passwordError}
+                confirmpasswordError={confirmpasswordError}
+                onFormTypeChange={(type: "user" | "admin") => setIsAdmin(type === "admin")}
+              />
+
+              <div className="mt-10 pt-8 border-t border-gray-50 text-center">
+                <p className="text-gray-400 text-sm">
+                  Already part of the family?{" "}
+                  <Link href="/login" className="text-primary-600 font-bold hover:underline transition-all">
+                    Sign In
+                  </Link>
+                </p>
+              </div>
+            </div>
+
+            {/* Background Decorative Card */}
+            <div className="absolute top-10 right-10 -left-4 -bottom-4 bg-primary-600/5 rounded-[2.5rem] lg:rounded-[3rem] -z-0" />
+          </div>
         </div>
       </div>
     </>

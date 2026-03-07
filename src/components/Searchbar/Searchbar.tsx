@@ -47,7 +47,7 @@ const ExpandedComp = memo(
       return (
         <ul
           id="Kolkata_Colleges"
-          className="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200 transition-all duration-500 ease-out opacity-0 transform translate-y-4 animate-slideFadeIn"
+          className="max-h-[400px] px-2 pb-3 overflow-y-auto text-sm text-gray-700 font-body transition-all duration-500 ease-out opacity-0 transform translate-y-4 animate-slideFadeIn"
         >
           {Colleges?.length === 0 ? (
             <NoDataFound text="No Colleges Found" />
@@ -58,21 +58,28 @@ const ExpandedComp = memo(
                 onClick={() => {
                   handleChangePath(item?.location?.coordinates?.join(","),item.college_name,item.address,item.pincode,item._id);
                 }}
+                className="group"
               >
-                <div className="flex items-center py-2 pl-2 rounded hover:bg-gray-50 cursor-pointer">
-                  <Image
-                    className="w-10 h-10 mr-2 rounded-md inline-block"
-                    src={item.image_url}
-                    alt={item.college_name + " logo"}
-                    width={40}
-                    height={40}
-                  />
-                  <div className="ml-2">
-                    <span className="text-black">{item.college_name}</span>{" "}
+                <div className="flex items-center p-3 rounded-2xl hover:bg-primary-50 cursor-pointer transition-all duration-200 border border-transparent hover:border-primary-100">
+                  <div className="relative w-12 h-12 flex-shrink-0">
+                    <Image
+                      className="rounded-xl object-cover"
+                      src={item.image_url}
+                      alt={item.college_name + " logo"}
+                      fill
+                    />
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <span className="text-gray-900 font-bold group-hover:text-primary-700 transition-colors">{item.college_name}</span>{" "}
                     <br />
-                    <span className="text-xs text-gray-700">
+                    <span className="text-xs text-gray-500">
                       {item.address}
                     </span>
+                  </div>
+                  <div className="text-primary-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </div>
               </li>
@@ -87,11 +94,6 @@ const ExpandedComp = memo(
 ExpandedComp.displayName = "ExpandedComp";
 
 const Searchbar = () => {
-  // const [selectedOption, setSelectedOption] = useState({
-  //   label: "College",
-  //   value: "college",
-  // });
-
   const [searchString, setSearchString] = useState("");
   const debouncedQuery = useDebounce(searchString, 500);
 
@@ -99,55 +101,45 @@ const Searchbar = () => {
 
   const handleChangePath = useCallback(
     (coordinates: string,college_name:string,college_addr:string,college_pin:number,college_id:string) => {
-      // console.log("Co-Ordinates",coordinates);
       const url = new URLSearchParams(window?.location.search);
-
-      //Adding query params
       url.set("coordinates", coordinates);
       url.set("kmradi", "20");
-      // url.set("clg_name",college_name);
-      // url.set("clg_addr",college_addr);
-      // url.set("clg_pin", college_pin?.toString());
       url.set("clg_id", college_id);
-
 
       router.push(`/search?${url.toString()}`, { scroll: false });
       setSearchString("");
     },
-    [debouncedQuery]
+    [router]
   );
 
   return (
-    <div data-aos="fade-up" suppressHydrationWarning={true}>
-      {/* <Districts /> */}
-      <div className="mx-auto flex flex-col p-2 lg:w-3/5 bg-white rounded-md">
-        <div className="flex items-center border w-full rounded-lg px-4 gap-2">
-          {/* <Select
-            value={selectedOption}
-            onChange={setSelectedOption}
-            isSearchable={false}
-            className="w-32 border-white"
-            options={[
-              { label: "Location", value: "location" },
-              { label: "College", value: "college" },
-            ]}
-          /> */}
-          <MagnifyingGlass size={20} color="#7d7d7d"/>
+    <div className="w-full relative" suppressHydrationWarning={true}>
+      <div className={`mx-auto flex flex-col p-2 bg-white rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.08)] border border-gray-100 transition-all duration-500 ${searchString ? 'ring-4 ring-primary-100' : ''}`}>
+        <div className="flex items-center w-full px-6 py-2 gap-4">
+          <div className="text-primary-600 bg-primary-50 p-3 rounded-2xl">
+            <MagnifyingGlass size={24} weight="bold"/>
+          </div>
           <input
             type="text"
-            // placeholder={
-            //   selectedOption?.value === "college"
-            //     ? "Search By College Name"
-            //     : "Search By Location"
-            // }
-            placeholder="Search By College Name"
-            className="w-full pe-4 py-2 focus:outline-none"
+            placeholder="Search for your college (e.g. Heritage Institute...)"
+            className="w-full text-lg font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none font-body bg-transparent"
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
           />
+          {searchString && (
+             <button 
+                onClick={() => setSearchString('')}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors"
+             >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+             </button>
+          )}
         </div>
+        
         {searchString && (
-          <div className="py-4">
+          <div className="px-4 py-4 border-t border-gray-50 mt-2">
             <ExpandedComp
               query={debouncedQuery}
               handleChangePath={handleChangePath}
@@ -155,6 +147,22 @@ const Searchbar = () => {
           </div>
         )}
       </div>
+      
+      {/* Search Hints */}
+      {!searchString && (
+        <div className="flex justify-center gap-3 mt-6">
+          <span className="text-sm text-gray-400 font-body">Common searches:</span>
+          {["MAKAUT", "Heritage", "Techno Main"].map((hint) => (
+            <button 
+              key={hint}
+              onClick={() => setSearchString(hint)}
+              className="text-xs font-semibold text-primary-600 bg-primary-50 px-3 py-1 rounded-full hover:bg-primary-100 transition-colors font-body"
+            >
+              {hint}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

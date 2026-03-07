@@ -29,65 +29,67 @@ export const RangeSlider = ({ values, setValues, MAX=20, MIN=1, STEP=1, unit='km
   }, [MIN, MAX, STEP]);
 
   return (
-    <div className="bg-slate-100 h-12 px-4 w-full rounded-md select-none text-gray-800 flex justify-between items-center gap-3">
-      <Range
-        step={STEP}
-        min={MIN}
-        max={MAX}
-        values={values}
-        onChange={setValues}
-        renderTrack={({ props, children }) => (
-          <div
-            {...props}
-            className="relative h-1.5 w-2/3 rounded bg-gray-400"
-          >
-            {scaleMarks}
-            {children}
-          </div>
-        )}
-        renderThumb={({ props, index, isDragged }) => {
-          const { key, ...restProps } = props;
-          return (
+    <div className="bg-transparent h-16 lg:h-14 px-4 w-full select-none text-gray-800 flex justify-between items-center gap-6">
+      <div className="flex-1 flex flex-col gap-2">
+        <div className="flex justify-between items-center px-1">
+           <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase font-jakarta">Radius</span>
+           <span className="text-xs font-bold text-primary-600 font-jakarta">
+              {values[0]}{unit}
+           </span>
+        </div>
+        <Range
+          step={STEP}
+          min={MIN}
+          max={MAX}
+          values={values}
+          onChange={setValues}
+          renderTrack={({ props, children }) => (
             <div
-              key={key}
-              {...restProps}
-              role="slider"
-              tabIndex={0}
-              aria-valuemin={MIN}
-              aria-valuemax={MAX}
-              aria-valuenow={values[index]}
-              aria-valuetext={`${values[index]} kilometers`}
-              data-tooltip={`${values[index]} ${unit}`}
-              className={`
-                relative flex items-center justify-center
-                h-6 w-6 rounded-full
-                bg-buttons
-                cursor-pointer
-                transition-colors
-                ${isDragged ? 'bg-buttons' : 'hover:bg-buttonsHover'}
-              `}
+              {...props}
+              className="relative h-1.5 w-full rounded-full bg-gray-100"
             >
-              {/* Tooltip - visible when dragging */}
+              <div 
+                className="absolute h-full bg-primary-600 rounded-full"
+                style={{
+                  width: `${((values[0] - MIN) * 100) / (MAX - MIN)}%`
+                }}
+              />
+              {children}
+            </div>
+          )}
+          renderThumb={({ props, index, isDragged }) => {
+            const { key, ...restProps } = props;
+            return (
               <div
+                key={key}
+                {...restProps}
+                role="slider"
+                tabIndex={0}
+                aria-valuemin={MIN}
+                aria-valuemax={MAX}
+                aria-valuenow={values[index]}
+                aria-valuetext={`${values[index]} kilometers`}
                 className={`
-                  absolute -top-10 px-2 py-1 rounded
-                  bg-black bg-opacity-75 text-xs font-semibold
-                  whitespace-nowrap text-white
-                  pointer-events-none
-                  transition-opacity duration-300
-                  ${isDragged ? 'opacity-100' : 'opacity-0'}
+                  relative flex items-center justify-center
+                  h-5 w-5 rounded-full
+                  bg-white border-2 border-primary-600
+                  shadow-md shadow-primary-200/50
+                  cursor-pointer
+                  transition-all duration-300 outline-none
+                  ${isDragged ? 'scale-125 shadow-lg' : 'hover:scale-110'}
                 `}
               >
-                {values[index]} {unit}
+                {/* Visual pulse when dragged */}
+                {isDragged && (
+                  <span className="absolute inset-0 rounded-full bg-primary-600/20 animate-ping"></span>
+                )}
               </div>
-            </div>
-          );
-        }}
-      />
-      <div className="text-sm select-none font-semibold text-gray-500">
-        {values?.length > 1 ?
-          `Selected Range: ${values[0]} ${unit} - ${values[1]} ${unit}` :
-          `Radius: ${values[0]} ${unit}`}
+            );
+          }}
+        />
+      </div>
+      <div className="hidden sm:block text-[10px] font-bold text-gray-300 tracking-tight uppercase font-jakarta shrink-0 whitespace-nowrap bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+         {MAX}{unit} max
       </div>
     </div>
   );

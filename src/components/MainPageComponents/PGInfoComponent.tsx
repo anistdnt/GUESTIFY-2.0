@@ -35,6 +35,8 @@ import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { CameraPlus, Trash } from "@phosphor-icons/react/dist/ssr";
 import { useWishlist } from "@/lib/hook/useWishlist";
 import Attractions from "./Attractions";
+import CommonButton from "../AppComponents/CommonButton";
+import { TrendingDistrict } from "../DisplayCard/TrendingDistrict";
 
 const Map = dynamic(() => import("../Map/Map"), { ssr: false });
 const Feedback = lazy(() => import("@/components/Feedback/Feedback"));
@@ -111,222 +113,205 @@ const PGInfoComponent = ({
   // console.log("Rendering PGInfoComponent with pginfo:", pginfo);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-white">
       {/* Header with back button */}
-      <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4">
+      <div className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-700 hover:text-headingCol transition-colors duration-200 group"
+            className="flex items-center gap-2 text-gray-500 hover:text-primary-600 transition-all duration-300 group font-jakarta font-medium text-sm"
           >
-            <ArrowLeft
-              size={16}
-              className="group-hover:-translate-x-1 transition-transform duration-200"
-            />
-            <span className="font-medium">Back</span>
+            <div className="p-2 bg-gray-50 rounded-full group-hover:bg-primary-50 transition-colors">
+              <ArrowLeft
+                size={16}
+                weight="bold"
+                className="group-hover:-translate-x-1 transition-transform duration-300"
+              />
+            </div>
+            <span>Back to Search</span>
           </button>
 
-
-          <button
-            data-tooltip="Select nearby PGs to enlist them for comparison"
-            data-tooltip-pos="bottom"
-            className="border-2 text-sm text-gray-600 font-semibold py-2 px-4 rounded-xl shadow-md transition duration-300 transform flex items-center justify-center gap-2 "
-            onClick={() => {
-              dispatch(
-                setModalVisibility({
-                  open: true,
-                  type: "compare",
-                  modalData: {
-                    pg_id: pginfo?._id,
-                    pg_name: pginfo?.pg_name,
-                    minRent: pginfo?.minRent,
-                    address: pginfo?.address,
-                    pg_type: pginfo?.pg_type,
-                    wifi: pginfo?.wifi_available,
-                    food: pginfo?.food_available,
-                    images: pginfo?.pg_images,
-                    coordinates: pginfo?.location?.coordinates,
-                    additional_wifi_charges: pginfo?.additional_wifi_charges,
-                    charge_duration: pginfo?.charge_duration,
-                  },
-                })
-              );
-            }}
-          >
-            <span>Add to Compare</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <CommonButton
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                dispatch(
+                  setModalVisibility({
+                    open: true,
+                    type: "compare",
+                    modalData: {
+                      pg_id: pginfo?._id,
+                      pg_name: pginfo?.pg_name,
+                      minRent: pginfo?.minRent,
+                      address: pginfo?.address,
+                      pg_type: pginfo?.pg_type,
+                      wifi: pginfo?.wifi_available,
+                      food: pginfo?.food_available,
+                      images: pginfo?.pg_images,
+                      coordinates: pginfo?.location?.coordinates,
+                      additional_wifi_charges: pginfo?.additional_wifi_charges,
+                      charge_duration: pginfo?.charge_duration,
+                    },
+                  })
+                );
+              }}
+            >
+              Add to Compare
+            </CommonButton>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         {/* Hero Section */}
         <div className="animate-fadeIn">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            {/* Main Image */}
-            <div className="lg:col-span-2">
-              <div className="relative group overflow-hidden rounded-2xl shadow-2xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
+            {/* Gallery Section */}
+            <div className="lg:col-span-8 space-y-6">
+              <div className="relative group overflow-hidden rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-100 bg-white p-2">
                 <img
                   src={pginfo?.pg_images[0]?.pg_image_url}
                   alt="PG Image"
-                  className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-[450px] lg:h-[600px] object-cover rounded-[2rem] transition-transform duration-700 group-hover:scale-[1.02]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Float Badges */}
+                <div className="absolute top-6 left-6 z-10 flex gap-2">
+                  <span className={`${getPGTypeColor(pginfo?.pg_type)} text-white text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full shadow-lg`}>
+                    {pginfo?.pg_type} Only
+                  </span>
+                  {pginfo?.food_available === "yes" && (
+                    <span className="bg-white/90 backdrop-blur-md text-gray-900 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full shadow-sm border border-white/20">
+                      Food Included
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Image Carousel */}
-              <div className="mt-6">
+              {/* Thumbnails Swiper */}
+              <div className="relative px-2">
                 <Swiper
                   modules={[Navigation, Pagination]}
-                  spaceBetween={24}
+                  spaceBetween={16}
                   slidesPerView={1}
                   navigation={{
                     nextEl: ".custom-swiper-next",
                     prevEl: ".custom-swiper-prev",
                   }}
-                  // pagination={{
-                  //   clickable: true,
-                  //   el: paginationRef.current,
-                  // }}
                   breakpoints={{
-                    640: { slidesPerView: 1 },
-                    768: { slidesPerView: 2 },
+                    640: { slidesPerView: 2 },
                     1024: { slidesPerView: 3 },
                   }}
-                  loop={true}
-                  // onBeforeInit={(swiper) => {
-                  //   // Assign pagination element dynamically
-                  //   if (paginationRef.current) {
-                  //     (swiper.params.pagination as any).el = paginationRef.current;
-                  //   }
-                  // }}
+                  className="rounded-3xl"
                 >
                   {pginfo?.pg_images?.slice(1)?.map((img, idx) => (
                     <SwiperSlide key={idx}>
-                      <img
-                        src={img?.pg_image_url}
-                        alt={`PG Carousel ${idx + 1}`}
-                        className="w-full h-[300px] object-cover rounded-2xl"
-                      />
+                      <div className="relative h-48 overflow-hidden rounded-3xl border border-gray-100 group cursor-pointer">
+                        <img
+                          src={img?.pg_image_url}
+                          alt={`PG Carousel ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                      </div>
                     </SwiperSlide>
                   ))}
 
-                  {/* Rounded Navigation Buttons */}
-                  <div className="custom-swiper-prev absolute top-1/2 left-2 z-10 -translate-y-1/2 cursor-pointer bg-white rounded-full p-3 flex justify-center items-center hover:bg-gray-200 transition shadow-[0_0px_6px_rgba(0,0,0,0.3),0_0_10px_rgba(0,0,0,0.2)]">
-                    <CaretLeft size={20} />
+                  {/* Custom Navigation */}
+                  <div className="custom-swiper-prev absolute top-1/2 left-4 z-10 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-white transition-all">
+                    <CaretLeft size={20} weight="bold" />
                   </div>
-                  <div className="custom-swiper-next absolute top-1/2 right-2 z-10 -translate-y-1/2 cursor-pointer bg-white rounded-full p-3 flex justify-center items-center hover:bg-gray-200 transition shadow-[0_0px_6px_rgba(0,0,0,0.3),0_0_10px_rgba(0,0,0,0.2)]">
-                    <CaretRight size={20} />
+                  <div className="custom-swiper-next absolute top-1/2 right-4 z-10 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-white transition-all">
+                    <CaretRight size={20} weight="bold" />
                   </div>
                 </Swiper>
-                {/* <div ref={paginationRef} className="flex justify-center mt-4"></div> */}
               </div>
             </div>
 
-            {/* PG Details Card */}
-            <div className="lg:col-span-1">
-              <div className="glass-effect rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
-                <div className="space-y-6">
-                  {/* PG Name and Type */}
+            {/* PG Details Sidebar */}
+            <div className="lg:col-span-4 h-full">
+              <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col h-full sticky top-32">
+                <div className="space-y-8 flex-1">
+                  {/* Title & Rating */}
                   <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                    <h1 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-4 font-display tracking-tight leading-tight">
                       {pginfo.pg_name}
                     </h1>
-                    <div className="flex items-center gap-3 mb-4">
-                      <span
-                        className={`${getPGTypeColor(
-                          pginfo?.pg_type
-                        )} text-white text-sm font-semibold px-4 py-2 rounded-full shadow-lg`}
-                      >
-                        {pginfo?.pg_type?.replace(
-                          pginfo?.pg_type[0],
-                          pginfo?.pg_type[0]?.toUpperCase()
-                        )}{" "}
-                        Only
-                      </span>
-                      {reviewData && reviewData.length > 0 && (
-                        <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
-                          <Star
-                            size={16}
-                            className="text-yellow-500 fill-yellow-500"
-                          />
-                          <span className="text-sm font-semibold text-gray-700">
+                    
+                    {reviewData && reviewData.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex bg-primary-50 px-3 py-1.5 rounded-full border border-primary-100">
+                          <Star size={16} weight="fill" className="text-primary-600 mr-1.5" />
+                          <span className="text-sm font-bold text-primary-700">
                             {getAverageRating()}
                           </span>
-                          <span className="text-xs text-gray-500">
-                            ({reviewData.length} reviews)
-                          </span>
                         </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Rent Section */}
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
-                    <p className="text-sm text-gray-600 mb-1">Starting from</p>
-                    <p className="text-4xl font-bold text-green-600">
-                      ₹{pginfo?.minRent}
-                    </p>
-                    <p className="text-sm text-gray-500">per month</p>
-                  </div>
-
-                  {/* Amenities */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                      <Shield size={20} className="text-blue-600" />
-                      Amenities
-                    </h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 hover:border-blue-200 transition-colors duration-200">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <WifiHigh size={20} className="text-blue-600" />
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-800">
-                            WiFi
-                          </span>
-                          <p className="text-sm text-gray-500">
-                            {pginfo.wifi_available === "yes"
-                              ? "High-speed internet"
-                              : "Not Available"}
-                          </p>
-                        </div>
+                        <span className="text-xs font-jakarta text-gray-400">
+                          Based on {reviewData.length} reviews
+                        </span>
                       </div>
-
-                      <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 hover:border-orange-200 transition-colors duration-200">
-                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                          <ForkKnife size={20} className="text-orange-600" />
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-800">
-                            Food
-                          </span>
-                          <p className="text-sm text-gray-500">
-                            {pginfo.food_available === "yes"
-                              ? "Homely meals included"
-                              : "Not Provided"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
-                  {/* Location */}
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                      <MapPin size={20} className="text-red-500" />
-                      Location
-                    </h3>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-700 mb-1">{pginfo.address}</p>
-                      <p className="text-sm text-gray-500">
-                        Pincode: {pginfo.pincode}
+                  {/* Features & Pricing */}
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="bg-gray-50/80 p-6 rounded-3xl border border-gray-100 group hover:border-primary-200 transition-colors">
+                      <div className="flex items-center gap-3 mb-1">
+                        <div className="p-2 bg-white rounded-xl shadow-sm group-hover:bg-primary-50 transition-colors">
+                          <WifiHigh size={20} className="text-primary-600" />
+                        </div>
+                        <span className="text-xs font-bold text-gray-400 tracking-widest uppercase">Connectivity</span>
+                      </div>
+                      <p className="text-sm font-jakarta text-gray-700 font-medium">
+                        {pginfo.wifi_available === "yes" ? "Ultra-fast Fiber WiFi Included" : "WiFi not available"}
+                      </p>
+                    </div>
+
+                    <div className="bg-gray-50/80 p-6 rounded-3xl border border-gray-100 group hover:border-primary-200 transition-colors">
+                      <div className="flex items-center gap-3 mb-1">
+                        <div className="p-2 bg-white rounded-xl shadow-sm group-hover:bg-primary-50 transition-colors">
+                          <ForkKnife size={20} className="text-primary-600" />
+                        </div>
+                        <span className="text-xs font-bold text-gray-400 tracking-widest uppercase">Dining</span>
+                      </div>
+                      <p className="text-sm font-jakarta text-gray-700 font-medium">
+                        {pginfo.food_available === "yes" ? "Nutritious Homely Meals" : "Self-managed meals"}
                       </p>
                     </div>
                   </div>
 
-                  {/* Contact Button */}
-                  <button
-                    className="w-full bg-buttons hover:bg-buttonsHover text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+                  {/* Rent Section */}
+                  <div className="pt-4 border-t border-gray-50">
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block mb-1">Starting from</span>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-4xl font-semibold text-gray-900 font-display">₹{pginfo?.minRent}</span>
+                          <span className="text-gray-400 font-jakarta text-sm">/mo</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] font-bold text-green-600 tracking-widest uppercase bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                          Best Value
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick Map Link */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-gray-400">
+                      <MapPin size={18} />
+                      <span className="text-sm font-jakarta leading-relaxed line-clamp-2">{pginfo.address}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="mt-10 space-y-4">
+                  <CommonButton
+                    className="w-full"
                     onClick={() => {
                       dispatch(
                         setModalVisibility({
@@ -340,24 +325,28 @@ const PGInfoComponent = ({
                       );
                     }}
                   >
-                    <Phone size={20} />
-                    Get Contact Details
-                  </button>
-                  {isUserLoggedIn && <button
-                    className="w-full text-buttons border-2 border-buttons hover:text-white hover:bg-buttons hover:border-0  font-semibold py-4 px-6 rounded-xl shadow-lg transition duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
-                    onClick={() => {
-                      addToWishlist(pginfo?._id);
-                    }}
-                  >
-                    {wishlistArray?.includes(pginfo?._id) ? <p className="flex justify-center items-center gap-1">
-                      <Trash size={20} />
-                      <span>Remove from Wishlist</span>
-                    </p> : <p className="flex justify-center items-center gap-1">
-                      <CameraPlus size={20} />
-                      <span>Add to Wishlist</span>
-                    </p>}
-                    
-                  </button>}
+                    View Owner Contact
+                  </CommonButton>
+
+                  {isUserLoggedIn && (
+                    <CommonButton
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => addToWishlist(pginfo?._id)}
+                    >
+                      {wishlistArray?.includes(pginfo?._id) ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <Trash size={20} />
+                          <span>Remove from Wishlist</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2">
+                          <Star size={20} />
+                          <span>Save for Later</span>
+                        </div>
+                      )}
+                    </CommonButton>
+                  )}
                 </div>
               </div>
             </div>
@@ -365,56 +354,107 @@ const PGInfoComponent = ({
         </div>
 
         {/* Rules Section */}
-        <div className="animate-slideUp mb-12">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-yellow-500 hover-lift">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Shield size={24} className="text-yellow-600" />
+        <div className="animate-slideUp mb-24">
+          <div className="flex flex-col items-center mb-12 text-center">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <div className="h-[1px] w-8 bg-primary-200" />
+              <span className="text-[10px] font-bold text-primary-600 tracking-widest uppercase">Community Guidelines</span>
+              <div className="h-[1px] w-8 bg-primary-200" />
+            </div>
+            <h2 className="text-4xl font-semibold text-gray-900 font-display tracking-tight mb-4">
+              House <span className="italic-serif text-primary-600">Rules</span>
+            </h2>
+          </div>
+          
+          <div className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.03)] p-10 lg:p-14 border border-gray-100 relative overflow-hidden group">
+            {/* Subtle Gradient Backdrop */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-50 rounded-full blur-[80px] opacity-50 transition-opacity group-hover:opacity-70" />
+            
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+              <div className="lg:col-span-4 space-y-6">
+                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center">
+                  <Shield size={32} weight="duotone" className="text-primary-600" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-semibold text-gray-900 font-display tracking-tight mb-3">
+                    Safety & <span className="text-primary-600">Harmony</span>
+                  </h3>
+                  <p className="text-sm text-gray-400 font-jakarta leading-relaxed">
+                    Guidelines crafted to ensure a safe, respectful, and premium living environment for all our residents.
+                  </p>
+                </div>
+                
+                <div className="pt-6 border-t border-gray-100">
+                  <div className="flex items-center gap-2 text-primary-600 mb-2">
+                    <Star size={18} weight="fill" />
+                    <span className="text-xs font-bold uppercase tracking-widest">Resident Note</span>
+                  </div>
+                  <p className="text-xs text-gray-400 font-jakarta leading-relaxed italic">
+                    "Compliance with these rules helps us maintain the high standard of living you expect from Guestify."
+                  </p>
+                </div>
               </div>
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                  House Rules & Guidelines
-                </h3>
-                <p className="text-gray-700 leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: pginfo.rules }}>
-                  {/* {pginfo.rules} */}
-                </p>
+              
+              <div className="lg:col-span-8">
+                <div className="bg-gray-50/50 rounded-3xl p-8 lg:p-10 border border-gray-100 shadow-inner">
+                  <div 
+                    className="text-gray-700 leading-loose text-lg font-jakarta prose prose-primary prose-lg max-w-none 
+                      [&>ul]:list-none [&>ul]:pl-0 [&>ul>li]:relative [&>ul>li]:pl-6
+                      [&>ul>li]:before:content-[''] [&>ul>li]:before:absolute [&>ul>li]:before:left-0 [&>ul>li]:before:top-[14px]
+                      [&>ul>li]:before:w-2 [&>ul>li]:before:h-2 [&>ul>li]:before:bg-primary-500 [&>ul>li]:before:rounded-full" 
+                    dangerouslySetInnerHTML={{ __html: pginfo.rules }} 
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Review CTA Section */}
-        <div className="animate-slideUp mb-12">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white shadow-xl">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="text-center sm:text-left">
-                <h3 className="text-2xl font-bold mb-2">
-                  Share Your Experience
+        <div className="animate-slideUp mb-24">
+          <div className="relative rounded-[3rem] p-12 overflow-hidden bg-gray-900">
+            {/* Animated Background Elements */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/30 rounded-full blur-[100px] animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px]" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 mb-4">
+                  <Star size={12} weight="fill" className="text-yellow-400" />
+                  <span className="text-[10px] font-bold text-white tracking-widest uppercase">Community Driven</span>
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold text-white font-display mb-3 tracking-tight">
+                  Share Your <span className="text-primary-400 italic-serif">Experience</span>
                 </h3>
-                <p className="text-blue-100">
-                  Help others by sharing your thoughts about this PG
+                <p className="text-white/60 font-jakarta max-w-md leading-relaxed">
+                  Join hundreds of students in building a transparent community. Your feedback helps others find their safe haven.
                 </p>
               </div>
-              <button
-                className="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-3 px-8 rounded-xl transition duration-300 transform hover:scale-105 flex items-center gap-2 shadow-lg"
+              
+              <CommonButton
+                variant="primary"
                 onClick={() => {
                   formRef.current?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 Write a Review
-                <ArrowRight size={18} />
-              </button>
+              </CommonButton>
             </div>
           </div>
         </div>
 
         {/* Available Rooms Section */}
-        <div className="animate-slideUp mb-12">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Available Rooms
+        <div className="animate-slideUp mb-24">
+          <div className="flex flex-col items-center mb-12 text-center">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <div className="h-[1px] w-8 bg-primary-200" />
+              <span className="text-[10px] font-bold text-primary-600 tracking-widest uppercase">Room Selection</span>
+              <div className="h-[1px] w-8 bg-primary-200" />
+            </div>
+            <h2 className="text-4xl font-semibold text-gray-900 font-display tracking-tight mb-4">
+              Available <span className="italic-serif text-primary-600">Accommodations</span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
+            <p className="text-gray-500 font-jakarta max-w-xl leading-relaxed">Curated living spaces designed for comfort, productivity, and peace of mind.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -471,7 +511,18 @@ const PGInfoComponent = ({
         </div>
 
         {/* Attractions Section */}
-        <div className="animate-slideUp mb-12">
+        <div className="animate-slideUp mb-24">
+          <div className="flex flex-col items-center mb-12 text-center">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <div className="h-[1px] w-8 bg-primary-200" />
+              <span className="text-[10px] font-bold text-primary-600 tracking-widest uppercase">Explore Local</span>
+              <div className="h-[1px] w-8 bg-primary-200" />
+            </div>
+            <h2 className="text-4xl font-semibold text-gray-900 font-display tracking-tight mb-4">
+              Nearby <span className="italic-serif text-primary-600">Attractions</span>
+            </h2>
+            <p className="text-gray-500 font-jakarta max-w-xl leading-relaxed">Discover popular spots and essentials conveniently located just minutes from your stay.</p>
+          </div>
           <Suspense fallback={<SimilarPGsSkeleton />}>
             <Attractions
               id={pginfo?._id}
@@ -480,16 +531,21 @@ const PGInfoComponent = ({
         </div>
 
         {/* Map Section */}
-        <div className="animate-slideUp mb-20">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Location & Nearby
+        <div className="animate-slideUp mb-24">
+          <div className="flex flex-col items-center mb-12 text-center">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <div className="h-[1px] w-8 bg-primary-200" />
+              <span className="text-[10px] font-bold text-primary-600 tracking-widest uppercase">Quick Transit</span>
+              <div className="h-[1px] w-8 bg-primary-200" />
+            </div>
+            <h2 className="text-4xl font-semibold text-gray-900 font-display tracking-tight mb-4">
+              Location & <span className="italic-serif text-primary-600">Neighborhood</span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
+            <p className="text-gray-500 font-jakarta max-w-xl leading-relaxed">Strategically situated with seamless connectivity to your college, food hubs, and medical centers.</p>
           </div>
 
-          <div className="bg-white h-[450px] rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-            <div className="h-[500px] w-full">
+          <div className="bg-white p-2 rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.06)] border border-gray-100 overflow-hidden">
+            <div className="h-[500px] w-full rounded-[2.5rem] overflow-hidden">
               <Map
                 clg_coords={college_coords}
                 pgInfo={{
@@ -505,7 +561,18 @@ const PGInfoComponent = ({
         </div>
 
         {/* Similar PGs Section */}
-        <div className="animate-slideUp mb-12">
+        <div className="animate-slideUp mb-24">
+          <div className="flex flex-col items-center mb-12 text-center">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <div className="h-[1px] w-8 bg-primary-200" />
+              <span className="text-[10px] font-bold text-primary-600 tracking-widest uppercase">Other Choices</span>
+              <div className="h-[1px] w-8 bg-primary-200" />
+            </div>
+            <h2 className="text-4xl font-semibold text-gray-900 font-display tracking-tight mb-4">
+              Similar <span className="italic-serif text-primary-600">Accommodations</span>
+            </h2>
+            <p className="text-gray-500 font-jakarta max-w-xl leading-relaxed">Discover other premium stays in this neighborhood that might better fit your unique needs.</p>
+          </div>
           <Suspense fallback={<SimilarPGsSkeleton />}>
             <SimilerPgs
               current_pgid={pginfo?._id}
@@ -514,8 +581,21 @@ const PGInfoComponent = ({
           </Suspense>
         </div>
 
+        <TrendingDistrict />
+
         {/* Feedback Section */}
-        <div className="animate-slideUp">
+        <div className="animate-slideUp pb-8">
+          <div className="flex flex-col items-center mb-16 text-center">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <div className="h-[1px] w-8 bg-primary-200" />
+              <span className="text-[10px] font-bold text-primary-600 tracking-widest uppercase">Verified Reviews</span>
+              <div className="h-[1px] w-8 bg-primary-200" />
+            </div>
+            <h2 className="text-4xl font-semibold text-gray-900 font-display tracking-tight mb-4">
+              Community <span className="italic-serif text-primary-600">Voice</span>
+            </h2>
+            <p className="text-gray-500 font-jakarta max-w-xl leading-relaxed">Hear from fellow students about their genuine living experiences at this property.</p>
+          </div>
           <Suspense fallback={<FeedbackSkeleton />}>
             <Feedback ref={formRef} {...{ reviewData, id }} />
           </Suspense>
