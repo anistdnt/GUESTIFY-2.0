@@ -74,7 +74,8 @@ export default function BasicDetailsEdit() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
+    <div className="max-w-7xl mx-auto space-y-8 mb-12">
+      <div className="bg-white rounded-[1rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-gray-50">
       {formloading ? (
         <PGFormSkeleton />
       ) : (
@@ -124,26 +125,26 @@ export default function BasicDetailsEdit() {
                   caption="Update Basic Details"
                   disabledField={["pg_name"]}
                 />
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 mt-10 pt-8 border-t border-gray-100">
                   <button
                     type="submit"
                     disabled={!dirty} // ✅ disables if nothing changed
-                    className={`px-6 py-2 rounded transition ${
+                    className={`px-8 py-3 rounded-xl font-bold font-jakarta transition-all duration-300 shadow-lg active:scale-95 ${
                       dirty
-                        ? "bg-yellow-600 hover:bg-yellow-700 text-white"
-                        : "bg-gray-400 cursor-not-allowed text-white"
+                        ? "bg-primary-600 hover:bg-primary-700 text-white shadow-primary-600/20"
+                        : "bg-gray-200 cursor-not-allowed text-gray-400 shadow-none"
                     }`}
                   >
-                    Update Details
+                    Save Changes
                   </button>
                   <button
                     type="button"
                     onClick={async () => {
                       await handleClose();
                     }}
-                    className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+                    className="bg-gray-100 text-gray-600 hover:bg-gray-200 font-bold font-jakarta px-8 py-3 rounded-xl transition-all duration-300 active:scale-95"
                   >
-                    Cancel
+                    Discard
                   </button>
                 </div>
               </Form>
@@ -151,6 +152,7 @@ export default function BasicDetailsEdit() {
           }}
         </Formik>
       )}
+    </div>
     </div>
   );
 }

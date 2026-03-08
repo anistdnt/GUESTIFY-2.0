@@ -96,7 +96,8 @@ export default function BasicDetailsEdit() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
+    <div className="max-w-7xl mx-auto space-y-8 mb-12">
+      <div className="bg-white rounded-[1rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-gray-50">
       {formloading ? (
         <ContactDetailsFormSkeleton />
       ) : (
@@ -135,6 +136,7 @@ export default function BasicDetailsEdit() {
           )}
         </Formik>
       )}
+    </div>
     </div>
   );
 }

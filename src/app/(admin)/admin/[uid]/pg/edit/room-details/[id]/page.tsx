@@ -87,7 +87,8 @@ export default function RoomDetailsEdit() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto bg-white p-6 rounded-lg mb-8">
+    <div className="max-w-7xl mx-auto space-y-8 mb-12">
+      <div className="bg-white rounded-[1rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-gray-50">
       {formloading ? (
         <RoomFormSkeleton />
       ) : (
@@ -137,39 +138,39 @@ export default function RoomDetailsEdit() {
             return (
               <Form>
                 <RoomForm hasAddBtn={false} caption="Update Room Details" />
-                <div className="flex justify-between w-full items-center">
+                <div className="flex flex-col sm:flex-row justify-between w-full items-center gap-6 mt-10 pt-8 border-t border-gray-100">
                   <div className="flex items-center gap-4">
                     <button
                       type="submit"
                       disabled={!dirty} // ✅ disables if nothing changed
-                      className={`px-6 py-2 rounded transition ${
+                      className={`px-8 py-3 rounded-xl font-bold font-jakarta transition-all duration-300 shadow-lg active:scale-95 ${
                         dirty
-                          ? "bg-yellow-600 hover:bg-yellow-700 text-white"
-                          : "bg-gray-400 cursor-not-allowed text-white"
+                          ? "bg-primary-600 hover:bg-primary-700 text-white shadow-primary-600/20"
+                          : "bg-gray-200 cursor-not-allowed text-gray-400 shadow-none"
                       }`}
                     >
-                      Update Details
+                      Update Inventory
                     </button>
                     <button
                       type="button"
                       onClick={async () => {
                         await handleClose();
                       }}
-                      className="bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
+                      className="bg-gray-100 text-gray-600 hover:bg-gray-200 font-bold font-jakarta px-8 py-3 rounded-xl transition-all duration-300 active:scale-95"
                     >
-                      Cancel
+                      Discard
                     </button>
                   </div>
                   <button
                     type="button"
-                    className="px-6 py-2 rounded transition bg-buttonsSecondary hover:bg-buttonsHover text-white"
+                    className="px-8 py-3 rounded-xl transition-all duration-300 bg-gray-900 border border-white/5 text-white font-bold font-jakarta shadow-xl hover:bg-gray-800 active:scale-95"
                     onClick={() =>
                       router.push(
                         `/admin/${params?.uid}/pg/${paying_guestID}/add-room`
                       )
                     }
                   >
-                    Enlist New Rooms
+                    + Enlist New Rooms
                   </button>
                 </div>
               </Form>
@@ -177,6 +178,7 @@ export default function RoomDetailsEdit() {
           }}
         </Formik>
       )}
+    </div>
     </div>
   );
 }
