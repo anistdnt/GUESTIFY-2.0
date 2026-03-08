@@ -138,6 +138,17 @@ export default function Attractions({ id }: Props) {
     <div className="w-full">
 
       {/* Section  */}
+      {slides?.length > 0 && <div className="flex flex-col items-center mb-12 text-center">
+        <div className="inline-flex items-center gap-2 mb-3">
+          <div className="h-[1px] w-8 bg-primary-200" />
+          <span className="text-[10px] font-bold text-primary-600 tracking-widest uppercase">Explore Local</span>
+          <div className="h-[1px] w-8 bg-primary-200" />
+        </div>
+        <h2 className="text-4xl font-semibold text-gray-900 font-display tracking-tight mb-4">
+          Nearby <span className="italic-serif text-primary-600">Attractions</span>
+        </h2>
+        <p className="text-gray-500 font-jakarta max-w-xl leading-relaxed">Discover popular spots and essentials conveniently located just minutes from your stay.</p>
+      </div>}
 
       {slides.length > 0 ? 
       <section className="relative w-full group/section">

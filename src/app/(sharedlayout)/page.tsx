@@ -4,6 +4,9 @@ import HowItWorks from "@/components/Landing/HowItWorks";
 import PopularSearches from "@/components/Landing/PopularSearches";
 import Testimonials from "@/components/Landing/Testimonials";
 import TrustBanner from "@/components/Landing/TrustBanner";
+import SplitBannerSection from "@/components/Landing/SplitBannerSection";
+import AmenitiesSection from "@/components/Landing/AmenitiesSection";
+import AdvantageSection from "@/components/Landing/AdvantageSection";
 import { Districts } from "@/components/Searchbar/Districts";
 import Searchbar from "@/components/Searchbar/Searchbar";
 
@@ -15,6 +18,10 @@ export default function Home() {
 
       {/* Trust Banner Section */}
       <TrustBanner />
+
+      {/* New Educational & Trust Sections */}
+      <SplitBannerSection />
+      <AmenitiesSection />
 
       {/* College Search Section - Unified Search Hub */}
       <div id="searchbar" className="bg-gray-50 py-24">
@@ -50,6 +57,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Advantage Section */}
+      <AdvantageSection />
 
       {/* How It Works Section */}
       <HowItWorks />

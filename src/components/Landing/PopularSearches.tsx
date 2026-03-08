@@ -85,7 +85,7 @@ export default function PopularSearches() {
             spaceBetween={24}
             slidesPerView={1}
             navigation
-            pagination={{ clickable: true }}
+            // pagination={{ clickable: true }}
             autoplay={{
               delay: 5000,
               disableOnInteraction: false,
@@ -108,42 +108,63 @@ export default function PopularSearches() {
           >
             {colleges.map((college: CollegeType, index: number) => (
               <SwiperSlide key={college._id || index}>
-                <Link
-                  href={`/search?kmradi=20&coordinates=${college.location?.coordinates?.join(
-                    ","
-                  )}&clg_id=${college?._id}`}
-                  className="block group h-full"
-                >
-                  {/* Card with uniform shadow and hover effect */}
-                  <div className="bg-white rounded-[2rem] overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.03)] hover:shadow-[0_0_30px_rgba(0,0,0,0.08)] transition-all duration-500 border border-gray-100 h-full flex flex-col">
-                    {/* Image container */}
-                    <div className="relative h-[200px] overflow-hidden">
-                      <Image
-                        src={college.image_url || defaultCollegeImages[index % 4]}
-                        alt={college.college_name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                      />
-                      {/* Listing count badge */}
-                      <div className="absolute bottom-4 left-4 bg-primary-600/90 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-[10px] font-bold shadow-lg font-jakarta uppercase tracking-wider">
-                        {Math.floor(Math.random() * 100) + 50}+ Listings
-                      </div>
-                    </div>
-                    {/* Text section */}
-                    <div className="p-6 flex flex-col flex-1">
-                      <h4 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition-colors font-jakarta line-clamp-1 tracking-tight">
-                        {college?.college_name}
-                      </h4>
-                      <p className="text-sm text-gray-500 flex items-center gap-2 font-jakarta">
-                        <svg className="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {college?.district || "Kolkata"}
-                      </p>
+                <div className="bg-white rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.03)] hover:shadow-[0_0_30px_rgba(0,0,0,0.08)] transition-all duration-500 border border-gray-100 h-full flex flex-col group">
+                  {/* Image container */}
+                  <div className="relative h-[200px] overflow-hidden">
+                    <Image
+                      src={college.image_url || defaultCollegeImages[index % 4]}
+                      alt={college.college_name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    {/* Listing count badge */}
+                    <div className="absolute bottom-4 left-4 bg-primary-600/90 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-[10px] font-bold shadow-lg font-jakarta uppercase tracking-wider">
+                      {Math.floor(Math.random() * 100) + 50}+ Listings
                     </div>
                   </div>
-                </Link>
+                  {/* Text section */}
+                  <div className="p-3 flex flex-col flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                       {/* College Logo */}
+                       <div className="w-8 h-8 rounded-lg border border-gray-100 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center p-1">
+                          <Image 
+                            src={college.image_url || "/college/college_logo_placeholder.png"}
+                            alt="logo"
+                            width={24}
+                            height={24}
+                            className="object-contain"
+                          />
+                       </div>
+                       <h4 className="font-bold text-lg text-gray-900 group-hover:text-primary-600 transition-colors font-jakarta line-clamp-1 tracking-tight">
+                        {college?.college_name}
+                      </h4>
+                    </div>
+                    
+                    <p className="text-sm text-gray-500 flex items-center gap-2 font-jakarta mb-6">
+                      <svg className="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      {college?.district || "Kolkata"}
+                    </p>
+
+                    {/* Action Buttons */}
+                    <div className="mt-auto flex items-center justify-between gap-2">
+                       <Link 
+                        href={`/search?kmradi=20&coordinates=${college.location?.coordinates?.join(",")}&clg_id=${college?._id}`}
+                        className="text-[10px] font-bold text-primary-600 border border-primary-100 bg-primary-50 hover:bg-primary-600 hover:text-white px-3 py-2 rounded-lg transition-all duration-300 font-jakarta uppercase tracking-wider"
+                       >
+                          Nearby PGs
+                       </Link>
+                       <Link 
+                        href={`#`}
+                        className="text-[10px] font-bold text-gray-600 border border-gray-100 bg-gray-50 hover:bg-gray-500 hover:text-white px-3 py-2 rounded-lg transition-all duration-300 font-jakarta uppercase tracking-wider"
+                       >
+                          Explore
+                       </Link>
+                    </div>
+                  </div>
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>

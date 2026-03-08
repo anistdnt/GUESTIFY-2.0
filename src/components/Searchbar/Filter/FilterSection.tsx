@@ -206,7 +206,7 @@ export const FilterSection = () => {
       </div>
 
       {showMap && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/40 backdrop-blur-md transition-all duration-500">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/40 backdrop-blur-md transition-all duration-500" style={{margin: 0}}>
           <div className="relative bg-white w-[95%] h-[85%] max-w-6xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20">
             {/* Map Header */}
             <div className="absolute top-0 left-0 right-0 z-10 p-6 flex justify-between items-center pointer-events-none">

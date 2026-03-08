@@ -145,7 +145,7 @@
         return (
           <button
             data-tooltip={formatTTL(countdowns[booking_id] || 0)}
-            className="mt-5 me-2 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-[10px] tracking-widest uppercase shadow-lg shadow-gray-900/10 hover:bg-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={() => {
               dispatch(
                 setModalVisibility({
@@ -165,9 +165,10 @@
       }
       else if (payment_ttl !== null && payment_at) {
         return (
-          <button className="bg-green-600 mt-5 me-2 text-white px-4 py-2 rounded text-center flex justify-center items-center gap-2" data-tooltip={formatDate(payment_at)}>
-            <CheckCircle size={20} /><span>Payment Done</span>
-          </button>
+          <div className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-50 text-green-600 rounded-xl font-bold text-[10px] tracking-widest uppercase border border-green-100 shadow-sm" data-tooltip={formatDate(payment_at)}>
+            <CheckCircle size={18} weight="bold" />
+            <span>Success</span>
+          </div>
         );
       }
       else {
@@ -208,10 +209,10 @@
 
 
     return (
-      <div className="max-w-full">
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="max-w-full space-y-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
           {/* Refresh or Reset Filter Button */}
-          <div>
+          <div className="flex items-center gap-4">
             <button
               data-tooltip="Refresh or Reset Filters"
               onClick={() => {
@@ -228,19 +229,20 @@
                   getBookings();
                 }
               }}
-              className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200 transition"
+              className="p-3 bg-gray-900 text-white rounded-xl hover:bg-black shadow-lg shadow-gray-900/10 transition-all duration-300 active:scale-95"
             >
-              <ArrowClockwise size={16} />
+              <ArrowClockwise size={18} weight="bold" />
             </button>
           </div>
-          <div className="flex-1 relative">
-            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+
+          <div className="flex-1 relative group">
+            <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-primary-600 transition-colors" />
             <input
               type="text"
               placeholder="Search by PG Name, Name or Address..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-xl font-jakarta text-sm focus:outline-none focus:ring-4 focus:ring-primary-50 focus:border-primary-100 transition-all duration-300"
             />
           </div>
 
@@ -248,24 +250,27 @@
           <div className="relative" ref={filterDropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center justify-between w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-yellow-500"
+              className={`flex items-center justify-between min-w-[160px] w-full md:w-auto px-5 py-3 text-[10px] font-bold tracking-widest uppercase rounded-xl border transition-all duration-300 ${
+                dropdownOpen || filterStatus !== 'all'
+                  ? "bg-primary-50 text-primary-600 border-primary-100 shadow-sm"
+                  : "bg-gray-50/50 text-gray-400 border-gray-100 hover:border-gray-200"
+              }`}
             >
               <span className="flex items-center gap-2">
-                <FunnelSimple size={18} className="text-gray-500" />
+                <FunnelSimple size={18} weight="bold" />
                 {filterStatus === "all"
                   ? "All Status"
-                  : filterStatus.charAt(0).toUpperCase() +
-                    filterStatus.slice(1)}
+                  : filterStatus}
               </span>
-              <CaretDown size={14} className="text-gray-500" />
+              <CaretDown size={14} weight="bold" className={`transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 z-10 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-200 animate-fadeIn">
-                <div className="px-4 py-2 border-b text-gray-600 font-semibold text-sm">
+              <div className="absolute right-0 z-30 mt-3 w-48 bg-white border border-gray-100 rounded-2xl shadow-2xl p-2 animate-in fade-in zoom-in duration-200 origin-top-right">
+                <div className="px-4 py-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-50">
                   Filter by status
                 </div>
-                <ul className="py-2 text-sm text-gray-700">
+                <ul className="space-y-1">
                   {["all", "pending", "accepted", "declined", "revolked"].map(
                     (s) => (
                       <li key={s}>
@@ -274,15 +279,15 @@
                             setFilterStatus(s as BookingStatus | "all");
                             setDropdownOpen(false);
                           }}
-                          className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${
+                          className={`w-full text-left px-4 py-2.5 rounded-xl text-[10px] font-bold tracking-widest uppercase transition-all duration-200 ${
                             s === filterStatus
-                              ? "bg-yellow-100 font-medium text-yellow-800"
-                              : "hover:bg-yellow-50"
+                              ? "bg-primary-50 text-primary-600"
+                              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                           }`}
                         >
                           {s === "all"
                             ? "All Status"
-                            : s.charAt(0).toUpperCase() + s.slice(1)}
+                            : s}
                         </button>
                       </li>
                     ),
@@ -294,24 +299,25 @@
         </div>
 
         {loading && currentPage === 1 ? (
-          <div className="flex justify-center items-center min-h-[60vh]">
-            <p className="text-gray-600 animate-pulse">Loading bookings...</p>
+          <div className="flex flex-col justify-center items-center min-h-[40vh] space-y-4">
+            <div className="w-12 h-12 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin"></div>
+            <p className="text-gray-400 font-jakarta text-sm animate-pulse tracking-wide uppercase font-bold">Synchronizing your stays...</p>
           </div>
         ) : (
           <div
-            className="h-[75vh] overflow-y-auto pr-2"
+            className="h-[75vh] overflow-y-auto custom-scrollbar"
             ref={scrollContainerRef}
           >
             {bookings.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-10">
                   {bookings.map((booking) => (
                     <div
                       key={booking.booking_id}
-                      className="relative group p-5 border border-indigo-200 rounded-2xl hover:shadow-xl hover:shadow-indigo-50 flex flex-col transition-all bg-white"
+                      className="group relative bg-white border border-gray-100 rounded-[2rem] p-4 transition-all duration-500 hover:shadow-2xl hover:shadow-primary-100/10 flex flex-col"
                     >
                       {/* Room Image Slider */}
-                      <div className="relative w-full h-48 overflow-hidden rounded-xl">
+                      <div className="relative w-full h-48 overflow-hidden rounded-[1.5rem] bg-gray-50 flex-shrink-0">
                         <FadedImageSlider
                           images={booking.room_details.room_images.map(
                             (img) => ({
@@ -320,82 +326,68 @@
                             }),
                           )}
                         />
+                        <div className="absolute top-3 right-3 z-20">
+                          <div
+                            data-tooltip={`${booking?.status?.toUpperCase()} on ${formatDate(
+                              booking?.status_timestamp,
+                            )}`}
+                            className={`px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase shadow-lg backdrop-blur-md border border-white/20 whitespace-nowrap ${
+                                booking.status === "pending" ? "bg-amber-500/90 text-white" :
+                                booking.status === "accepted" ? "bg-green-500/90 text-white" :
+                                booking.status === "cancelled" || booking.status === "declined" ? "bg-red-500/90 text-white" : "bg-gray-500/90 text-white"
+                             }`}
+                          >
+                            <span>
+                              {booking.status}
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Info */}
-                      <div className="mt-4 flex flex-col flex-1">
-                        <div className="flex justify-between">
-                          <h4 className="font-bold text-lg text-gray-900">
+                      <div className="mt-6 flex flex-col flex-1 px-2">
+                        <div className="flex justify-between items-start gap-4">
+                          <h4 className="text-lg font-normal text-gray-900 font-display tracking-tight group-hover:text-primary-600 transition-colors line-clamp-1">
                             {booking.pg_name}
                           </h4>
-                          <div className="flex items-center justify-end gap-3">
-                            {booking.status === "pending" && (
-                              <div data-tooltip="Waiting for Owner Approval">
-                                {/* Pending like animation clock spin */}
-                                <HourglassHighIcon size={20} className="animate-spin text-yellow-500"/>
-                              </div>
-                            )}
-                            <div
-                              data-tooltip={`${booking?.status?.toUpperCase()} on ${formatDate(
-                                booking?.status_timestamp,
-                              )}`}
-                              className={`text-xs px-2 py-1 rounded-md text-white ${
-                                booking.status === "pending"
-                                  ? "bg-yellow-500"
-                                  : booking.status === "accepted"
-                                    ? "bg-green-500"
-                                    : booking.status === "cancelled"
-                                      ? "bg-red-500"
-                                      : "bg-gray-500"
-                              }`}
-                            >
-                              <span>
-                                {booking.status.charAt(0).toUpperCase() +
-                                  booking.status.slice(1)}
-                              </span>
+                          {booking.status === "pending" && (
+                            <div data-tooltip="Waiting for Owner Approval" className="mt-1">
+                              <HourglassHighIcon size={18} weight="bold" className="animate-spin text-amber-500"/>
                             </div>
-                          </div>
+                          )}
+                        </div>
+
+                        <div className="mt-1">
+                           <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase flex items-center gap-2">
+                              <span className="w-1 h-1 rounded-full bg-gray-200"></span>
+                              ID: {booking.booking_id}
+                           </p>
                         </div>
 
                         {/* Booking Details */}
-                        <div className="mt-3 text-sm text-gray-700 space-y-1">
-                          <p className="flex items-center gap-2">
-                            <Calendar size={16} />{" "}
-                            <span>
-                              {new Date(
-                                booking.booking_date,
-                              ).toLocaleDateString("en-IN", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </span>
-                          </p>
-                          <p className="flex items-center gap-2">
-                            <UsersThree size={16} /> {booking.person_number}{" "}
-                            Person
-                            {booking.person_number > 1 ? "s" : ""}
-                          </p>
+                        <div className="mt-5 space-y-3 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                          <div className="flex items-center justify-between">
+                            <p className="flex items-center gap-2 text-[11px] font-jakarta font-bold text-gray-600">
+                              <Calendar size={14} className="text-primary-600" />
+                              <span>{formatDate(booking.booking_date)}</span>
+                            </p>
+                            <p className="flex items-center gap-2 text-[11px] font-jakarta font-bold text-gray-600">
+                              <UsersThree size={14} className="text-primary-600" />
+                              <span>{booking.person_number} Person{booking.person_number > 1 ? 's' : ''}</span>
+                            </p>
+                          </div>
+                          
+                          <div className="pt-3 border-t border-gray-200/60 flex items-center justify-between">
+                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{booking.room_details.type} Bed</span>
+                             <p className="flex items-center gap-0.5 text-gray-900 font-jakarta font-bold text-sm">
+                                <CurrencyInr size={14} weight="bold" className="text-primary-600" />
+                                {booking.room_details.room_rent}
+                                <span className="text-[10px] text-gray-400 font-normal ml-0.5">/{booking.room_details.deposit_duration}</span>
+                             </p>
+                          </div>
                         </div>
 
-                        {/* Room Details */}
-                        <div className="mt-3 text-sm text-gray-700 border-t pt-2 space-y-1">
-                          <p>
-                            Room Type:{" "}
-                            <span className="font-medium capitalize">
-                              {booking.room_details.type}
-                            </span>
-                          </p>
-                          <p className="flex items-center gap-1">
-                            Rent: <CurrencyInr size={12} />
-                            {booking.room_details.room_rent} /{" "}
-                            {booking.room_details.deposit_duration}
-                          </p>
-                        </div>
-
-                        <div className="flex justify-between">
+                        <div className="mt-6 flex flex-wrap sm:flex-nowrap items-center gap-3">
                           <PaymentButton
                             booking_id={booking?.booking_id}
                             payment_at={booking?.payment_at}
@@ -403,7 +395,7 @@
                           />
                           <button
                             data-tooltip="View Booking Details"
-                            className={`mt-5 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 flex-1 rounded text-center`}
+                            className="flex-1 px-4 py-2.5 bg-white text-gray-900 border border-gray-200 rounded-xl font-bold text-[10px] tracking-widest uppercase hover:bg-gray-50 transition-all duration-300"
                             onClick={() => {
                               dispatch(
                                 setModalVisibility({
@@ -418,7 +410,7 @@
                               );
                             }}
                           >
-                            <span>View Details</span>
+                            <span>Details</span>
                           </button>
                         </div>
                       </div>
@@ -426,24 +418,37 @@
                   ))}
                 </div>
 
-                <div ref={loaderRef} className="flex justify-center my-12">
+                <div ref={loaderRef} className="flex flex-col items-center justify-center py-12 space-y-4">
                   {isFetchingMore && hasMore && (
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <span className="animate-spin border-2 border-gray-300 border-t-transparent rounded-full w-5 h-5"></span>
-                      Loading more...
-                    </div>
+                    <>
+                      <div className="w-8 h-8 border-3 border-primary-100 border-t-primary-600 rounded-full animate-spin"></div>
+                      <p className="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Fetching more stays...</p>
+                    </>
+                  )}
+                  {!hasMore && bookings.length > 0 && (
+                     <p className="text-[10px] text-gray-300 font-bold tracking-widest uppercase">End of journey</p>
                   )}
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-600">
-                <p className="text-lg font-semibold">No bookings found</p>
-                <Link
-                  href="/"
-                  className="mt-4 bg-buttons hover:bg-buttonsHover text-white px-4 py-2 rounded text-center"
+              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4 space-y-6 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200">
+                <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center border border-gray-100">
+                  <MagnifyingGlass size={40} weight="thin" className="text-gray-200" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-normal text-gray-900 font-display tracking-tight">No stays <span className="italic-serif text-primary-600">discovered</span></h3>
+                  <p className="text-gray-400 font-jakarta text-sm max-w-xs mx-auto">Try adjusting your filters or search terms to find what you're looking for.</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilterStatus("all");
+                    setCurrentPage(1);
+                  }}
+                  className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold text-xs tracking-widest uppercase shadow-xl hover:bg-black transition-all duration-300"
                 >
                   Explore PGs
-                </Link>
+                </button>
               </div>
             )}
           </div>

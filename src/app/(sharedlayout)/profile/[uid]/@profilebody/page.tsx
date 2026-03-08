@@ -125,35 +125,34 @@ const Page = () => {
   }, [reduxUserData]);
 
   if (!reduxUserData || Object.keys(reduxUserData).length === 0) {
-    <PageSkeleton />;
+    return <PageSkeleton />;
   } else {
     return (
-      <div className="flex flex-col gap-8">
-        <form className="flex flex-col" onSubmit={formik.handleSubmit}>
-          {/* up Section */}
-          <div className="w-full flex flex-row justify-between mb-10">
-            <div>
-              <div className="relative w-28 h-28 mb-4">
-                <Image
-                  src={image || "/assets/profile.png"}
-                  alt="Profile Image"
-                  className="rounded-full"
-                  fill
-                  objectFit="cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("fileInput")?.click()}
-                  className={
-                    isEditing
-                      ? "absolute h-9 w-9 bottom-0 right-0 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
-                      : "hidden"
-                  }
-                >
-                  <i className="fas fa-pencil-alt  text-gray-700"></i>
-                </button>
-                {/* delete button will be implemented with api */}
-
+      <div className="space-y-12">
+        <form className="space-y-10" onSubmit={formik.handleSubmit}>
+          {/* Section: Profile Image & Header Action */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-gray-50/30 p-8 rounded-[2.5rem] border border-gray-100">
+            <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+              <div className="relative group">
+                <div className="relative w-32 h-32 ring-8 ring-white rounded-[2rem] overflow-hidden shadow-2xl border border-gray-100 bg-white">
+                  <Image
+                    src={image || "/assets/profile.png"}
+                    alt="Profile Image"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {isEditing && (
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                       <button
+                        type="button"
+                        onClick={() => document.getElementById("fileInput")?.click()}
+                        className="p-3 bg-white rounded-2xl shadow-xl hover:scale-110 transition-transform text-primary-600"
+                      >
+                        <Pencil size={24} weight="fill" />
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <input
                   id="fileInput"
                   type="file"
@@ -162,346 +161,267 @@ const Page = () => {
                   onChange={handleImageChange}
                 />
               </div>
-              <h2 className="text-2xl font-semibold text-gray-800">
-                {reduxUserData?.first_name} {reduxUserData?.last_name}
-              </h2>
-              <p className="text-gray-600">{reduxUserData?.email}</p>
+              <div className="space-y-1">
+                <h3 className="text-2xl font-normal text-gray-900 font-display tracking-tight">
+                  {reduxUserData?.first_name} {reduxUserData?.last_name}
+                </h3>
+                <p className="text-sm text-gray-400 font-jakarta">{reduxUserData?.email}</p>
+                <div className="pt-2">
+                  <span className="inline-flex items-center px-3 py-1 bg-primary-50 text-primary-600 text-[10px] font-bold tracking-widest uppercase rounded-full border border-primary-100">
+                    Verified Account
+                  </span>
+                </div>
+              </div>
             </div>
-            <div>
+
+            <div className="w-full md:w-auto">
               {isEditing ? (
-                <div className="flex flex-row justify-center items-center gap-5">
+                <div className="flex items-center gap-3">
                   <button
-                    className="mt-6 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-2"
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-2xl font-bold text-xs tracking-widest uppercase shadow-lg shadow-primary-600/20 hover:bg-primary-700 transition-all duration-300"
                     type="submit"
                   >
-                    <FloppyDisk size={25} color="#ffffff" weight="fill" />
-                    <span>Save</span>
+                    <FloppyDisk size={18} weight="bold" />
+                    <span>Save Changes</span>
                   </button>
                   <button
-                    className="mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80 flex justify-center items-center gap-2"
+                    type="button"
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-400 rounded-2xl font-bold text-xs tracking-widest uppercase border border-gray-200 hover:bg-gray-50 transition-all duration-300"
                     onClick={() => {
                       formik.resetForm();
                       setIsEditing(false);
                     }}
                   >
-                    <XCircle size={25} color="#ffffff" weight="fill" />
+                    <XCircle size={18} weight="bold" />
                     <span>Cancel</span>
                   </button>
                 </div>
               ) : (
                 <button
-                  className="flex items-center justify-center gap-2 mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80"
+                  type="button"
+                  className="w-full md:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold text-xs tracking-widest uppercase shadow-xl hover:bg-black transition-all duration-300"
                   onClick={() => setIsEditing(true)}
                 >
-                  <Pencil size={25} color="#ffffff" weight="fill" />
-                  <span>Edit</span>
+                  <Pencil size={18} weight="bold" />
+                  <span>Edit Profile</span>
                 </button>
               )}
             </div>
           </div>
 
-          {/* down Section */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <label className="block text-gray-700 font-medium">
-                First Name
-              </label>
-              <input
-                type="text"
-                placeholder="Your Full Name"
-                name="first_name"
-                value={formik.values.first_name}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.first_name && formik.errors.first_name
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.first_name && formik.errors.first_name ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.first_name}
-                </div>
-              ) : null}
+          {/* Section: Personal & Contact Details */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-1 space-y-2">
+              <h4 className="text-xl font-normal font-display text-gray-900 tracking-tight">Personal <span className="italic-serif text-primary-600">Details</span></h4>
+              <p className="text-sm text-gray-400 leading-relaxed font-jakarta">Update your basic information to help us personalize your experience.</p>
             </div>
+            
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">First Name</label>
+                <input
+                  type="text"
+                  name="first_name"
+                  value={formik.values.first_name}
+                  onChange={formik.handleChange}
+                  className={`w-full px-5 py-3.5 bg-gray-50/50 border rounded-2xl font-jakarta text-sm focus:outline-none focus:ring-2 transition-all duration-300 ${
+                    formik.touched.first_name && formik.errors.first_name
+                      ? "border-red-200 focus:ring-red-50"
+                      : "border-gray-100 focus:ring-primary-50 focus:border-primary-100"
+                  } ${!isEditing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  readOnly={!isEditing}
+                />
+                {formik.touched.first_name && formik.errors.first_name && (
+                  <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-tight">{formik.errors.first_name}</p>
+                )}
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">
-                Last Name
-              </label>
-              <input
-                type="text"
-                placeholder="Your Full Name"
-                name="last_name"
-                value={formik.values.last_name}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.last_name && formik.errors.last_name
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.last_name && formik.errors.last_name ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.last_name}
-                </div>
-              ) : null}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">Last Name</label>
+                <input
+                  type="text"
+                  name="last_name"
+                  value={formik.values.last_name}
+                  onChange={formik.handleChange}
+                  className={`w-full px-5 py-3.5 bg-gray-50/50 border rounded-2xl font-jakarta text-sm focus:outline-none focus:ring-2 transition-all duration-300 ${
+                    formik.touched.last_name && formik.errors.last_name
+                      ? "border-red-200 focus:ring-red-50"
+                      : "border-gray-100 focus:ring-primary-50 focus:border-primary-100"
+                  } ${!isEditing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  readOnly={!isEditing}
+                />
+                {formik.touched.last_name && formik.errors.last_name && (
+                  <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-tight">{formik.errors.last_name}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">Email Address</label>
+                <input
+                  type="email"
+                  value={formik.values.email}
+                  className="w-full px-5 py-3.5 bg-gray-100/50 border border-gray-100 rounded-2xl font-jakarta text-sm text-gray-400 cursor-not-allowed"
+                  disabled={true}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">Gender</label>
+                <Select
+                  isDisabled={!isEditing}
+                  name="gender"
+                  options={genderOptions}
+                  value={genderOptions.find(o => o.value === formik.values.gender)}
+                  onChange={(opt) => formik.setFieldValue("gender", opt?.value)}
+                  placeholder="Select Gender"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: "1rem",
+                      padding: "8px",
+                      background: state.isDisabled ? "rgba(243, 244, 246, 0.5)" : "rgba(249, 250, 251, 0.5)",
+                      borderColor: formik.touched.gender && formik.errors.gender ? "#fecaca" : "#f3f4f6",
+                      boxShadow: state.isFocused ? "0 0 0 4px rgba(217, 144, 0, 0.05)" : "none",
+                      borderWidth: "1px",
+                      "&:hover": { borderColor: "#e5e7eb" }
+                    }),
+                    placeholder: (base) => ({ ...base, color: "#9ca3af", fontSize: "0.875rem" }),
+                    singleValue: (base) => ({ ...base, color: "#111827", fontSize: "0.875rem" })
+                  }}
+                />
+                {formik.touched.gender && formik.errors.gender && (
+                  <p className="text-[10px] text-red-500 font-bold px-1 uppercase tracking-tight">{formik.errors.gender}</p>
+                )}
+              </div>
             </div>
+          </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">Email</label>
-              <input
-                type="email"
-                placeholder="Your Email Address"
-                name="email"
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.email && formik.errors.email
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                disabled={true}
-              />
-              {formik.touched.email && formik.errors.email ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.email}
-                </div>
-              ) : null}
+          <div className="h-px bg-gray-100 w-full" />
+
+          {/* Section: Localization & Address */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-1 space-y-2">
+              <h4 className="text-xl font-normal font-display text-gray-900 tracking-tight">Address & <span className="italic-serif text-primary-600">Region</span></h4>
+              <p className="text-sm text-gray-400 leading-relaxed font-jakarta">Providing your location helps us show you more relevant PG options and local events.</p>
             </div>
+            
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">Country / District</label>
+                <Select
+                  isDisabled={!isEditing}
+                  options={districtOptions}
+                  value={districtOptions.find(o => o.value === formik.values.district)}
+                  onChange={(opt) => formik.setFieldValue("district", opt?.value)}
+                  placeholder="Select Region"
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: "1rem",
+                      padding: "8px",
+                      background: state.isDisabled ? "rgba(243, 244, 246, 0.5)" : "rgba(249, 250, 251, 0.5)",
+                      borderColor: "#f3f4f6",
+                      boxShadow: state.isFocused ? "0 0 0 4px rgba(217, 144, 0, 0.05)" : "none",
+                      "&:hover": { borderColor: "#e5e7eb" }
+                    }),
+                    placeholder: (base) => ({ ...base, fontSize: "0.875rem" }),
+                    singleValue: (base) => ({ ...base, fontSize: "0.875rem" })
+                  }}
+                />
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">Gender</label>
-              <Select
-                className="mt-2"
-                isDisabled={!isEditing}
-                name="gender"
-                options={genderOptions}
-                value={
-                  genderOptions.find(
-                    (option) => option.value === formik.values.gender
-                  ) || null
-                }
-                onChange={(option) =>
-                  formik.setFieldValue("gender", option?.value)
-                }
-                onBlur={() => formik.setFieldTouched("gender", true)}
-                placeholder="Select Gender"
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    borderRadius: "0.5rem", // rounded-lg
-                    padding: "6px",
-                    borderColor:
-                      formik.touched.gender && formik.errors.gender
-                        ? "#ef4444" // Tailwind red-500
-                        : "#d1d5db", // Tailwind gray-300
-                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // Tailwind gray-600 focus ring
-                    "&:hover": {
-                      borderColor:
-                        formik.touched.gender && formik.errors.gender
-                          ? "#ef4444"
-                          : "#9ca3af", // Tailwind gray-400
-                    },
-                  }),
-                }}
-              />
-              {formik.touched.gender && formik.errors.gender ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.gender}
-                </div>
-              ) : null}
-            </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">Primary Language</label>
+                <Select
+                  isDisabled={!isEditing}
+                  options={languageOptions}
+                  value={languageOptions.find(o => o.value === formik.values.mother_tongue)}
+                  onChange={(opt) => formik.setFieldValue("mother_tongue", opt?.value)}
+                  placeholder="Select Language"
+                  isSearchable
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: "1rem",
+                      padding: "8px",
+                      background: state.isDisabled ? "rgba(243, 244, 246, 0.5)" : "rgba(249, 250, 251, 0.5)",
+                      borderColor: "#f3f4f6",
+                      boxShadow: state.isFocused ? "0 0 0 4px rgba(217, 144, 0, 0.05)" : "none",
+                      "&:hover": { borderColor: "#e5e7eb" }
+                    }),
+                    placeholder: (base) => ({ ...base, fontSize: "0.875rem" }),
+                    singleValue: (base) => ({ ...base, fontSize: "0.875rem" })
+                  }}
+                />
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">Country</label>
-              <Select
-                className="mt-2 w-full"
-                isDisabled={!isEditing}
-                name="district"
-                options={districtOptions}
-                value={
-                  districtOptions.find(
-                    (option) => option.value === formik.values.district
-                  ) || null
-                }
-                onChange={(option) =>
-                  formik.setFieldValue("district", option?.value)
-                }
-                onBlur={() => formik.setFieldTouched("district", true)}
-                placeholder="Select Country"
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    borderRadius: "0.5rem", // rounded-lg
-                    padding: "6px",
-                    borderColor:
-                      formik.touched.district && formik.errors.district
-                        ? "#ef4444" // red-500
-                        : "#d1d5db", // gray-300
-                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
-                    "&:hover": {
-                      borderColor:
-                        formik.touched.district && formik.errors.district
-                          ? "#ef4444"
-                          : "#9ca3af", // gray-400
-                    },
-                  }),
-                }}
-              />
-              {formik.touched.district && formik.errors.district ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.district}
-                </div>
-              ) : null}
-            </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">Residential Address</label>
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Street, Landmark, City"
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  className={`w-full px-5 py-3.5 bg-gray-50/50 border rounded-2xl font-jakarta text-sm focus:outline-none focus:ring-2 transition-all duration-300 ${
+                    formik.touched.address && formik.errors.address
+                      ? "border-red-200 focus:ring-red-50"
+                      : "border-gray-100 focus:ring-primary-50 focus:border-primary-100"
+                  } ${!isEditing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  readOnly={!isEditing}
+                />
+              </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium">
-                Language
-              </label>
-              <Select
-                className="mt-2 w-full"
-                isDisabled={!isEditing}
-                name="mother_tongue"
-                options={languageOptions}
-                value={
-                  languageOptions.find(
-                    (option) => option.value === formik.values.mother_tongue
-                  ) || null
-                }
-                onChange={(option) =>
-                  formik.setFieldValue("mother_tongue", option?.value)
-                }
-                onBlur={() => formik.setFieldTouched("mother_tongue", true)}
-                placeholder="Select Language"
-                isSearchable // 🔎 makes it searchable
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    borderRadius: "0.5rem", // rounded-lg
-                    padding: "6px",
-                    borderColor:
-                      formik.touched.mother_tongue &&
-                      formik.errors.mother_tongue
-                        ? "#ef4444" // red-500
-                        : "#d1d5db", // gray-300
-                    boxShadow: state.isFocused ? "0 0 0 2px #4b5563" : "none", // focus:ring-gray-600
-                    "&:hover": {
-                      borderColor:
-                        formik.touched.mother_tongue &&
-                        formik.errors.mother_tongue
-                          ? "#ef4444"
-                          : "#9ca3af", // gray-400
-                    },
-                  }),
-                }}
-              />
-              {formik.touched.mother_tongue && formik.errors.mother_tongue ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.mother_tongue}
-                </div>
-              ) : null}
-            </div>
-
-            {/* <div>
-              <label className="block text-gray-700 font-medium">
-                Time Zone
-              </label>
-              <select
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.timezone && formik.errors.timezone
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                disabled={!isEditing}
-                name="timezone"
-                value={formik.values.timezone}
-                onChange={formik.handleChange}
-              >
-                <option value="">Select Time Zone</option>
-                <option value="gmt">GMT</option>
-                <option value="pst">PST</option>
-              </select>
-              {formik.touched.timezone && formik.errors.timezone ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.timezone}
-                </div>
-              ) : null}
-            </div> */}
-
-            <div>
-              <label className="block text-gray-700 font-medium">Address</label>
-              <input
-                type="text"
-                placeholder="Your Full Address"
-                name="address"
-                value={formik.values.address}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.address && formik.errors.address
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.address && formik.errors.address ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.address}
-                </div>
-              ) : null}
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-medium">Pincode</label>
-              <input
-                type="text"
-                placeholder="Your Pincode"
-                name="pincode"
-                value={formik.values.pincode}
-                onChange={formik.handleChange}
-                className={`w-full mt-2 p-3 border ${
-                  formik.touched.pincode && formik.errors.pincode
-                    ? "border-red-500"
-                    : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600`}
-                readOnly={!isEditing}
-              />
-              {formik.touched.address && formik.errors.pincode ? (
-                <div className="text-red-500 text-sm mt-1">
-                  {formik.errors.pincode}
-                </div>
-              ) : null}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 tracking-widest uppercase px-1">Pincode</label>
+                <input
+                  type="text"
+                  name="pincode"
+                  value={formik.values.pincode}
+                  onChange={formik.handleChange}
+                  className={`w-full px-5 py-3.5 bg-gray-50/50 border rounded-2xl font-jakarta text-sm focus:outline-none focus:ring-2 transition-all duration-300 ${
+                    formik.touched.pincode && formik.errors.pincode
+                      ? "border-red-200 focus:ring-red-50"
+                      : "border-gray-100 focus:ring-primary-50 focus:border-primary-100"
+                  } ${!isEditing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  readOnly={!isEditing}
+                />
+              </div>
             </div>
           </div>
         </form>
-        <div className="flex items-center gap-5">
-          <button
-            className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-            onClick={() => {
-              toast.success("You are redirecting to the Reset Password Page");
-              setTimeout(() => {
-                window?.open(
-                  `/reset-password/${getCookie("authToken")}`,
-                  "_blank"
-                );
-              }, 2000);
-            }}
-          >
-            Change Password
-          </button>
-          <button
-            className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={true}
-            onClick={() => {
-              dispatch(setModalVisibility({ open: true, type: "delete" }));
-            }}
-          >
-            <Trash size={20} />
-            <p>Delete Account</p>
-          </button>
+
+        <div className="h-px bg-gray-100 w-full" />
+
+        {/* Section: Account Actions */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-6 px-10 bg-gray-50 rounded-[2.5rem] border border-gray-100">
+          <div className="space-y-1 text-center md:text-left">
+            <h4 className="text-lg font-bold font-display text-gray-900">Security & <span className="italic-serif text-red-600">Privacy</span></h4>
+            <p className="text-xs text-gray-400 font-jakarta">Manage your password and account status.</p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <button
+              className="px-6 py-2.5 bg-white text-gray-700 text-[10px] font-bold tracking-widest uppercase rounded-xl border border-gray-200 hover:bg-gray-50 transition-all duration-300 shadow-sm"
+              onClick={() => {
+                toast.success("Redirecting to Reset Password");
+                setTimeout(() => {
+                  window?.open(`/reset-password/${getCookie("authToken")}`, "_blank");
+                }, 1000);
+              }}
+            >
+              Update Password
+            </button>
+            <button
+              className="px-6 py-2.5 bg-red-50 text-red-600 text-[10px] font-bold tracking-widest uppercase rounded-xl border border-red-100 hover:bg-red-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group flex items-center gap-2"
+              disabled={true}
+              onClick={() => {
+                dispatch(setModalVisibility({ open: true, type: "delete" }));
+              }}
+            >
+              <Trash size={16} weight="bold" />
+              Delete Account
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -514,40 +434,48 @@ export default Page;
 
 const PageSkeleton = () => {
   return (
-    <div className="animate-pulse">
-      {/* Top Section */}
-      <div className="flex flex-row justify-between mb-10">
-        <div>
-          <div className="relative w-28 h-28 mb-4">
-            <div className="rounded-full bg-gray-300 w-full h-full" />
-          </div>
-          <div className="h-6 w-48 bg-gray-300 rounded mb-2" />
-          <div className="h-4 w-60 bg-gray-300 rounded" />
-        </div>
-        <div className="w-[93px] h-[44px] bg-gray-300 rounded-lg" />
-      </div>
-
-      {/* Form Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i}>
-            <div className="h-4 w-32 bg-gray-300 rounded mb-2" />
-            <div className="h-12 bg-gray-300 rounded-lg" />
-          </div>
-        ))}
-      </div>
-
-      {/* Email Section */}
-      <div className="mt-10">
-        <div className="h-5 w-48 bg-gray-300 rounded mb-4" />
-        <div className="flex items-center p-4 bg-gray-100 rounded-lg">
-          <div className="w-10 h-10 bg-gray-300 rounded-full mr-4" />
-          <div>
-            <div className="h-4 w-40 bg-gray-300 rounded mb-1" />
-            <div className="h-3 w-24 bg-gray-300 rounded" />
+    <div className="space-y-12 animate-pulse">
+      {/* Top Banner Skeleton */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100">
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="w-32 h-32 bg-gray-200 rounded-[2rem]"></div>
+          <div className="space-y-3">
+            <div className="h-6 w-48 bg-gray-200 rounded-lg"></div>
+            <div className="h-4 w-32 bg-gray-100 rounded-lg"></div>
+            <div className="h-6 w-24 bg-primary-50 rounded-full mt-2"></div>
           </div>
         </div>
-        <div className="mt-6 w-48 h-10 bg-gray-300 rounded-lg" />
+        <div className="w-full md:w-32 h-12 bg-gray-200 rounded-2xl"></div>
+      </div>
+
+      {/* Details Grid Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="space-y-3">
+          <div className="h-6 w-32 bg-gray-200 rounded-lg"></div>
+          <div className="h-12 w-full bg-gray-100 rounded-lg"></div>
+        </div>
+        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-3 w-20 bg-gray-100 rounded-full"></div>
+              <div className="h-12 w-full bg-gray-50 rounded-2xl"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="h-px bg-gray-100 w-full" />
+
+      {/* Account Actions Skeleton */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 py-6 px-10 bg-gray-50 rounded-[2.5rem]">
+        <div className="space-y-2">
+          <div className="h-5 w-40 bg-gray-200 rounded-lg"></div>
+          <div className="h-3 w-64 bg-gray-100 rounded-lg"></div>
+        </div>
+        <div className="flex gap-4">
+          <div className="h-10 w-32 bg-gray-200 rounded-xl"></div>
+          <div className="h-10 w-32 bg-gray-200 rounded-xl"></div>
+        </div>
       </div>
     </div>
   );

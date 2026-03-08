@@ -99,6 +99,8 @@ const Searchbar = () => {
 
   const router = useRouter();
 
+  const commonSearches = ["MAKAUT", "Heritage", "Techno Main", "IEM", "JIS", "Jadavpur University", "Calcutta University", "NIT Durgapur", "GCECT"];
+
   const handleChangePath = useCallback(
     (coordinates: string,college_name:string,college_addr:string,college_pin:number,college_id:string) => {
       const url = new URLSearchParams(window?.location.search);
@@ -150,9 +152,10 @@ const Searchbar = () => {
       
       {/* Search Hints */}
       {!searchString && (
-        <div className="flex justify-center gap-3 mt-6">
-          <span className="text-sm text-gray-400 font-body">Common searches:</span>
-          {["MAKAUT", "Heritage", "Techno Main"].map((hint) => (
+        <div className="flex flex-col items-center justify-center gap-3 mt-6">
+          <span className="text-sm text-gray-400 font-body text-nowrap">Common searches:</span>
+          <div className="flex flex-wrap justify-center gap-3">
+            {commonSearches?.map((hint) => (
             <button 
               key={hint}
               onClick={() => setSearchString(hint)}
@@ -161,6 +164,7 @@ const Searchbar = () => {
               {hint}
             </button>
           ))}
+          </div>
         </div>
       )}
     </div>
