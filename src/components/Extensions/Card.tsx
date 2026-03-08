@@ -89,69 +89,82 @@ export default function Card({ extension, fetchExtensions }: Props) {
   }
 
   return (
-    <div className="flex min-h-screen items-start justify-center">
-      <div className="relative flex w-full max-w-[48rem] flex-row rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
-        <div className="relative m-0 w-2/5 shrink-0 overflow-hidden rounded-xl rounded-r-none bg-white bg-clip-border text-gray-700">
+    <div className="w-full">
+      <div className="relative flex flex-col sm:flex-row w-full rounded-2xl bg-white border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] overflow-hidden hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-500 group">
+        {/* Image Section */}
+        <div className="relative w-full sm:w-1/3 aspect-[4/3] sm:aspect-auto overflow-hidden">
           <Image
             src={extension.image_url}
             alt={extension.name}
             fill
-            className="h-full w-full object-cover"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4">
+            <div className="text-[10px] font-bold text-white uppercase tracking-widest bg-white/20 backdrop-blur-md rounded-lg px-2 py-1">
+              Active Module
+            </div>
+          </div>
         </div>
-        <div className="p-6">
-          <h6 className="mb-4 font-sans text-base font-semibold uppercase leading-relaxed tracking-normal text-yellow-800 antialiased flex flex-col">
-            <span>{extension.category}</span>
-            <span className="text-xs text-gray-500">
-              Version {extension.version}
-            </span>
-          </h6>
-          <h4 className="mb-2 block font-sans text-2xl font-semibold text-gray-700 leading-snug tracking-normal text-blue-gray-900 antialiased">
-            {extension.name}
-          </h4>
-          <p className="mb-8 block font-sans font-normal text-sm leading-relaxed text-gray-600 antialiased">
-            {extension.description?.substring(0, 150)}...
-          </p>
-          <div className="flex justify-end items-center pt-3">
-            {/* Install / Uninstall Button */}
+
+        {/* Content Section */}
+        <div className="p-6 flex-1 flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-primary-600 uppercase tracking-widest mb-0.5">
+                  {extension.category}
+                </span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  v{extension.version}
+                </span>
+              </div>
+            </div>
+
+            <h4 className="text-xl font-bold text-gray-900 font-display mb-2 group-hover:text-primary-600 transition-colors">
+              {extension.name}
+            </h4>
+            
+            <p className="text-sm text-gray-500 font-jakarta leading-relaxed line-clamp-2">
+              {extension.description}
+            </p>
+          </div>
+
+          <div className="flex justify-end items-center gap-3 pt-6">
             {extension.is_installed ? (
-              <div className="flex justify-center items-center gap-2">
+              <>
                 <button
                   disabled={loading}
                   onClick={() => handleUnInstall(extension._id)}
-                  className={`px-3 py-2 text-sm rounded-md border transition flex justify-center items-center gap-2
-                ${
-                  loading
-                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                    : "border-red-500 text-red-600 hover:bg-red-600 hover:text-white"
-                }`}
+                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 border
+                    ${loading
+                      ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed"
+                      : "bg-white border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200 active:scale-95"
+                    }`}
                 >
-                  {loading && <Spinner size={14} />}
+                  {loading && <Spinner size={12} />}
                   {loading ? "Uninstalling..." : "Uninstall"}
                 </button>
                 <Link
-                  href={`${
-                    process.env.NEXT_PUBLIC_EXTENSION_REDIRECT_URL
-                  }/${extension?.slug}?token=${getCookie("authToken") || ""}`}
+                  href={`${process.env.NEXT_PUBLIC_EXTENSION_REDIRECT_URL}/${extension?.slug}?token=${getCookie("authToken") || ""}`}
                   target="_blank"
-                  className={`px-3 py-2 text-sm rounded-md border transition text-white bg-yellow-700 flex justify-center items-center gap-2 hover:bg-yellow-800 hover:text-white`}
+                  className="px-5 py-2 text-xs font-bold rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-all duration-300 active:scale-95 flex items-center gap-2"
                 >
-                  <span>Explore</span><ArrowSquareOutIcon size={20} />
+                  <span>Launch Extension</span>
+                  <ArrowSquareOutIcon size={16} weight="bold" />
                 </Link>
-              </div>
+              </>
             ) : (
               <button
                 disabled={loading}
                 onClick={() => handleInstall(extension._id)}
-                className={`px-3 py-2 text-sm rounded-md border transition flex justify-center items-center gap-2
-                ${
-                  loading
-                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                    : "border-yellow-700 text-yellow-700 hover:bg-yellow-700 hover:text-white"
-                }`}
+                className={`px-6 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm active:scale-95 flex items-center gap-2
+                  ${loading
+                    ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed"
+                    : "bg-primary-600 text-white hover:bg-primary-700 shadow-[0_10px_30px_rgba(37,99,235,0.2)]"
+                  }`}
               >
-                {loading ? <Spinner size={14} /> : <CloudArrowDownIcon size={20} />}
-                {loading ? "Installing..." : "Install"}
+                {loading ? <Spinner size={14} /> : <CloudArrowDownIcon size={18} weight="bold" />}
+                {loading ? "Installing..." : "Install Extension"}
               </button>
             )}
           </div>
