@@ -152,7 +152,7 @@ export default function Header() {
   }, [showMobileMenu]);
 
   return (
-    <header className="sticky z-50 top-0">
+    <header className="sticky z-40 top-0">
       <nav className={`transition-all duration-300 ${isScrolled ? "bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm py-1" : "bg-white py-3"}`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
