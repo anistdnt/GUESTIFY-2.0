@@ -64,7 +64,7 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
               </div>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
               {/* Notification System */}
               {userInfo?.user_id && (
                 <div className="relative p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">
