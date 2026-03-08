@@ -47,22 +47,19 @@ export default function Profile() {
     return <ProfileSkeleton />;
   } else {
     return (
-      <>
-        <div className="flex justify-between items-center mb-10">
-          <div>
-            <h1 className=" text-xl sm:text-3xl font-semibold text-gray-800">
-              Welcome, {profile_info?.first_name} {profile_info?.last_name}
+      <div className="space-y-12 pb-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-gray-100 pb-10">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-5xl font-normal text-gray-900 font-display tracking-tight leading-tight">
+              Welcome, <span className="italic-serif text-primary-600">{profile_info?.first_name} {profile_info?.last_name}</span>
             </h1>
-            <p className="text-gray-500 mt-1 max-sm:text-sm">
-              Created At : {formatDate(profile_info?.createdAt as string)}
+            <p className="text-sm text-gray-400 font-jakarta flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse"></span>
+              Member since {formatDate(profile_info?.createdAt as string)}
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            {/* <i
-              onClick={handleModal}
-              className="fa-solid fa-magnifying-glass text-black/50 sm:mr-4 cursor-pointer"
-            ></i> */}
-            <div className="relative w-12 h-12">
+          <div className="flex items-center gap-6">
+            <div className="relative w-20 h-20 ring-4 ring-primary-50 rounded-2xl overflow-hidden shadow-lg border border-white">
               <Image
                 src={
                   profile_info?.image_url
@@ -70,27 +67,34 @@ export default function Profile() {
                     : "/assets/profile.png"
                 }
                 alt="Profile Avatar"
-                className="rounded-full"
                 fill
-                objectFit="cover"
+                className="object-cover"
               />
             </div>
           </div>
         </div>
 
         {/* navigation */}
-        <div className=" py-3 flex gap-4 font-semibold mb-4">
+        <div className="flex flex-wrap justify-center gap-3 p-1.5 bg-gray-50/50 rounded-2xl border border-gray-100 w-fit mx-auto mb-10">
           <Link
             href={`/profile/${uid}`}
-            className={linkClass(`/profile/${uid}`)}
+            className={`px-6 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-300 font-jakarta uppercase tracking-widest ${
+              pathname === `/profile/${uid}` 
+                ? "bg-white text-primary-600 shadow-md border border-primary-50" 
+                : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+            }`}
           >
-            Profile
+            Profile Overview
           </Link>
 
           {!profile_info?.is_admin && (
             <Link
               href={`/profile/${uid}/wishlist`}
-              className={linkClass(`/profile/${uid}/wishlist`)}
+              className={`px-6 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-300 font-jakarta uppercase tracking-widest ${
+                pathname === `/profile/${uid}/wishlist` 
+                  ? "bg-white text-primary-600 shadow-md border border-primary-50" 
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+              }`}
             >
               Wishlist
             </Link>
@@ -99,7 +103,11 @@ export default function Profile() {
           {!profile_info?.is_admin && (
             <Link
               href={`/profile/${uid}/my-bookings`}
-              className={linkClass(`/profile/${uid}/my-bookings`)}
+              className={`px-6 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-300 font-jakarta uppercase tracking-widest ${
+                pathname === `/profile/${uid}/my-bookings` 
+                  ? "bg-white text-primary-600 shadow-md border border-primary-50" 
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+              }`}
             >
               My Bookings
             </Link>
@@ -142,7 +150,7 @@ export default function Profile() {
             </div>
           </div>
         )}
-      </>
+      </div>
     );
   }
 }
@@ -151,25 +159,20 @@ export default function Profile() {
 
 const ProfileSkeleton = () => {
   return (
-    <>
-      <div className="flex justify-between items-center mb-10 animate-pulse">
-        <div>
-          <div className="h-6 sm:h-8 w-40 sm:w-64 bg-gray-300 rounded mb-2"></div>
-          <div className="h-4 w-48 bg-gray-200 rounded max-sm:w-40"></div>
+    <div className="space-y-12 animate-pulse">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-gray-100 pb-10">
+        <div className="space-y-2">
+          <div className="h-10 md:h-12 w-64 bg-gray-200 rounded-lg"></div>
+          <div className="h-4 w-48 bg-gray-100 rounded-full"></div>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="h-6 w-6 bg-gray-300 rounded-full sm:mr-4"></div>
-          <div className="relative w-12 h-12">
-            <div className="absolute inset-0 bg-gray-300 rounded-full" />
-          </div>
-        </div>
+        <div className="w-20 h-20 bg-gray-200 rounded-2xl shadow-sm"></div>
       </div>
 
-      {/* navigation skeleton */}
-      <div className="py-3 flex gap-4 mb-4 animate-pulse">
-        <div className="h-6 w-20 bg-gray-300 rounded"></div>
-        <div className="h-6 w-20 bg-gray-300 rounded"></div>
+      <div className="flex flex-wrap gap-3 p-1.5 bg-gray-50 rounded-2xl border border-gray-100 w-fit">
+        <div className="h-10 w-32 bg-gray-200 rounded-xl"></div>
+        <div className="h-10 w-24 bg-gray-200 rounded-xl"></div>
+        <div className="h-10 w-28 bg-gray-200 rounded-xl"></div>
       </div>
-    </>
+    </div>
   );
 };
