@@ -2,7 +2,7 @@
 import { api_caller, ApiReturn } from "@/lib/api_caller";
 import { API } from "@/lib/api_const";
 import { RootState } from "@/redux/store";
-import { Check } from "@phosphor-icons/react/dist/ssr";
+import { ArrowSquareOut, Check } from "@phosphor-icons/react/dist/ssr";
 import { Form, getIn, setIn } from "formik";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
@@ -112,9 +112,12 @@ export default function Stepper({ steps, helpers }: StepperProps) {
   }, [currentStep]);
 
   return (
-    <div className="w-full bg-white shadow-md p-8 rounded-xl">
-      {/* Step Indicator */}
-      <div className="flex justify-between items-center relative mb-10">
+    <div className="w-full">
+      {/* Step Indicator - Premium Redesign */}
+      <div className="flex justify-between items-center relative mb-16 max-w-4xl mx-auto px-4">
+        {/* Progress Background Line */}
+        <div className="absolute top-6 left-0 right-0 h-[2px] bg-gray-100 -translate-y-1/2 z-0 hidden sm:block"></div>
+        
         {steps.map((step, index) => {
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
@@ -122,42 +125,45 @@ export default function Stepper({ steps, helpers }: StepperProps) {
           return (
             <div
               key={index}
-              className="flex-1 flex flex-col items-center relative"
+              className="flex-1 flex flex-col items-center relative group"
             >
-              {/* Circle */}
+              {/* Connector line - Interactive Progress */}
+              {index < steps.length - 1 && (
+                <div className="absolute top-6 left-[50%] w-full h-[2px] bg-gray-100 z-0 hidden sm:block">
+                  <div
+                    className={`h-full transition-all duration-700 ease-in-out ${
+                      isCompleted ? "bg-emerald-500" : "bg-transparent"
+                    }`}
+                    style={{ width: isCompleted ? '100%' : '0%' }}
+                  ></div>
+                </div>
+              )}
+
+              {/* Circle Indicator */}
               <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-300 z-10
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-bold transition-all duration-500 z-10 border-2
                   ${
                     isCompleted
-                      ? "bg-green-500 text-white"
+                      ? "bg-emerald-500 border-emerald-500 text-white shadow-[0_10px_20px_rgba(16,185,129,0.2)]"
                       : isActive
-                      ? "bg-yellow-600 text-white"
-                      : "bg-gray-300 text-gray-700"
+                      ? "bg-primary-600 border-primary-600 text-white shadow-[0_10px_20px_rgba(202,138,4,0.2)] scale-110"
+                      : "bg-white border-gray-200 text-gray-400 group-hover:border-primary-400 group-hover:text-primary-600"
                   }
                 `}
               >
                 {isCompleted ? (
-                  <Check size={20} weight="bold" />
+                  <Check size={20} weight="bold" className="animate-in fade-in zoom-in duration-500" />
                 ) : (
-                  <span>{index + 1}</span>
+                  <span className="font-display">{index + 1}</span>
                 )}
               </div>
 
-              {/* Label */}
-              <div className="mt-2 text-base font-medium text-center text-gray-700">
+              {/* Step Title Label */}
+              <div className={`mt-4 text-[10px] font-bold uppercase tracking-widest transition-colors duration-300
+                ${isActive ? "text-primary-600" : isCompleted ? "text-emerald-600" : "text-gray-400"}
+              `}>
                 {step.label}
               </div>
-
-              {/* Connector line */}
-              {index < steps.length - 1 && (
-                <div className="absolute top-6 right-[-50%] w-full h-1 bg-gray-300 z-[-1]">
-                  <div
-                    className={`h-full transition-all duration-300 ${
-                      isCompleted ? "bg-green-500" : "bg-gray-300"
-                    }`}
-                  ></div>
-                </div>
-              )}
             </div>
           );
         })}
@@ -168,54 +174,68 @@ export default function Stepper({ steps, helpers }: StepperProps) {
         <div>{steps[currentStep].content}</div>
       </Form>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between mt-8">
-        {!isFirst && (
-          <button
-            type="button"
-            onClick={() => setCurrentStep((s) => s - 1)}
-            className="bg-gray-300 px-5 py-2 rounded hover:bg-gray-400 transition"
-          >
-            Back
-          </button>
-        )}
+      {/* Navigation Controls - Premium Redesign */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-6 mt-16 pt-8 border-t border-gray-100">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+            {!isFirst ? (
+            <button
+                type="button"
+                onClick={() => setCurrentStep((s) => s - 1)}
+                className="w-full sm:w-auto bg-gray-50 text-gray-500 hover:bg-gray-100 font-bold font-jakarta px-8 py-3 rounded-xl transition-all duration-300 active:scale-95 border border-gray-100"
+            >
+                Previous Step
+            </button>
+            ) : (
+            <button
+                type="button"
+                onClick={async () => await handleClose()}
+                className="w-full sm:w-auto bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-red-500 font-bold font-jakarta px-8 py-3 rounded-xl transition-all duration-300 active:scale-95 border border-gray-100"
+            >
+                Discard & Exit
+            </button>
+            )}
+        </div>
 
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={async () => await handleClose()}
-              className="ml-auto bg-slate-200 text-gray-800 hover:bg-slate-400 px-6 py-2 rounded transition"
-            >
-              Cancel
-            </button>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+            {!isFirst && (
+                <button
+                    type="button"
+                    onClick={async () => await handleClose()}
+                    className="hidden sm:block text-gray-400 hover:text-gray-600 font-bold font-jakarta px-6 py-2 transition-colors duration-300"
+                >
+                    Cancel
+                </button>
+            )}
+            
             {!isLast ? (
-            <button
-              type="button"
-              onClick={() => {
-                handleNext(
-                  currentStep,
-                  helpers?.validateForm,
-                  helpers?.errors,
-                  helpers?.touched,
-                  helpers?.setTouched
-                );
-                //   setCurrentStep((s) => s + 1);
-              }}
-              className="ml-auto bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition"
-            >
-              Next
-            </button>
-        ) : (
-          <button
-            type="submit"
-            onClick={() => {
-              helpers?.submitForm();
-            }}
-            className="ml-auto bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
-          >
-            Submit
-          </button>
-        )}
+                <button
+                    type="button"
+                    onClick={() => {
+                        handleNext(
+                        currentStep,
+                        helpers?.validateForm,
+                        helpers?.errors,
+                        helpers?.touched,
+                        helpers?.setTouched
+                        );
+                    }}
+                    className="w-full sm:w-auto bg-primary-600 text-white px-10 py-3.5 rounded-xl font-bold font-jakarta hover:bg-primary-700 transition-all duration-300 shadow-lg shadow-primary-600/20 active:scale-95 flex items-center justify-center gap-2 group"
+                >
+                    <span>Continue</span>
+                    <ArrowSquareOut size={18} weight="bold" className="group-hover:translate-x-1 transition-transform" />
+                </button>
+            ) : (
+                <button
+                    type="submit"
+                    onClick={() => {
+                        helpers?.submitForm();
+                    }}
+                    className="w-full sm:w-auto bg-emerald-600 text-white px-10 py-3.5 rounded-xl font-bold font-jakarta hover:bg-emerald-700 transition-all duration-300 shadow-lg shadow-emerald-600/20 active:scale-95 flex items-center justify-center gap-2"
+                >
+                    <span>Finalize Listing</span>
+                    <Check size={18} weight="bold" />
+                </button>
+            )}
         </div>
       </div>
     </div>

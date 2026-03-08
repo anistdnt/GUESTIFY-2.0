@@ -155,9 +155,7 @@ const PGComponent = () => {
         </div>
 
         {loading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <CardSkeleton no_of_card={4} />
-            </div>
+            <CardSkeleton no_of_card={4} />
         ) : cards?.length === 0 ? (
             <div className="w-full py-20 bg-gray-50/50 rounded-[2.5rem] border border-dashed border-gray-200">
             <NoDataFound

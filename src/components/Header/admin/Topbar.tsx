@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Noti from "../Noti";
 import { UserInfo } from "@/types/admin";
 import { User, SignOut, CaretDown } from "@phosphor-icons/react";
@@ -16,22 +17,21 @@ interface Props {
 export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: Props) {
   const [showProfileDropdown, setshowProfileDropdown] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
 
-  const getTabHeading = () => {
-    switch (tabValue) {
-      case "dashboard": return "Dashboard";
-      case "profile": return "My Profile";
-      case "mypg": return "My Enlisted PGs";
-      case "pg": return "Enlist New PG";
-      case "payments": return "Payments";
-      case "bookings": return "Bookings";
-      case "tools/attractions": return "Attractions and Essentials";
-      case "tools/extensions": return "Extensions";
-      default: return "";
-    }
+  // Dynamic Breadcrumb Logic
+  const generateBreadcrumbs = () => {
+    const segments = pathname.split('/').filter(segment => 
+      segment && 
+      segment !== 'admin' && 
+      !/^[0-9a-fA-F]{24}$/.test(segment) && // ObjectID filter
+      segment !== userInfo?.user_id // Filter out current user ID
+    );
+
+    return segments.map(segment => segment.replace(/-/g, ' ').toUpperCase());
   };
-  
-  const tabHeading = getTabHeading();
+
+  const breadcrumbs = generateBreadcrumbs();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent | PointerEvent) {
@@ -50,7 +50,18 @@ export default function Topbar({ userInfo, isLoggedIn, logout_user, tabValue }: 
           <div className="relative flex h-20 items-center justify-between">
             <div className="flex flex-col">
               <p className="text-[10px] font-bold text-primary-600 uppercase tracking-[0.3em] mb-0.5">Owner Central</p>
-              <h3 className="text-gray-900 font-normal text-2xl font-display tracking-tight">{tabHeading}</h3>
+              <div className="flex items-center gap-2">
+                {breadcrumbs.map((crumb, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <h3 className={`text-gray-900 font-normal text-xl font-display tracking-tight transition-opacity duration-300 ${index === breadcrumbs.length - 1 ? 'opacity-100 font-semibold text-gray-800' : 'opacity-50'}`}>
+                      {crumb}
+                    </h3>
+                    {index < breadcrumbs.length - 1 && (
+                      <span className="text-gray-300 font-light text-xl">/</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center gap-6">
