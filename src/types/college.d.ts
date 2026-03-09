@@ -11,5 +11,6 @@ export interface CollegeType {
   pincode: number;
   location: LocationType;
   image_url: string;
+  college_image_url?: string;
   popular?: boolean;
 }
