@@ -100,7 +100,7 @@ export default async function CollegeSection({
         {/* LEFT IMAGE */}
         <div className="md:w-1/2 h-72 md:h-auto relative overflow-hidden">
           <Image
-            src={"/college/college_placeholder.jpg"}
+            src={c?.college_image_url || "/college/college_placeholder.jpg"}
             alt={c.college_name}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
