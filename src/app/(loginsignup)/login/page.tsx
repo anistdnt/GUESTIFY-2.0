@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux";
 import { setLoading } from "@/redux/slices/loaderSlice";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import CommonButton from "@/components/AppComponents/CommonButton";
-import { EnvelopeSimple, LockSimple, ShieldCheck } from "@phosphor-icons/react";
+import { EnvelopeSimple, LockSimple, ShieldCheck, ArrowLeft } from "@phosphor-icons/react";
 import { log } from "console";
 
 const passwordRegex =
@@ -99,12 +99,25 @@ const Login = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-neutral-900/20 to-neutral-950/40" />
           
           <div className="absolute inset-0 p-20 flex flex-col justify-between z-10">
-            <Link href="/" className="flex items-center gap-2 group/logo">
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg transform transition-transform group-hover/logo:scale-110">
-                <ShieldCheck size={26} weight="fill" className="text-primary-600" />
-              </div>
-              <span className="text-3xl font-bold text-white font-display tracking-tight">Guestify</span>
-            </Link>
+            <div className="flex w-full justify-between items-center">
+              <Link href="/" className="flex items-center transform transition-transform hover:scale-105 active:scale-95">
+                <Image
+                  src={"/assets/new_logo.png"}
+                  alt="Logo"
+                  width={180}
+                  height={70}
+                  className="w-auto h-12 sm:h-14 lg:h-16"
+                  loading="eager"
+                />
+              </Link>
+              <Link 
+                href="/" 
+                className="flex items-center gap-2 text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 backdrop-blur-md px-4 py-2 text-sm font-medium rounded-full shadow-sm border border-white/20 group cursor-pointer"
+              >
+                <ArrowLeft size={16} weight="bold" className="transform group-hover:-translate-x-1 transition-transform" />
+                <span>Back to Home</span>
+              </Link>
+            </div>
 
             <div className="max-w-md space-y-6">
               <h1 className="text-6xl font-semibold text-white font-display leading-[1.1] tracking-tight">
@@ -135,6 +148,15 @@ const Login = () => {
 
         {/* Right Auth Section */}
         <div className="w-full lg:w-1/2 h-full flex flex-col p-6 lg:p-20 relative overflow-y-auto scrollbar-hide">
+          {/* Back to Home Button (Mobile Only) */}
+          <Link 
+            href="/" 
+            className="absolute top-6 left-6 z-50 flex lg:hidden items-center gap-2 text-gray-500 hover:text-primary-600 transition-colors bg-white/80 hover:bg-white backdrop-blur-md px-4 py-2 rounded-full shadow-sm border border-gray-200/50 hover:shadow-md text-sm font-medium group"
+          >
+            <ArrowLeft size={16} weight="bold" className="transform group-hover:-translate-x-1 transition-transform" />
+            <span>Home</span>
+          </Link>
+
           {/* Decorative shapes on mobile */}
           <div className="absolute top-1/4 -right-20 w-80 h-80 bg-primary-100/50 rounded-full blur-[100px] lg:hidden" />
           

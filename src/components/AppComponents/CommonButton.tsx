@@ -62,7 +62,7 @@ const CommonButton = ({
     </>
   );
 
-  const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${animationClasses} ${className} group`;
+  const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${animationClasses} ${disabled ? "opacity-70 cursor-not-allowed !transform-none !shadow-none" : ""} ${className} group`;
 
   if (href) {
     return (
