@@ -16,7 +16,6 @@ export default function LoginSignupLayout({
   return (
     <ReduxProvider>
       <GlobalLoaderWrapper />
-      <Header />
       <main>
         <Toaster />
         {children}
