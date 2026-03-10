@@ -112,7 +112,7 @@ export default function PopularSearches() {
                   {/* Image container */}
                   <div className="relative h-[200px] overflow-hidden">
                     <Image
-                      src={college.image_url || defaultCollegeImages[index % 4]}
+                      src={college.college_image_url || defaultCollegeImages[index % 4]}
                       alt={college.college_name}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
