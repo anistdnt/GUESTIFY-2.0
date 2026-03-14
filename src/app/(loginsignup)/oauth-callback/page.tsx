@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setCookie } from "cookies-next/client";
 import Image from "next/image";
+import styles from "./oauth-callback.module.css";
 
 export default function OAuthCallbackPage() {
   const router = useRouter();
@@ -80,7 +81,7 @@ export default function OAuthCallbackPage() {
 
             {/* Progress bar */}
             <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full animate-progress" />
+              <div className={`h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full ${styles.animateProgress}`} />
             </div>
           </>
         )}
@@ -124,16 +125,6 @@ export default function OAuthCallbackPage() {
       <p className="relative z-10 mt-8 text-xs text-gray-300">
         © {new Date().getFullYear()} Guestify. Secure OAuth 2.0
       </p>
-
-      <style jsx>{`
-        @keyframes progress {
-          0% { width: 0; }
-          100% { width: 100%; }
-        }
-        .animate-progress {
-          animation: progress 1.6s ease-in-out forwards;
-        }
-      `}</style>
     </div>
   );
 }
@@ -142,21 +133,12 @@ export default function OAuthCallbackPage() {
 function DotFlicker() {
   return (
     <span className="inline-flex gap-[2px] ml-0.5 align-bottom">
-      {[0, 1, 2].map((i) => (
+      {[1, 2, 3].map((i) => (
         <span
           key={i}
-          className="inline-block w-[5px] h-[5px] rounded-full bg-primary-600"
-          style={{
-            animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
-          }}
+          className={`${styles.dot} ${styles[`dot${i}` as keyof typeof styles]}`}
         />
       ))}
-      <style jsx>{`
-        @keyframes bounce {
-          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-          40% { transform: translateY(-5px); opacity: 1; }
-        }
-      `}</style>
     </span>
   );
 }
