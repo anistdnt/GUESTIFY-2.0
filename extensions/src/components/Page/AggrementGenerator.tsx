@@ -19,6 +19,10 @@ const AgreementEditor = dynamic(() => import("../AgreementGenerator/Editor"), {
   ssr: false,
 });
 const turndown = new TurndownService();
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
 interface CompProps {
   name: string;
   email?: string;
@@ -28,9 +32,9 @@ interface CompProps {
 export default function AgreementGenerator({ name, token, email }: CompProps) {
   const [prompt, setPrompt] = useState("");
   const [promptHistory, setPromptHistory] = useState<string[]>([]);
-  const [output, setOutput] = useState(""); // markdown
-  const [draftOutput, setDraftOutput] = useState("");
-  const [queue, setQueue] = useState("");
+  const [output, setOutput] = useState(""); // Markdown during stream, HTML after edit
+  const [draftOutput, setDraftOutput] = useState(""); // Always HTML
+  const [isRichText, setIsRichText] = useState(false); // Flag: true = HTML, false = Markdown
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<Mode>("preview");
   const [section, setSection] = useState<Sections>("home");
@@ -48,26 +52,10 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
     });
   }, [token]);
 
-  /* ---------------- Smooth streaming typing ---------------- */
-  useEffect(() => {
-    if (!queue) {
-      setIsStreaming(false);
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setOutput((prev) => prev + queue.slice(0, 2));
-      setQueue((prev) => prev.slice(2));
-    }, 16);
-
-    return () => clearInterval(interval);
-  }, [queue]);
-
   /* ---------------- Stop Streaming ---------------- */
   const stopGeneration = () => {
     // Abort the fetch request
     abortControllerRef.current?.abort();
-    setQueue("");
     setIsStreaming(false);
     setLoading(false);
   };
@@ -77,7 +65,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
     setPromptHistory((prev) => [prompt, ...prev]);
     setOutput("");
-    setQueue("");
+    setIsRichText(false); // New content starts as Markdown
     setLoading(true);
     setMode("preview");
     setIsStreaming(true);
@@ -131,7 +119,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
           }
 
           if (payload.chunk_type === "markdown") {
-            setQueue((prev) => prev + payload.content);
+            setOutput((prev) => prev + payload.content);
           }
         }
       }
@@ -144,7 +132,6 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         console.error(err);
         setError(err.message || "Something went wrong while generating");
       }
-      setQueue("");
       setLoading(false);
       setIsStreaming(false);
     }
@@ -152,101 +139,112 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
   // -------- Actions-----------
   const handleEdit = () => {
-    setDraftOutput(output); // snapshot
+    // When entering edit mode, we convert Markdown to HTML EXACTLY ONCE
+    const initialHtml = isRichText ? output : (marked(output) as string);
+    setDraftOutput(initialHtml); 
     setMode("edit");
   };
 
   const handleDone = () => {
-    setOutput(draftOutput); // commit changes
+    // Commit the rich HTML changes
+    setOutput(draftOutput); 
+    setIsRichText(true); // Content is now definitively HTML
     setMode("preview");
   };
 
   const handleDiscard = () => {
-    setDraftOutput(output); // drop edits
+    // Reset the draft to the current output (converting if needed)
+    setDraftOutput(isRichText ? output : (marked(output) as string));
   };
 
-  const html = marked(output);
+  // Final rendering logic: uses flag instead of unreliable regex
+  const html = isRichText ? output : (marked(output) as string);
+  const draftHtml = draftOutput;
 
   return (
-    <div className="flex h-screen bg-zinc-100">
-      {/* LEFT — Welcome, Prompt & History */}
-      <div className="w-1/3 p-3 flex flex-row gap-4">
-        <div className="bg-white py-3 px-2 h-full shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-lg flex flex-col gap-4">
-          <div onClick={() => setSection("home")} className="cursor-pointer">
-            <HouseIcon
-              size={28}
-              weight="fill"
-              className={section === "home" ? "text-gray-600" : "text-gray-400"}
-            />
-          </div>
-          <hr />
-          <div onClick={() => setSection("list")} className="cursor-pointer">
-            <ClockCounterClockwiseIcon
-              size={28}
-              weight="fill"
-              className={section === "list" ? "text-gray-600" : "text-gray-400"}
-            />
-          </div>
-          <hr />
-          <div onClick={() => setSection("saved")} className="cursor-pointer">
-            <ListDashesIcon
-              size={28}
-              weight="fill"
-              className={section === "saved" ? "text-gray-600" : "text-gray-400"}
-            />
-          </div>
-        </div>
-        <div className="bg-white py-3 px-4 h-full shadow-[0_0_10px_rgba(0,0,0,0.16)] rounded-2xl flex-1">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="flex shrink-0 items-center mb-1">
+    <div className="flex h-screen bg-slate-50 overflow-hidden">
+      {/* PROFESSIONAL UNIFIED SIDEBAR (CLEAN WHITE) */}
+      <div className="w-[500px] shrink-0 h-full bg-white border-r border-slate-200 flex flex-col overflow-hidden relative z-20">
+        
+        {/* BRAND & NAVIGATION HEADER */}
+        <div className="p-8 pb-4">
+          <div className="flex justify-between items-center mb-10">
+            <Link href="/" className="flex shrink-0 items-center">
               <Image
                 src={"/logo-bg-removed.png"}
                 alt="Logo"
-                width={130}
-                height={50}
+                width={110}
+                height={40}
+                className="opacity-90 hover:opacity-100 transition-opacity"
                 loading="eager"
               />
             </Link>
-            <p className="text-xs text-gray-600 bg-gray-200 border border-gray-600 px-2 py-1 rounded-lg flex justify-center items-center gap-1">
-              <span>
-                <InfoIcon size={14} weight="fill" />
-              </span>
-              <span>{mode === "edit" ? "Editor Mode" : "Preview Mode"}</span>
-            </p>
+            <div className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-2 border ${mode === "edit" ? "bg-amber-50 text-amber-600 border-amber-200" : "bg-violet-50 text-violet-600 border-violet-200"}`}>
+              <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${mode === "edit" ? "bg-amber-500" : "bg-violet-500"}`} />
+              {mode === "edit" ? "Editor" : "Preview"}
+            </div>
           </div>
-          <hr />
 
-          {/* Sections */}
-          {section === "home" && (
-            <HomeSection
-              email={email as string}
-              name={name}
-              handleGenerate={handleGenerate}
-              isStreaming={isStreaming}
-              prompt={prompt}
-              setPrompt={setPrompt}
-              stopGeneration={stopGeneration}
-            />
-          )}
+          {/* SEGMENTED NAVIGATION (LIGHT STYLE) */}
+          <div className="flex p-1.5 bg-slate-200/50 rounded-2xl mb-8 border border-slate-200">
+            <button 
+              onClick={() => setSection("home")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${section === "home" ? "bg-white text-violet-600 shadow-md shadow-violet-900/5 ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"}`}
+            >
+              <HouseIcon size={18} weight={section === "home" ? "fill" : "bold"} />
+              <span>Workspace</span>
+            </button>
+            <button 
+              onClick={() => setSection("list")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${section === "list" ? "bg-white text-violet-600 shadow-md shadow-violet-900/5 ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"}`}
+            >
+              <ClockCounterClockwiseIcon size={18} weight={section === "list" ? "fill" : "bold"} />
+              <span>History</span>
+            </button>
+            <button 
+              onClick={() => setSection("saved")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${section === "saved" ? "bg-white text-violet-600 shadow-md shadow-violet-900/5 ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"}`}
+            >
+              <ListDashesIcon size={18} weight={section === "saved" ? "fill" : "bold"} />
+              <span>Saved</span>
+            </button>
+          </div>
+        </div>
 
-          {section === "list" && (
-            <ListSection
-              promptHistory={promptHistory}
-              setPrompt={setPrompt}
-              setSection={setSection}
-            />
-          )}
+        {/* SIDEBAR CONTENT AREA */}
+        <div className="flex-1 overflow-y-auto px-8 pb-10 scrollbar-hide">
+          <div className="animate-in fade-in slide-in-from-bottom-3 duration-500">
+            {section === "home" && (
+              <HomeSection
+                email={email as string}
+                name={name}
+                handleGenerate={handleGenerate}
+                isStreaming={isStreaming}
+                prompt={prompt}
+                setPrompt={setPrompt}
+                stopGeneration={stopGeneration}
+              />
+            )}
 
-          {section === "saved" && (
-            <SavedAssets 
-              setSection={setSection}
-            />
-          )}
+            {section === "list" && (
+              <ListSection
+                promptHistory={promptHistory}
+                setPrompt={setPrompt}
+                setSection={setSection}
+              />
+            )}
+
+            {section === "saved" && (
+              <SavedAssets 
+                setSection={setSection}
+              />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* RIGHT — Agreement */}
-      <div className="w-2/3 p-8 overflow-auto bg-zinc-100">
+      {/* RIGHT — Document Canvas */}
+      <div className="flex-1 overflow-auto bg-[#fafafa] flex flex-col">
         {/* Thinking animation */}
         {loading && (
           <div className="flex justify-center items-center text-zinc-400 h-[80vh]">
@@ -315,15 +313,14 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         {/* Edit */}
         {!loading && mode === "edit" && (
           <AgreementEditor
-            html={html}
+            html={draftHtml}
             onChange={(newHtml) => {
-              const md = turndown.turndown(newHtml);
-              setDraftOutput(md);
+              setDraftOutput(newHtml); // Store HTML directly
             }}
             handleDone={handleDone}
             handleDiscard={handleDiscard}
-            output={output}
-            draftOuput={draftOutput}
+            output={output} // This is HTML
+            draftOuput={draftOutput} // This is HTML
           />
         )}
 
