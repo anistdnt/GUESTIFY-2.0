@@ -112,6 +112,19 @@ export default function Profile() {
               My Bookings
             </Link>
           )}
+
+          {!profile_info?.is_admin && (
+            <Link
+              href={`/profile/${uid}/complaint-box`}
+              className={`px-6 py-2.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-300 font-jakarta uppercase tracking-widest ${
+                pathname === `/profile/${uid}/complaint-box` 
+                  ? "bg-white text-primary-600 shadow-md border border-primary-50" 
+                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Complain Box
+            </Link>
+          )}
         </div>
 
         {isModalOpen && (

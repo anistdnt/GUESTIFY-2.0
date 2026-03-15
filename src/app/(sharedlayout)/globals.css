@@ -113,34 +113,31 @@ html {
   position: absolute;
 
   /* Size */
-  width: 180px;
-  /* fixed width */
-  max-width: 260px;
-  /* optional safety */
+  width: max-content;
+  max-width: 200px;
   white-space: normal;
-  /* allow wrapping */
   text-align: center;
 
   /* Appearance */
-  background-color: rgb(55 65 81);
-  /* Tailwind gray-700 (lighter than gray-800) */
-  color: white;
-  padding: 0.5rem 0.75rem;
-  /* more breathing space */
-  font-size: 0.875rem;
-  /* Tailwind text-sm */
-  line-height: 1.4;
+  background-color: #111827; /* Tailwind gray-900 */
+  color: #f9fafb; /* Tailwind gray-50 */
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+  text-transform: none;
 
-  border-radius: 0.5rem;
-  /* slightly softer corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
   /* Behavior */
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s ease-in-out;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  visibility: hidden;
 
-  z-index: 50;
+  z-index: 100;
 }
 
 /* Default (top) */
@@ -175,6 +172,7 @@ html {
 /* Show tooltip */
 [data-tooltip]:hover::after {
   opacity: 1;
+  visibility: visible;
 }
 
 /* Remove default checkbox style */
