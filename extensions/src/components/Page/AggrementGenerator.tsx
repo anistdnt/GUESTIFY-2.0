@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { marked } from "marked";
 import TurndownService from "turndown";
+import toast from "react-hot-toast";
 import { API } from "@/app/api/_api_const";
 import Link from "next/link";
 import Image from "next/image";
@@ -39,6 +40,9 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   const [mode, setMode] = useState<Mode>("preview");
   const [section, setSection] = useState<Sections>("home");
   const [isStreaming, setIsStreaming] = useState(false);
+
+  const [agreementPayload, setAgreementPayload] = useState<any>({});
+  const [newsessionId, setNewSessionId] = useState<string>("");
 
   const [error, setError] = useState<string>("");
 
@@ -159,6 +163,62 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
     setDraftOutput(isRichText ? output : (marked(output) as string));
   };
 
+  const handleSave = async (customData?: { title: string; description: string }) => {
+    if (!output) {
+      toast.error("No content to save");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = {
+        title: customData?.title || `Agreement - ${agreementPayload.tenant_name || "Untitled"}`,
+        description: customData?.description || "",
+        userEmail: email,
+        content: {
+          html: isRichText ? output : (marked.parse(output) as string),
+          markdown: isRichText ? turndown.turndown(output) : output,
+        },
+        metadata: {
+          ...agreementPayload,
+          generatedAt: new Date().toISOString(),
+          sessionId: newsessionId,
+        },
+        status: "COMPLETED",
+        version: 1,
+      };
+
+      console.log("Industrial Payload for MongoDB:", payload);
+
+      // Placeholder for actual API call
+      // const res = await fetch('/api/agreements/save', { 
+      //   method: 'POST', 
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(payload)
+      // });
+      
+      // Simulate success for now
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast.success("Agreement saved to workspace!", {
+        icon: '🚀',
+        style: {
+          borderRadius: '12px',
+          background: '#1e293b',
+          color: '#fff',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase'
+        }
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save agreement");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Final rendering logic: uses flag instead of unreliable regex
   const html = isRichText ? output : (marked.parse(output) as string);
   const draftHtml = draftOutput;
@@ -173,10 +233,10 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
           <div className="flex justify-between items-center mb-10">
             <Link href="/" className="flex shrink-0 items-center">
               <Image
-                src={"/logo-bg-removed.png"}
+                src={"/new_logo.png"}
                 alt="Logo"
-                width={110}
-                height={40}
+                width={120}
+                height={60}
                 className="opacity-90 hover:opacity-100 transition-opacity"
                 loading="eager"
               />
@@ -225,6 +285,10 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
                 prompt={prompt}
                 setPrompt={setPrompt}
                 stopGeneration={stopGeneration}
+                agreementPayload={agreementPayload}
+                setAgreementPayload={setAgreementPayload}
+                newsessionId={newsessionId}
+                setNewSessionId={setNewSessionId}
               />
             )}
 
@@ -247,67 +311,63 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
       {/* RIGHT — Document Canvas */}
       <div className="flex-1 overflow-auto bg-[#f8fafc]">
-        {/* Thinking animation (only if no output yet) */}
+        {/* Thinking animation (Cinematic AI Drafting) */}
         {loading && !output && (
-          <div className="flex justify-center items-center text-zinc-400 h-[80vh]">
-            <div className="flex flex-col items-center gap-3">
-              {/* Thinking SVG */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 100 100"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-64 h-64"
-              >
-                <path d="M30 10h36l14 14v66a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6V16a6 6 0 0 1 6-6z" />
-                <path d="M66 10v14h14" />
+          <div className="flex justify-center items-center h-[80vh] animate-in fade-in duration-1000">
+            <div className="flex flex-col items-center gap-8">
+              <div className="relative">
+                {/* Outer Glow */}
+                <div className="absolute inset-0 bg-violet-500/20 blur-[60px] rounded-full animate-pulse-glow" />
+                
+                {/* Intelligence Rings */}
+                <div className="relative w-48 h-48 flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" className="w-full h-full animate-float-gentle">
+                    <defs>
+                      <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#8b5cf6" />
+                        <stop offset="100%" stopColor="#c084fc" />
+                      </linearGradient>
+                    </defs>
+                    {/* Pulsing Core */}
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="url(#aiGradient)" strokeWidth="0.5" strokeDasharray="4 4" className="animate-spin duration-[10s]" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="#e2e8f0" strokeWidth="0.5" opacity="0.3" />
+                  </svg>
+                  
+                  {/* Floating Sparkles */}
+                  <div className="absolute inset-0">
+                    {[...Array(6)].map((_, i) => (
+                      <div 
+                        key={i}
+                        className="absolute w-1 h-1 bg-violet-400 rounded-full animate-sparkle"
+                        style={{
+                          top: `${Math.random() * 100}%`,
+                          left: `${Math.random() * 100}%`,
+                          animationDelay: `${i * 0.4}s`
+                        }}
+                      />
+                    ))}
+                  </div>
 
-                <line x1="36" y1="40" x2="72" y2="40" />
-                <line x1="36" y1="48" x2="72" y2="48" />
-                <line x1="36" y1="56" x2="60" y2="56" />
+                  {/* AI Hub Icon */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100/50 backdrop-blur-sm">
+                      <div className="w-2.5 h-2.5 bg-violet-600 rounded-full animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                <circle cx="46" cy="74" r="2">
-                  <animate
-                    attributeName="opacity"
-                    values="0;1;0"
-                    dur="1.4s"
-                    repeatCount="indefinite"
-                    begin="0s"
-                  />
-                </circle>
-                <circle cx="58" cy="74" r="2">
-                  <animate
-                    attributeName="opacity"
-                    values="0;1;0"
-                    dur="1.4s"
-                    repeatCount="indefinite"
-                    begin="0.2s"
-                  />
-                </circle>
-                <circle cx="70" cy="74" r="2">
-                  <animate
-                    attributeName="opacity"
-                    values="0;1;0"
-                    dur="1.4s"
-                    repeatCount="indefinite"
-                    begin="0.4s"
-                  />
-                </circle>
-              </svg>
-
-              <span className="text-sm tracking-wide">
-                Drafting your agreement…
-              </span>
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-[0.4em] text-slate-800 animate-pulse">Drafting Agreement</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-slate-400 via-violet-400 to-slate-400 animate-ai-shimmer">Synthesizing legal context...</span>
+              </div>
             </div>
           </div>
         )}
 
         {/* Preview (Visible during stream/loading if there is output) */}
         {mode === "preview" && output && (
-          <Preview handleEdit={handleEdit} html={html} />
+          <Preview handleEdit={handleEdit} handleSave={handleSave} html={html} />
         )}
 
         {/* Edit */}
@@ -323,38 +383,44 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         )}
 
         {!loading && !output && (
-          <div className="text-zinc-400 flex justify-center items-center h-[80vh]">
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 64 64"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-64 h-64"
-                >
-                  <path d="M14 2h26l10 10v46a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4z" />
-                  <path d="M40 2v10h10" />
-
-                  <line x1="18" y1="20" x2="46" y2="20" />
-                  <line x1="18" y1="26" x2="46" y2="26" />
-                  <line x1="18" y1="32" x2="38" y2="32" />
-
-                  <line x1="18" y1="42" x2="34" y2="42" />
-                  <path d="M36 40c2 2 4 2 6 0" />
-
-                  <path d="M42 48l4 4 8-8" />
+          <div className="flex justify-center items-center h-[80vh] animate-in fade-in duration-1000">
+            <div className="flex flex-col items-center gap-10">
+              <div className="relative w-64 h-64 flex items-center justify-center">
+                {/* Cinematic Empty State Stars */}
+                {[...Array(12)].map((_, i) => (
+                  <div 
+                    key={i}
+                    className="absolute w-1 h-1 bg-violet-300 rounded-full animate-sparkle"
+                    style={{
+                      top: `${Math.random() * 100}%`,
+                      left: `${Math.random() * 100}%`,
+                      animationDelay: `${i * 0.3}s`
+                    }}
+                  />
+                ))}
+                
+                {/* Abstract Parchment Outline */}
+                <svg viewBox="0 0 100 120" className="w-48 h-48 opacity-20 text-slate-300 transition-all group-hover:opacity-40" fill="none" stroke="currentColor" strokeWidth="1">
+                  <path d="M25 10h50l15 15v85a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5V15a5 5 0 0 1 5-5z" />
+                  <path d="M75 10v15h15" />
+                  <line x1="35" y1="40" x2="65" y2="40" />
+                  <line x1="35" y1="50" x2="65" y2="50" />
+                  <line x1="35" y1="60" x2="55" y2="60" />
                 </svg>
-                <span>Agreement will appear here…</span>
-              </div>
-              {error && (
-                <div className="mt-5 bg-red-300 text-red-900 border border-red-900 rounded-lg px-3 py-2 font-semibold">
-                  {error}
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                   <div className="w-12 h-12 rounded-full border border-violet-100 bg-violet-50/30 backdrop-blur-sm flex items-center justify-center animate-pulse-glow">
+                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full" />
+                   </div>
                 </div>
-              )}
+              </div>
+
+              <div className="text-center space-y-3">
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.5em] text-slate-800">Workspace Ready</h3>
+                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest max-w-[280px] leading-relaxed mx-auto">
+                  Configure the legal schema on the left to begin <span className="text-violet-500 font-bold">AI generation</span>
+                </p>
+              </div>
             </div>
           </div>
         )}

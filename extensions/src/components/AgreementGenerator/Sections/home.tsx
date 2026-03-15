@@ -15,6 +15,10 @@ type Props = {
   isStreaming: boolean;
   handleGenerate: (payload?: any, sessionId?: string) => Promise<void>;
   stopGeneration: () => void;
+  agreementPayload: any;
+  setAgreementPayload: Dispatch<SetStateAction<any>>;
+  newsessionId: string;
+  setNewSessionId: Dispatch<SetStateAction<string>>;
 };
 
 export default function HomeSection({
@@ -25,10 +29,12 @@ export default function HomeSection({
   prompt,
   setPrompt,
   stopGeneration,
+  agreementPayload,
+  setAgreementPayload,
+  newsessionId,
+  setNewSessionId,
 }: Props) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [agreementPayload, setAgreementPayload] = useState<any>({});
-  const [newsessionId, setNewSessionId] = useState<string>("");
 
   const handleModalSubmit = (values: AgreementFormValues) => {
     const payload = {

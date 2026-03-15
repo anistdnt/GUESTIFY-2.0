@@ -1,15 +1,37 @@
 "use client";
 
-import { PenNibIcon, CaretDownIcon, ListDashesIcon, ShieldCheckIcon } from "@phosphor-icons/react";
+import { PenNibIcon, CaretDownIcon, ListDashesIcon, ShieldCheckIcon, CloudArrowUpIcon, X } from "@phosphor-icons/react";
 import React, { useState } from "react";
 
 type Props = {
   handleEdit: () => void;
+  handleSave: (customData: { title: string; description: string }) => Promise<void>;
   html: string | Promise<string>;
 };
 
-export default function Preview({ handleEdit, html }: Props) {
+export default function Preview({ handleEdit, handleSave, html }: Props) {
   const [open, setOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Save Template Modal State
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [templateDescription, setTemplateDescription] = useState("");
+
+  const onSaveClick = () => {
+    setIsSaveModalOpen(true);
+  };
+
+  const onConfirmSave = async () => {
+    if (!templateName.trim()) return;
+    setIsSaving(true);
+    await handleSave({
+      title: templateName,
+      description: templateDescription,
+    });
+    setIsSaving(false);
+    setIsSaveModalOpen(false);
+  };
 
   const downloadHTML = () => {
     const blob = new Blob([html as string], { type: "text/html;charset=utf-8" });
@@ -109,6 +131,70 @@ export default function Preview({ handleEdit, html }: Props) {
           dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : "" }}
         />
       </div>
+
+      {/* Save Template Modal */}
+      {isSaveModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsSaveModalOpen(false)} />
+          
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-slate-100 bg-slate-50/50">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h3 className="text-[11px] font-bold uppercase tracking-[0.3em] text-violet-600 mb-1">Persist Workspace</h3>
+                  <h2 className="text-xl font-bold text-slate-900">Save as Template</h2>
+                </div>
+                <button 
+                  onClick={() => setIsSaveModalOpen(false)}
+                  className="p-2 hover:bg-slate-200/50 rounded-xl text-slate-400 transition-colors"
+                >
+                  <X size={20} weight="bold" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block px-1">Template Name</label>
+                  <input
+                    type="text"
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="e.g., Premium Rent Agreement 2024"
+                    className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-violet-50 focus:border-violet-200 transition-all font-medium"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block px-1">Description</label>
+                  <textarea
+                    value={templateDescription}
+                    onChange={(e) => setTemplateDescription(e.target.value)}
+                    placeholder="Short summary for your records..."
+                    className="w-full h-24 bg-white border border-slate-200 rounded-2xl p-5 text-sm text-slate-700 placeholder:text-slate-300 resize-none focus:outline-none focus:ring-4 focus:ring-violet-50 focus:border-violet-200 transition-all font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 bg-white flex gap-3">
+              <button
+                onClick={() => setIsSaveModalOpen(false)}
+                className="flex-1 py-4 text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-2xl transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onConfirmSave}
+                disabled={!templateName.trim() || isSaving}
+                className="flex-[2] py-4 bg-violet-600 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-xl shadow-violet-900/20 hover:bg-violet-700 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-30 disabled:translate-y-0 disabled:shadow-none"
+              >
+                {isSaving ? "Finalizing..." : "Confirm Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
