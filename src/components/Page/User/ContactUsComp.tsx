@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { Envelope, Phone, MapPin, PaperPlaneTilt, ChatCircle, Clock, CheckCircle } from '@phosphor-icons/react';
+import CommonButton from '../../AppComponents/CommonButton';
 
 type FormData = {
   name: string;
@@ -53,43 +54,36 @@ const ContactPage = () => {
       title: "Email",
       content: "support@guestify.com",
       link: "mailto:support@guestify.com",
-      bgColor: "bg-buttons"
+      bgColor: "bg-primary-50 text-primary-600"
     },
     {
       icon: Phone,
       title: "Phone",
       content: "+91 88888 88888",
       link: "tel:+918888888888",
-      bgColor: "bg-buttonsSecondary"
+      bgColor: "bg-primary-50 text-primary-600"
     },
     {
       icon: MapPin,
       title: "Address",
-      content: "Kolkata, West Bengal, India",
+      content: "Kolkata, WB, India",
       link: "#",
-      bgColor: "bg-priceCol"
+      bgColor: "bg-primary-50 text-primary-600"
     },
     {
       icon: ChatCircle,
-      title: "Business Hours",
+      title: "Hours",
       content: "Mon - Fri: 9AM - 6PM",
       link: "#",
-      bgColor: "bg-ratingStarCol"
+      bgColor: "bg-primary-50 text-primary-600"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white font-jakarta">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-buttons/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-buttonsSecondary/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-headingCol/5 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 text-center">
+      <section className="relative pt-32 pb-20 overflow-hidden bg-white">
+        <div className="mx-auto max-w-7xl px-6 text-center">
           <div
             className={`transition-all duration-1000 ease-out ${
               isVisible
@@ -97,17 +91,15 @@ const ContactPage = () => {
                 : "opacity-0 translate-y-12"
             }`}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cardsBackground/20 backdrop-blur-sm rounded-full text-gray-300 text-sm font-medium mb-6">
-              <ChatCircle className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 rounded-full text-primary-700 text-sm font-medium mb-8">
+              <ChatCircle className="w-4 h-4" weight="bold" />
               Get in Touch
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent leading-tight">
-              Let's Start a<br />
-              <span className="bg-gradient-to-r from-buttons via-buttonsSecondary to-headingCol bg-clip-text text-transparent">
-                Conversation
-              </span>
+            <h1 className="text-5xl md:text-7xl font-normal leading-tight text-gray-900 font-display tracking-tight mb-8">
+              Let's Start a <br />
+              <span className="text-primary-600 italic-serif">Conversation</span>
             </h1>
-            <p className="text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed text-gray-300 font-light">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-jakarta">
               We're here to help you find the perfect accommodation. Reach out with any questions, 
               feedback, or partnership opportunities.
             </p>
@@ -116,7 +108,7 @@ const ContactPage = () => {
       </section>
 
       {/* Main Contact Section */}
-      <section className="relative -mt-16 px-6 pb-24">
+      <section className="px-6 pb-24">
         <div className="max-w-7xl mx-auto">
           <div
             className={`transition-all duration-1000 delay-200 ease-out ${
@@ -125,23 +117,23 @@ const ContactPage = () => {
                 : "opacity-0 translate-y-12"
             }`}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               {/* Contact Form */}
               <div className="lg:col-span-2">
-                <div className="bg-cardsBackground/80 backdrop-blur-sm p-8 lg:p-12 rounded-3xl shadow-xl border border-cardsBackground/40">
-                  <div className="mb-8">
-                    <h2 className="text-3xl font-bold text-cardTitleCol mb-3">
-                      Send us a message
+                <div className="bg-white p-10 lg:p-14 rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.04)] border border-gray-100">
+                  <div className="mb-10 space-y-2">
+                    <h2 className="text-4xl font-normal text-gray-900 font-display tracking-tight">
+                      Send us a <span className="italic-serif text-primary-600">message</span>
                     </h2>
-                    <p className="text-cardDesCol leading-relaxed">
+                    <p className="text-gray-500 font-jakarta">
                       Fill out the form below and we'll get back to you within 24 hours.
                     </p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <div className="group">
-                        <label className="block text-sm font-semibold text-cardTitleCol mb-2">
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">
                           Full Name
                         </label>
                         <input
@@ -151,11 +143,11 @@ const ContactPage = () => {
                           onChange={handleChange}
                           placeholder="John Doe"
                           required
-                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-buttons focus:border-transparent transition-all duration-300 group-hover:border-gray-300"
+                          className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:bg-white focus:border-primary-600 transition-all duration-300 font-jakarta"
                         />
                       </div>
-                      <div className="group">
-                        <label className="block text-sm font-semibold text-cardTitleCol mb-2">
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">
                           Email Address
                         </label>
                         <input
@@ -165,13 +157,13 @@ const ContactPage = () => {
                           onChange={handleChange}
                           placeholder="john@example.com"
                           required
-                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-buttons focus:border-transparent transition-all duration-300 group-hover:border-gray-300"
+                          className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:bg-white focus:border-primary-600 transition-all duration-300 font-jakarta"
                         />
                       </div>
                     </div>
 
-                    <div className="group">
-                      <label className="block text-sm font-semibold text-cardTitleCol mb-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">
                         Subject
                       </label>
                       <select
@@ -179,7 +171,7 @@ const ContactPage = () => {
                         value={formData.subject}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-buttons focus:border-transparent transition-all duration-300 group-hover:border-gray-300"
+                        className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:bg-white focus:border-primary-600 transition-all duration-300 appearance-none font-jakarta"
                       >
                         <option value="">Select a topic</option>
                         <option value="accommodation">Accommodation Inquiry</option>
@@ -190,8 +182,8 @@ const ContactPage = () => {
                       </select>
                     </div>
 
-                    <div className="group">
-                      <label className="block text-sm font-semibold text-cardTitleCol mb-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-700 uppercase tracking-wider">
                         Message
                       </label>
                       <textarea
@@ -200,93 +192,87 @@ const ContactPage = () => {
                         onChange={handleChange}
                         placeholder="Tell us how we can help you..."
                         required
-                        rows={5}
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-buttons focus:border-transparent transition-all duration-300 group-hover:border-gray-300 resize-none"
+                        rows={6}
+                        className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-600/20 focus:bg-white focus:border-primary-600 transition-all duration-300 resize-none font-jakarta"
                       />
                     </div>
 
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || isSubmitted}
-                      className={`w-full relative py-4 px-8 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] ${
-                        isSubmitted
-                          ? "bg-green-500 text-white"
-                          : isSubmitting
-                          ? "bg-gray-400 text-white cursor-not-allowed"
-                          : "bg-buttons hover:bg-buttonsHover text-white shadow-lg hover:shadow-xl"
-                      }`}
-                    >
-                      <span className="flex items-center justify-center gap-2">
-                        {isSubmitted ? (
-                          <>
-                            <CheckCircle className="w-5 h-5" />
-                            Message Sent Successfully!
-                          </>
-                        ) : isSubmitting ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            Sending Message...
-                          </>
-                        ) : (
-                          <>
-                            <PaperPlaneTilt className="w-5 h-5" />
-                            Send Message
-                          </>
-                        )}
-                      </span>
-                    </button>
+                    <div className="pt-4">
+                      <CommonButton 
+                        variant={isSubmitted ? "outline" : "primary"} 
+                        size="xl" 
+                        className={`w-full justify-center ${isSubmitted ? 'border-green-500 text-green-600' : ''}`}
+                        disabled={isSubmitting}
+                      >
+                        <span className="flex items-center gap-2">
+                          {isSubmitted ? (
+                            <>
+                              <CheckCircle className="w-6 h-6" weight="bold" />
+                              SUCCESSFULLY SENT
+                            </>
+                          ) : isSubmitting ? (
+                            <>
+                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                              SENDING...
+                            </>
+                          ) : (
+                            <>
+                              <PaperPlaneTilt className="w-6 h-6" weight="bold" />
+                              SEND MESSAGE
+                            </>
+                          )}
+                        </span>
+                      </CommonButton>
+                    </div>
                   </form>
                 </div>
               </div>
 
-              {/* Contact Information */}
-              <div className="space-y-6">
-                <div className="bg-cardsBackground/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-cardsBackground/40">
-                  <h3 className="text-2xl font-bold text-cardTitleCol mb-6">
-                    Contact Information
+              {/* Contact Information & Sidebar */}
+              <div className="flex flex-col gap-8">
+                <div className="bg-white p-10 rounded-[3rem] shadow-[0_0_40px_rgba(0,0,0,0.03)] border border-gray-100 flex-1">
+                  <h3 className="text-2xl font-normal text-gray-900 font-display tracking-tight mb-8">
+                    Contact <span className="italic-serif text-primary-600">Info</span>
                   </h3>
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     {contactInfo.map((info, index) => (
                       <div
                         key={index}
-                        className="group cursor-pointer"
-                        style={{ animationDelay: `${index * 100}ms` }}
+                        className="group flex items-start gap-4 p-2 transition-all"
                       >
-                        <a
-                          href={info.link}
-                          className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/50 transition-all duration-300 group-hover:scale-105"
-                        >
-                          <div className={`p-3 rounded-xl ${info.bgColor} shadow-lg group-hover:shadow-xl transition-all duration-300`}>
-                            <info.icon className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-cardTitleCol group-hover:text-headingCol transition-colors">
-                              {info.title}
-                            </h4>
-                            <p className="text-cardDesCol mt-1 group-hover:text-primaryText transition-colors">
+                        <div className={`w-12 h-12 rounded-2xl ${info.bgColor} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                          <info.icon size={22} weight="bold" />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            {info.title}
+                          </h4>
+                          {info.link !== "#" ? (
+                            <a href={info.link} className="text-gray-900 font-semibold hover:text-primary-600 transition-colors">
+                              {info.content}
+                            </a>
+                          ) : (
+                            <p className="text-gray-900 font-semibold">
                               {info.content}
                             </p>
-                          </div>
-                        </a>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Additional Info Card */}
-                <div className="bg-gradient-to-br from-cardsBackground to-cardsBackground/70 p-8 rounded-3xl border border-buttons/20">
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-buttons to-buttonsSecondary rounded-2xl mb-4">
-                      <ChatCircle className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-cardTitleCol mb-3">
-                      Quick Response
-                    </h3>
-                    <p className="text-cardDesCol leading-relaxed">
-                      We typically respond to all inquiries within 2-4 hours during business hours. 
-                      For urgent matters, please call us directly.
-                    </p>
-                  </div>
+                <div className="bg-primary-600 rounded-[3rem] p-10 text-white space-y-6 relative overflow-hidden shadow-2xl shadow-primary-600/20">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                   <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+                       <Clock size={32} weight="bold" />
+                   </div>
+                   <div className="space-y-4">
+                     <h3 className="text-2xl font-display tracking-tight leading-tight">Fast <span className="italic-serif opacity-90">Response</span> Guaranteed</h3>
+                     <p className="text-white/80 leading-relaxed text-sm font-jakarta">
+                        We typically respond within 2-4 hours. For urgent booking support, please choose the correct subject in the form.
+                     </p>
+                   </div>
                 </div>
               </div>
             </div>
@@ -294,25 +280,25 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="px-6 pb-24">
+      {/* FAQ Section with unified style */}
+      <section className="px-6 pb-32 bg-gray-50/50 pt-24">
         <div
-          className={`max-w-4xl mx-auto transition-all duration-1000 delay-500 ease-out ${
+          className={`max-w-5xl mx-auto transition-all duration-1000 delay-500 ease-out ${
             isVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-12"
           }`}
         >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-headingCol mb-4">
-              Frequently Asked Questions
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-4xl md:text-6xl font-normal text-gray-900 font-display tracking-tight leading-tight">
+              Frequently Asked <span className="italic-serif text-primary-600">Questions</span>
             </h2>
-            <p className="text-cardDesCol text-lg">
+            <p className="text-gray-500 text-lg font-jakarta">
               Quick answers to common questions about our services
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               {
                 question: "How do I book accommodation?",
@@ -333,12 +319,12 @@ const ContactPage = () => {
             ].map((faq, index) => (
               <div
                 key={index}
-                className="bg-cardsBackground/60 backdrop-blur-sm p-6 rounded-2xl border border-cardsBackground/50 hover:border-buttons/30 transition-all duration-300 hover:shadow-lg group"
+                className="bg-white p-10 rounded-[2.5rem] shadow-[0_0_20px_rgba(0,0,0,0.02)] border border-gray-100 hover:shadow-[0_0_30px_rgba(0,0,0,0.05)] transition-all duration-300 group"
               >
-                <h3 className="font-semibold text-cardTitleCol mb-3 group-hover:text-headingCol transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-6 font-display tracking-tight group-hover:text-primary-600 transition-colors">
                   {faq.question}
                 </h3>
-                <p className="text-cardDesCol leading-relaxed text-sm">
+                <p className="text-gray-600 leading-relaxed font-jakarta">
                   {faq.answer}
                 </p>
               </div>
@@ -350,4 +336,4 @@ const ContactPage = () => {
   );
 };
 
-export default ContactPage;
+export default ContactPage;

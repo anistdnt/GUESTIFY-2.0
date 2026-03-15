@@ -101,20 +101,21 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
             )}
           </span>
         </div>
-        <div className="p-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-xl font-semibold">{pginfo?.pg_name}</h3>
-              <p className="text-sm text-gray-600">{pginfo?.address}</p>
+        <div className="p-6">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <h3 className="text-2xl font-bold text-gray-900 font-display tracking-tight leading-none">{pginfo?.pg_name}</h3>
+              <div className="flex items-center gap-1.5 text-gray-400 group/loc cursor-pointer hover:text-primary-600 transition-colors duration-300">
+                <MapPin size={14} weight="bold" />
+                <p className="text-xs font-bold font-jakarta tracking-wide">{pginfo?.address}</p>
+              </div>
             </div>
             <div className="text-right">
-              <p className="text-xl font-bold flex flex-row justify-center items-center text-priceCol">
-                <span>
-                  <CurrencyInr size={15} />
-                </span>
+              <p className="text-2xl font-bold flex flex-row justify-end items-baseline text-primary-600 font-display">
+                <span className="text-sm mr-0.5">₹</span>
                 <span>{pginfo?.minRent}</span>
               </p>
-              <p className="text-sm text-gray-500">onwards</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Starting From</p>
             </div>
           </div>
 
@@ -189,10 +190,10 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                 Created At : {formatDate(pginfo?.createdAt as string)}
               </span>
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <button
-                className="bg-slate-500 hover:bg-slate-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
-                data-tooltip="Attachments to this PG"
+                className="bg-primary-50 hover:bg-primary-100 text-primary-600 px-4 py-2.5 rounded-xl flex justify-center items-center border border-primary-100 transition-all duration-300 hover:scale-105 active:scale-95 group shadow-sm"
+                data-tooltip="View Attachments"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -206,11 +207,11 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                   );
                 }}
               >
-                <Plus size={20} color="#ffffff" />
+                <Plus size={18} weight="bold" className="group-hover:rotate-90 transition-transform duration-500" />
               </button>
               <button
-                className="bg-slate-500 hover:bg-slate-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
-                data-tooltip="Edit PG Details"
+                className="bg-gray-50 hover:bg-gray-100 text-gray-600 px-4 py-2.5 rounded-xl flex justify-center items-center border border-gray-100 transition-all duration-300 hover:scale-105 active:scale-95 group shadow-sm"
+                data-tooltip="Edit Details"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -224,11 +225,11 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                   );
                 }}
               >
-                <Pencil size={20} color="#ffffff" weight="fill" />
+                <Pencil size={18} weight="bold" className="group-hover:text-primary-600 transition-colors" />
               </button>
               <button
-                className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded flex justify-center items-center gap-2"
-                data-tooltip="Delete Paying Guest House"
+                className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl flex justify-center items-center border border-red-100 transition-all duration-300 hover:scale-105 active:scale-95 group shadow-sm"
+                data-tooltip="Delete Property"
                 onClick={() => {
                   dispatch(
                     setModalVisibility({
@@ -247,7 +248,7 @@ export default function ProfilePGCard({ item, number_of_stars }: Props) {
                   );
                 }}
               >
-                <Trash size={20} color="#ffffff" weight="fill" />
+                <Trash size={18} weight="bold" />
               </button>
             </div>
           </div>

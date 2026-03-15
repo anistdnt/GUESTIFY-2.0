@@ -13,7 +13,6 @@ export const SortComp = ({selectedOption, setSelectedOption}) => {
 
   return (
     <div className="flex items-center space-x-4 h-12 ps-3 rounded-md">
-      <span className="text-gray-500 font-semibold">Sort By</span>
       <div className="w-48">
         <Select
           options={options}

@@ -8,6 +8,7 @@ import { API } from "@/lib/api_const";
 import { deleteSuccess, triggerRefetch } from "@/redux/slices/modalSlice";
 import { RootState } from "@/redux/store";
 import { Plus } from "@phosphor-icons/react";
+import { Buildings, Star, TrendUp, Users } from "@phosphor-icons/react/dist/ssr";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -33,25 +34,26 @@ const PGComponent = () => {
   }
 
   function MyPGHeader({ stats }: { stats: any }) {
-    const boxes: {
-      label: string;
-      value: number;
-    }[] = [
-      { label: "Percent Occupied", value: `${stats?.percent_occupied || 0}%` },
-      { label: "Occupied Rooms", value: stats?.occupied_rooms || 0 },
-      { label: "Vacant Rooms", value: stats?.available_rooms || 0 },
-      { label: "Total Reviews", value: stats?.total_reviews || 0 },
+    const boxes = [
+      { label: "Occupancy Rate", value: `${stats?.percent_occupied || 0}%`, icon: TrendUp, color: "text-emerald-500", bg: "bg-emerald-50" },
+      { label: "Occupied Units", value: stats?.occupied_rooms || 0, icon: Users, color: "text-blue-500", bg: "bg-blue-50" },
+      { label: "Available Inventory", value: stats?.available_rooms || 0, icon: Buildings, color: "text-primary-600", bg: "bg-primary-50" },
+      { label: "Global Reviews", value: stats?.total_reviews || 0, icon: Star, color: "text-amber-500", bg: "bg-amber-50" },
     ];
     return (
-      <div className="mb-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+      <div className="mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           {boxes.map((box, idx) => (
             <div
               key={idx}
-              className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center"
+              className="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-[0_15px_40px_rgba(0,0,0,0.02)] border border-gray-50 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:-translate-y-1"
             >
-              <p className="text-gray-500 text-sm">{box.label}</p>
-              <p className="text-5xl font-bold">{box.value}</p>
+              <div className={`p-3 w-12 h-12 rounded-2xl ${box.bg} ${box.color} mb-4 flex items-center justify-center transition-transform group-hover:scale-110 duration-500`}>
+                <box.icon size={24} weight="duotone" />
+              </div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 font-jakarta">{box.label}</p>
+              <p className="text-4xl font-bold text-gray-900 font-display tracking-tight">{box.value}</p>
+              <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gray-50 rounded-full blur-2xl group-hover:bg-primary-50 transition-colors duration-500"></div>
             </div>
           ))}
         </div>
@@ -107,66 +109,84 @@ const PGComponent = () => {
   }, [isRefetch]);
 
   return (
-    <div className="p-6">
-      <div>
-        <h1 className="text-gray-500">
-          <span className="text-gray-500 text-2xl">Manage Your</span> <br />
-          <span className="text-4xl font-semibold text-gray-700">
-            <span className="text-yellow-700">Paying Guest</span> Properties
-          </span>
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Manage all your listed Paying Guest properties here — <br />
-          update details, monitor occupancy, and keep your PGs performing at
-          their best.
-        </p>
+    <div className="p-8 max-w-[1600px] mx-auto space-y-12">
+      {/* Cinematic Welcome Header */}
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div className="space-y-2">
+            <div className="flex items-center gap-2 text-primary-600 font-bold uppercase tracking-[0.3em] text-[10px]">
+                <span className="w-8 h-[2px] bg-primary-600"></span>
+                Inventory Management
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-normal text-gray-900 tracking-tight">
+                Manage <span className="font-bold text-primary-600">Properties</span>
+            </h1>
+            <p className="text-gray-500 max-w-2xl font-jakarta text-base leading-relaxed">
+                Centralized control for your PG network. Update property details, monitor inventory health, and ensure your listings are optimized for peak performance.
+            </p>
+        </div>
+        
+        <div className="hidden lg:flex items-center gap-4 bg-gray-50/50 p-4 rounded-3xl border border-gray-100 backdrop-blur-sm h-fit">
+            <div className="p-3 bg-white rounded-2xl shadow-sm text-primary-600">
+                <Buildings size={24} weight="bold" />
+            </div>
+            <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Fleet</p>
+                <p className="text-sm font-bold text-gray-900">{cards?.length || 0} <span className="text-gray-400 ml-1 font-normal">Properties</span></p>
+            </div>
+        </div>
       </div>
+
       {statloading ? (
         <div className="animate-pulse space-y-6 mt-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 rounded-2xl bg-gray-300"></div>
+              <div key={i} className="h-40 rounded-3xl bg-gray-100"></div>
             ))}
           </div>
         </div>
       ) : (
         <MyPGHeader stats={statBox} />
       )}
-      {loading ? (
-        <CardSkeleton no_of_card={2} />
-      ) : cards?.length === 0 ? (
-        <div className="w-full py-10">
-          <NoDataFound
-            text="No Paying Guest House Found"
-            redirectBtn={{
-              text: "Add New Paying Guest House",
-              link: `/admin/${param?.uid}/pg/new`,
-            }}
-          />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 justify-items-center">
-          {cards?.map((item: any, index: number) => (
-            <div key={index}>
-              <ProfilePGCard item={item} />
-            </div>
-          ))}
 
-          <button
-            className="fixed flex bottom-10 right-10 bg-black/70 text-white p-4 rounded-full shadow-lg hover:bg-black/80 transition-transform transform hover:scale-105"
-            onClick={handleRoute}
-            title="Add PG"
-          >
-            <div
-              data-tooltip="Add New Paying Guest"
-              className="flex justify-center items-center gap-2"
-            >
-              <p className="me-3">Add PG</p>
-              <Plus size={20} weight="bold" />
-            </div>
-          </button>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <h2 className="text-xl font-bold text-gray-900 font-jakarta">Property Listings</h2>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Real-time data</p>
         </div>
-      )}
+
+        {loading ? (
+            <CardSkeleton no_of_card={4} />
+        ) : cards?.length === 0 ? (
+            <div className="w-full py-20 bg-gray-50/50 rounded-[2.5rem] border border-dashed border-gray-200">
+            <NoDataFound
+                text="No Paying Guest House Found"
+                redirectBtn={{
+                text: "Add New Paying Guest House",
+                link: `/admin/${param?.uid}/pg/new`,
+                }}
+            />
+            </div>
+        ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {cards?.map((item: any, index: number) => (
+                <div key={index} className="w-full">
+                <ProfilePGCard item={item} />
+                </div>
+            ))}
+            </div>
+        )}
+      </div>
+
+      {/* Floating Action Button - Premium Redesign */}
+      <button
+        className="fixed bottom-10 right-10 bg-gray-900 text-white pl-6 pr-4 py-3.5 rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.4)] transition-all duration-300 transform hover:scale-105 group active:scale-95 flex items-center gap-4 z-50 border border-white/10"
+        onClick={handleRoute}
+      >
+        <span className="text-sm font-bold font-jakarta tracking-wide">Add New PG</span>
+        <div className="bg-primary-600 rounded-full p-2 group-hover:rotate-90 transition-transform duration-500 shadow-lg shadow-primary-600/30">
+            <Plus size={20} weight="bold" />
+        </div>
+      </button>
     </div>
   );
 };

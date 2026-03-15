@@ -207,51 +207,68 @@ export default function PaymentLogList() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-gray-500">
-          <span>View All</span> <br />
-          <span className="text-4xl font-semibold text-gray-700">
-            Payment <span className="text-yellow-700">Logs</span>
-          </span>
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Track all payments made by tenants — amounts, methods, status and
-          invoices.
-        </p>
+      {/* Cinematic Heading Banner */}
+      <div className="relative overflow-hidden bg-white rounded-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 group">
+        {/* Decorative Background Element */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-50 rounded-full blur-3xl group-hover:bg-primary-100/50 transition-colors duration-700"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 text-primary-600 text-[10px] font-bold uppercase tracking-widest mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse"></span>
+              Financial Control Center
+            </div>
+            <h1 className="text-gray-400 font-medium text-lg font-jakarta">
+              View All
+            </h1>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 font-display tracking-tight">
+              Payment <span className="text-primary-600">Logs</span>
+            </h2>
+            <p className="text-gray-500 max-w-2xl font-jakarta text-sm leading-relaxed pt-2">
+              Monitor and analyze all financial transactions across your property portfolio. Real-time tracking of amounts, methods, and status ensuring fiscal precision.
+            </p>
+          </div>
+          
+          <div className="hidden lg:block text-right">
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total Processed Transactions</p>
+            <p className="text-3xl font-bold text-gray-900 font-display">{transactionSummary?.totalTransactions || 0}</p>
+          </div>
+        </div>
       </div>
 
       {/* Summary and Stats */}
-      <div className="flex justify-center items-center gap-3">
-        <div className="bg-white shadow-[0_0_10px_rgba(0,0,0,0.12)] rounded-2xl p-4 transition-shadow hover:shadow-[0_0_18px_rgba(0,0,0,0.2)] w-4/6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold mb-4 text-gray-600">
-              Transaction Analytics
-              <p className="text-sm text-gray-500 font-normal">
-                Total Amount Received Over Time in Week / Month
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="bg-white shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-gray-100 rounded-3xl p-8 transition-shadow hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] lg:w-4/6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold text-gray-900 font-display">
+                Transaction Analytics
+              </h2>
+              <p className="text-sm text-gray-500 font-jakarta">
+                Revenue visualization over time (Week / Month)
               </p>
-            </h2>
-            <div className="flex flex-row gap-3 justify-end items-center">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="rangeType"
-                  value="week"
-                  checked={type === "week"}
-                  onChange={() => setType("week")}
-                />
-                <span>Week</span>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="rangeType"
-                  value="month"
-                  checked={type === "month"}
-                  onChange={() => setType("month")}
-                />
-                <span>Month</span>
-              </label>
+            </div>
+            <div className="flex items-center p-1 bg-gray-50 rounded-xl border border-gray-100">
+              <button
+                onClick={() => setType("week")}
+                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  type === "week"
+                    ? "bg-white text-primary-600 shadow-sm border border-gray-200"
+                    : "text-gray-500 hover:text-gray-800"
+                }`}
+              >
+                Week
+              </button>
+              <button
+                onClick={() => setType("month")}
+                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  type === "month"
+                    ? "bg-white text-primary-600 shadow-sm border border-gray-200"
+                    : "text-gray-500 hover:text-gray-800"
+                }`}
+              >
+                Month
+              </button>
             </div>
           </div>
           {transactionLineLoading && (
@@ -302,55 +319,44 @@ export default function PaymentLogList() {
                 <Line
                   type="monotone"
                   dataKey="value"
-                  stroke="#ca8a04"
-                  strokeWidth={3}
-                  dot={{ r: 5 }}
-                  activeDot={{ r: 7 }}
+                  stroke="#2563eb"
+                  strokeWidth={4}
+                  dot={{ r: 6, fill: '#2563eb', strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 8, strokeWidth: 0 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           )}
         </div>
-        <div className="w-2/6 flex flex-col justify-between gap-2">
-          {/* Placeholder for future summary cards or stats */}
-          <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center">
-            <p className="text-gray-500 text-sm">Total Revenue (In Rupees)</p>
-            <p className="text-5xl font-bold">
-              {transactionSummary?.totalRevenue || 0}
+        <div className="lg:w-2/6 flex flex-col gap-6">
+          <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-gray-100 p-6 flex flex-col items-center text-center group hover:bg-primary-600 transition-all duration-500">
+            <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center mb-4 group-hover:bg-primary-500 transition-colors">
+              <CurrencyInr size={24} className="text-primary-600 group-hover:text-white" />
+            </div>
+            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1 group-hover:text-primary-100">Total Revenue</p>
+            <p className="text-4xl font-bold text-gray-900 font-display group-hover:text-white">
+              ₹{(transactionSummary?.totalRevenue || 0).toLocaleString()}
             </p>
           </div>
-          <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-row gap-3 justify-evenly items-center">
-            <div className="flex flex-col">
-              <p className="text-gray-500 text-xl">
-                Month: {getCurrentMonthName()}
-              </p>
-              <p className="text-3xl font-bold flex items-center gap-1">
-                <CurrencyInr size={16} />
-                <span>{transactionSummary?.thisMonthAmount || 0}</span>
-              </p>
-              <hr />
-              <p className="text-gray-500 text-xs mt-1">
-                Transaction Count: {transactionSummary?.thisMonthCount || 0}
-              </p>
-            </div>
-            <div className="border-2 w-1"></div>
-            <div className="flex flex-col">
-              <p className="text-gray-500 text-xl">
-                Week: {getCurrentWeekNumber()}
-              </p>
-              <p className="text-3xl font-bold flex items-center gap-1">
-                <CurrencyInr size={16} />
-                <span>{transactionSummary?.thisWeekAmount || 0}</span>
-              </p>
-              <hr />
-              <p className="text-gray-500 text-xs mt-1">
-                Transaction Count: {transactionSummary?.thisWeekCount || 0}
-              </p>
+
+          <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-gray-100 p-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{getCurrentMonthName()}</p>
+                <p className="text-xl font-bold text-gray-900 font-display">₹{(transactionSummary?.thisMonthAmount || 0).toLocaleString()}</p>
+                <div className="h-1 w-8 bg-primary-500 rounded-full"></div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Week {getCurrentWeekNumber()}</p>
+                <p className="text-xl font-bold text-gray-900 font-display">₹{(transactionSummary?.thisWeekAmount || 0).toLocaleString()}</p>
+                <div className="h-1 w-8 bg-blue-500 rounded-full"></div>
+              </div>
             </div>
           </div>
-          <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white px-4 py-5 flex flex-col gap-3 justify-center items-center">
-            <p className="text-gray-500 text-sm">Total Transactions</p>
-            <p className="text-5xl font-bold">
+
+          <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-gray-100 p-6 flex flex-col items-center text-center">
+            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">Lifetime Transactions</p>
+            <p className="text-4xl font-bold text-gray-900 font-display">
               {transactionSummary?.totalTransactions || 0}
             </p>
           </div>
@@ -360,7 +366,7 @@ export default function PaymentLogList() {
       {/* Main Card */}
       <div className="bg-white rounded-xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] p-6">
         {/* Search + Filter */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
           <button
             onClick={() => {
               setSearchTerm("");
@@ -368,18 +374,18 @@ export default function PaymentLogList() {
               setCurrentPage(1);
               fetchPaymentLogs();
             }}
-            className="p-3 border rounded-md bg-gray-100 hover:bg-gray-200"
+            className="p-3 border border-gray-100 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all active:scale-95"
           >
-            <ArrowClockwise size={18} />
+            <ArrowClockwise size={18} className="text-gray-600" />
           </button>
 
-          <div className="flex-1 relative">
-            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <div className="flex-1 relative group">
+            <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-500 transition-colors w-5 h-5" />
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by Name, Email or Method..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
+              className="w-full pl-12 pr-4 py-2.5 border border-gray-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all duration-300 font-jakarta text-sm"
             />
           </div>
 
@@ -390,25 +396,25 @@ export default function PaymentLogList() {
               onClick={() =>
                 setDropdownOpen(dropdownOpen === "sort" ? "" : "sort")
               }
-              className="flex items-center gap-2 px-4 py-2 border rounded-lg"
+              className="flex items-center gap-3 px-5 py-2.5 border border-gray-100 rounded-xl bg-white hover:bg-gray-50 transition-all font-bold font-jakarta text-sm text-gray-700 shadow-sm active:scale-95"
             >
-              <FunnelSimple size={18} />
+              <FunnelSimple size={18} className="text-primary-600" />
               Sort
-              <CaretDown size={14} />
+              <CaretDown size={14} className={`text-gray-400 transition-transform ${dropdownOpen === 'sort' ? 'rotate-180' : ''}`} />
             </button>
 
             {dropdownOpen === "sort" && (
-              <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg transition-all duration-200 animate-fadeIn">
-                <div className="px-4 py-2 border-b text-gray-600 font-semibold text-sm">
-                  Sort by
+                <div className="absolute right-0 z-50 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-2 animate-in fade-in zoom-in duration-200">
+                <div className="px-4 py-2 mb-1 text-gray-400 font-bold text-[10px] uppercase tracking-widest">
+                  Sort parameters
                 </div>
 
-                <ul className="py-2 text-sm text-gray-700">
+                <ul className="space-y-1">
                   {[
                     { label: "Newest First", sortBy: "-create" },
                     { label: "Oldest First", sortBy: "create" },
-                    { label: "Amount – High to Low", sortBy: "-amount" },
-                    { label: "Amount – Low to High", sortBy: "amount" },
+                    { label: "Amount: High to Low", sortBy: "-amount" },
+                    { label: "Amount: Low to High", sortBy: "amount" },
                   ].map((opt) => {
                     const isSelected = sortBy === opt.sortBy;
 
@@ -417,13 +423,12 @@ export default function PaymentLogList() {
                         <button
                           onClick={() => {
                             setSortBy(opt.sortBy as any);
-                            // setSortOrder(opt.sortOrder as any);
                             setDropdownOpen("");
                           }}
-                          className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${
+                          className={`block w-full text-left px-4 py-2.5 rounded-xl transition-all duration-200 font-bold text-sm ${
                             isSelected
-                              ? "bg-yellow-100 font-medium text-yellow-800"
-                              : "hover:bg-yellow-50"
+                              ? "bg-primary-50 text-primary-600"
+                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                           }`}
                         >
                           {opt.label}
@@ -535,15 +540,15 @@ export default function PaymentLogList() {
                 <div className="flex flex-row items-start gap-3">
                   {/* Status */}
                   <span
-                    className={`text-xs px-3 py-1 rounded-full font-semibold tracking-wide self-start ${
+                    className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest self-start border ${
                       p.payment_status === "paid"
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
                         : p.payment_status === "pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
+                        ? "bg-amber-50 text-amber-600 border-amber-100"
+                        : "bg-red-50 text-red-600 border-red-100"
                     }`}
                   >
-                    {p.payment_status.toUpperCase()}
+                    {p.payment_status}
                   </span>
 
                   {/* Download Button */}
@@ -555,9 +560,9 @@ export default function PaymentLogList() {
                       a.href = p.invoice_url;
                       a.click();
                     }}
-                    className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                    className="flex items-center gap-2 px-3 py-2 border border-gray-100 rounded-xl bg-white hover:bg-gray-50 hover:text-primary-600 transition-all shadow-sm active:scale-90"
                   >
-                    <Download size={18} />
+                    <Download size={18} weight="bold" />
                   </button>
                 </div>
               </div>
@@ -603,23 +608,23 @@ export default function PaymentLogList() {
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="p-2 border rounded-md disabled:opacity-30"
+                className="p-2.5 border border-gray-100 rounded-xl bg-white hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white transition-all active:scale-95"
               >
-                <CaretLeft size={16} />
+                <CaretLeft size={16} weight="bold" />
               </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
+              <div className="bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 font-bold font-jakarta text-xs text-gray-600">
+                Page {currentPage} <span className="text-gray-300 mx-1">/</span> {totalPages}
+              </div>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="p-2 border rounded-md disabled:opacity-30"
+                className="p-2.5 border border-gray-100 rounded-xl bg-white hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white transition-all active:scale-95"
               >
-                <CaretRight size={16} />
+                <CaretRight size={16} weight="bold" />
               </button>
             </div>
           </div>

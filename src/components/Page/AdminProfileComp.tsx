@@ -146,11 +146,12 @@ const AdminProfileComponent = () => {
     return (
       <div className="flex flex-col gap-8 p-6">
         <div>
-          <h1 className=" text-xl sm:text-3xl font-semibold text-gray-800">
-            <span className="text-gray-700 text-xl">Welcome</span>, <span className="text-yellow-700">{reduxUserData?.first_name} {reduxUserData?.last_name}</span>
+          <h1 className="text-2xl sm:text-4xl font-normal text-gray-900 font-display tracking-tight">
+            Welcome, <span className="italic-serif text-primary-600">{reduxUserData?.first_name} {reduxUserData?.last_name}</span>
           </h1>
-          <p className="text-gray-500 mt-1 max-sm:text-sm">
-            Created At : {formatDate(reduxUserData?.createdAt as string)}
+          <p className="text-xs text-gray-400 font-jakarta mt-1 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse"></span>
+            Account Partner since {formatDate(reduxUserData?.createdAt as string)}
           </p>
         </div>
         <div className="rounded-2xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] bg-white p-6">
@@ -189,39 +190,41 @@ const AdminProfileComponent = () => {
                     onChange={handleImageChange}
                   />
                 </div>
-                <h2 className="text-2xl font-semibold text-gray-800">
+                <h2 className="text-2xl font-bold text-gray-900 font-display tracking-tight">
                   {reduxUserData?.first_name} {reduxUserData?.last_name}
                 </h2>
-                <p className="text-gray-600">{reduxUserData?.email}</p>
+                <p className="text-sm text-gray-400 font-jakarta mt-0.5">{reduxUserData?.email}</p>
               </div>
               <div>
                 {isEditing ? (
-                  <div className="flex flex-row justify-center items-center gap-5">
+                  <div className="flex flex-row justify-center items-center gap-3">
                     <button
-                      className="mt-6 px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 flex items-center justify-center gap-2"
+                      className="px-6 py-2.5 bg-yellow-600 text-white rounded-xl hover:bg-yellow-700 font-bold font-jakarta text-sm transition-all duration-300 shadow-[0_10px_30px_rgba(202,138,4,0.2)] active:scale-95 flex items-center justify-center gap-2"
                       type="submit"
                     >
-                      <FloppyDisk size={25} color="#ffffff" weight="fill" />
-                      <span>Save</span>
+                      <FloppyDisk size={20} weight="bold" />
+                      <span>Save Changes</span>
                     </button>
                     <button
-                      className="mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80 flex justify-center items-center gap-2"
+                      type="button"
+                      className="px-6 py-2.5 bg-black text-white rounded-xl hover:bg-gray-800 font-bold font-jakarta text-sm transition-all active:scale-95 flex justify-center items-center gap-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
                       onClick={() => {
                         formik.resetForm();
                         setIsEditing(false);
                       }}
                     >
-                      <XCircle size={25} color="#ffffff" weight="fill" />
+                      <XCircle size={20} weight="bold" />
                       <span>Cancel</span>
                     </button>
                   </div>
                 ) : (
                   <button
-                    className="flex items-center justify-center gap-2 mt-6 px-3 py-2 bg-black/70 text-white rounded-lg hover:bg-black/80"
+                    type="button"
+                    className="flex items-center justify-center gap-2 px-8 py-2.5 bg-gray-700 text-white rounded-xl hover:bg-gray-800 font-bold font-jakarta text-sm transition-all duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.1)] active:scale-95"
                     onClick={() => setIsEditing(true)}
                   >
-                    <Pencil size={25} color="#ffffff" weight="fill" />
-                    <span>Edit</span>
+                    <Pencil size={20} weight="bold" />
+                    <span>Edit Profile</span>
                   </button>
                 )}
               </div>
@@ -230,7 +233,7 @@ const AdminProfileComponent = () => {
             {/* down Section */}
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <label className="block text-gray-700 font-medium required">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
                   First Name
                 </label>
                 <input
@@ -254,7 +257,7 @@ const AdminProfileComponent = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium required">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
                   Last Name
                 </label>
                 <input
@@ -278,7 +281,9 @@ const AdminProfileComponent = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium required">Email</label>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
+                  Email Address
+                </label>
                 <input
                   type="email"
                   placeholder="Your Email Address"
@@ -300,7 +305,7 @@ const AdminProfileComponent = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium required">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
                   Gender
                 </label>
                 <Select
@@ -345,7 +350,7 @@ const AdminProfileComponent = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium required">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
                   Country
                 </label>
                 <Select
@@ -390,7 +395,7 @@ const AdminProfileComponent = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium required">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
                   Language
                 </label>
                 <Select
@@ -464,7 +469,7 @@ const AdminProfileComponent = () => {
             </div> */}
 
               <div>
-                <label className="block text-gray-700 font-medium required">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
                   Address
                 </label>
                 <input
@@ -488,7 +493,7 @@ const AdminProfileComponent = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium required">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5">
                   Pincode
                 </label>
                 <input
@@ -512,11 +517,12 @@ const AdminProfileComponent = () => {
               </div>
             </div>
           </form>
-          <div className="flex items-center gap-5 mt-8">
+          <div className="flex flex-wrap items-center gap-4 mt-12 pt-10 border-t border-gray-100">
             <button
-              className="px-5 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              type="button"
+              className="px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 font-bold font-jakarta text-xs transition-all active:scale-95 shadow-[0_4px_15px_rgba(107,114,128,0.2)] flex items-center gap-2"
               onClick={() => {
-                toast.success("You are redirecting to the Reset Password Page");
+                toast.success("Redirecting to security center...");
                 setTimeout(() => {
                   window?.open(
                     `/reset-password/${getCookie("authToken")}`,
@@ -525,17 +531,18 @@ const AdminProfileComponent = () => {
                 }, 2000);
               }}
             >
-              Change Password
+              Update Security Password
             </button>
             <button
-              className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              type="button"
+              className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold font-jakarta text-xs transition-all active:scale-95 shadow-[0_4px_15px_rgba(220,38,38,0.2)] flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={true}
               onClick={() => {
                 dispatch(setModalVisibility({ open: true, type: "delete" }));
               }}
             >
-              <Trash size={20} />
-              <p>Delete Account</p>
+              <Trash size={18} weight="bold" />
+              <span>Terminate Identity Account</span>
             </button>
           </div>
         </div>

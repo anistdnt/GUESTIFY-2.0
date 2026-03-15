@@ -26,8 +26,10 @@ export const FilterIcon = ({ allowed_query_highlight = [] }: FilterIconProps) =>
 
   // Define SVG classes: add highlight styles if isHighlighted is true
   const svgClassName = `
-    h-12 w-12 cursor-pointer p-3 rounded-md bg-slate-100 
-    ${isHighlighted ? "text-yellow-600" : "text-gray-500 hover:text-gray-700"}
+    h-12 w-12 cursor-pointer p-3 rounded-full transition-all duration-300 border
+    ${isHighlighted 
+      ? "bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-200" 
+      : "bg-gray-50 text-gray-400 border-gray-100 hover:bg-white hover:text-primary-600 hover:border-primary-100 hover:shadow-md"}
   `;
 
   return (

@@ -157,21 +157,36 @@ export default function BookingList() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-gray-500">
-          <span>Explore Your</span> <br />
-          <span className="text-4xl font-semibold text-gray-700">
-            Booking <span className="text-yellow-700">Requests</span>
-          </span>
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Empower your management operations with a unified interface for
-          handling all tenant booking requests
-          <br />
-          Review and manage all booking requests from tenants.
-        </p>
+      
+      {/* Cinematic Heading Banner */}
+      <div className="relative overflow-hidden bg-white rounded-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 group">
+        {/* Decorative Background Element */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-50 rounded-full blur-3xl group-hover:bg-primary-100/50 transition-colors duration-700"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 text-primary-600 text-[10px] font-bold uppercase tracking-widest mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse"></span>
+              Reservation Management
+            </div>
+            <h1 className="text-gray-400 font-medium text-lg font-jakarta">
+              Explore Your
+            </h1>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 font-display tracking-tight">
+              Booking <span className="text-primary-600">Requests</span>
+            </h2>
+            <p className="text-gray-500 max-w-2xl font-jakarta text-sm leading-relaxed pt-2">
+              Empower your management operations with a unified interface for handling all tenant booking requests. Precision in oversight ensures high-fidelity property management.
+            </p>
+          </div>
+          
+          <div className="hidden lg:block text-right">
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Total Active Requests</p>
+            <p className="text-3xl font-bold text-gray-900 font-display">{bookings.length}</p>
+          </div>
+        </div>
       </div>
-
+      
       <div className="bg-white rounded-xl shadow-[0_0_10px_0_rgba(0,0,0,0.12)] p-6">
         {/* Search & Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -200,7 +215,7 @@ export default function BookingList() {
               placeholder="Search by PG Name, Name or Address..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-300 font-jakarta text-sm"
             />
           </div>
 
@@ -208,7 +223,7 @@ export default function BookingList() {
           <div className="relative" ref={filterDropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center justify-between w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-yellow-500"
+              className="flex items-center justify-between w-44 px-4 py-2 text-sm font-bold font-jakarta text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all focus:ring-4 focus:ring-primary-500/10 active:scale-95"
             >
               <span className="flex items-center gap-2">
                 <FunnelSimple size={18} className="text-gray-500" />
@@ -233,10 +248,10 @@ export default function BookingList() {
                           setFilterStatus(s as BookingStatus | "all");
                           setDropdownOpen(false);
                         }}
-                        className={`block w-full text-left px-4 py-2 rounded-md transition-colors duration-150 ${
+                        className={`block w-full text-left px-4 py-2 rounded-lg transition-colors duration-150 font-bold ${
                           s === filterStatus
-                            ? "bg-yellow-100 font-medium text-yellow-800"
-                            : "hover:bg-yellow-50"
+                            ? "bg-primary-50 text-primary-600"
+                            : "hover:bg-primary-50/50 text-gray-600"
                         }`}
                       >
                         {s === "all"

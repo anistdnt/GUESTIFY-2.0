@@ -105,23 +105,37 @@ export default function LocalAttractionsComp() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-gray-500">
-          <span>View and </span> <br />
-          <span className="text-4xl font-semibold text-gray-700">
-            Explore the <span className="text-yellow-700">Neighborhood</span>
-          </span>
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Explore verified essentials and popular attractions around your PG,
-          ensuring comfort, convenience, and peace of mind
-        </p>
+      {/* Cinematic Heading Banner */}
+      <div className="relative overflow-hidden bg-white rounded-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 group">
+        {/* Decorative Background Element */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-50 rounded-full blur-3xl group-hover:bg-primary-100/50 transition-colors duration-700"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 border border-primary-100 text-primary-600 text-[10px] font-bold uppercase tracking-widest mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary-600 animate-pulse"></span>
+              Neighborhood Explorer
+            </div>
+            <h1 className="text-gray-400 font-medium text-lg font-jakarta leading-none">
+              View and
+            </h1>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 font-display tracking-tight">
+              Explore the <span className="text-primary-600">Neighborhood</span>
+            </h2>
+            <p className="text-gray-500 max-w-2xl font-jakarta text-sm leading-relaxed pt-2">
+              Discover verified essentials and popular attractions around your property. Ensuring comfort, convenience, and peace of mind for all Guestify tenants.
+            </p>
+          </div>
+          
+          <div className="hidden lg:block text-right">
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Enlisted Places</p>
+            <p className="text-3xl font-bold text-gray-900 font-display">{attractions.length}</p>
+          </div>
+        </div>
       </div>
 
-      <hr />
-
-      <div>
-        <div className="flex justify-between items-center">
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
           <button
             onClick={() => {
               dispatch(
@@ -134,27 +148,50 @@ export default function LocalAttractionsComp() {
                 })
               );
             }}
-            className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md flex items-center justify-center gap-1"
+            className="group relative px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-bold font-jakarta overflow-hidden"
           >
-            <Plus size={20} />
-            <span>Add New</span>
+            <Plus size={20} weight="bold" />
+            <span>Add New Attraction</span>
           </button>
-          <div className="flex justify-end items-center gap-3">
-            <span className="text-gray-700 font-semibold">
-              Filter By Place type
-            </span>
-            <Select
-              options={filterOptions}
-              value={
-                filterOptions?.find((o) => o.value === selectedOption?.value) ||
-                null
-              }
-              onChange={(option: Options) => setSelectedOption(option)}
-              placeholder="Select Type"
-              className="w-40 rounded-md"
-            />
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex flex-col items-end sm:items-start">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sort By</span>
+              <span className="text-xs font-bold text-gray-700 uppercase">Place type</span>
+            </div>
+            <div className="w-52">
+              <Select
+                options={filterOptions}
+                value={
+                  filterOptions?.find((o) => o.value === selectedOption?.value) ||
+                  null
+                }
+                onChange={(option: Options) => setSelectedOption(option)}
+                placeholder="Select Type"
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    borderRadius: '0.75rem',
+                    padding: '2px',
+                    borderColor: '#f3f4f6',
+                    '&:hover': { borderColor: '#2563eb' },
+                    boxShadow: 'none',
+                    fontWeight: '600',
+                    fontSize: '0.875rem'
+                  }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isSelected ? '#2563eb' : state.isFocused ? '#eff6ff' : 'transparent',
+                    color: state.isSelected ? 'white' : '#4b5563',
+                    fontWeight: '600',
+                    fontSize: '0.875rem'
+                  })
+                }}
+              />
+            </div>
           </div>
         </div>
+      </div>
 
         <div className="mt-6">
           {loading ? (
@@ -174,6 +211,5 @@ export default function LocalAttractionsComp() {
           )}
         </div>
       </div>
-    </div>
   );
 }

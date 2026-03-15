@@ -114,5 +114,11 @@ export const API = {
     CHECKOUT: {
         CREATE_SESSION: "/create-checkout-session",
         CHECKOUT_INFO: "/booking/session/success"
+    },
+    COMPLAINT: {
+        LIST: "/complaint",
+        CREATE: "/complaint",
+        UPDATE: "/complaint",
+        DELETE: "/complaint"
     }
 }
