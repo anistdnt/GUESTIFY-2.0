@@ -30,9 +30,9 @@ export default function Preview({ handleEdit, html }: Props) {
   };
 
   return (
-    <div className="editor-wrapper">
-      {/* Professional Preview Toolbar */}
-      <div className="preview-toolbar shadow-2xl shadow-slate-200 border border-slate-200 backdrop-blur-xl bg-white/95 sticky top-4 mb-10 p-2 rounded-2xl flex items-center justify-between gap-4 w-full max-w-[850px]">
+    <div className="agreement-preview-container">
+      {/* Professional Preview Toolbar (Sticky Top) */}
+      <div className="agreement-preview-toolbar">
         <div className="flex items-center gap-4 pl-4 border-l-2 border-emerald-500 py-1">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ export default function Preview({ handleEdit, html }: Props) {
             {open && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-                <div className="absolute right-0 mt-4 w-56 rounded-2xl border border-slate-200 bg-white shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="absolute right-0 top-full mt-4 w-56 rounded-2xl border border-slate-200 bg-white shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                   <div className="p-3 border-b border-slate-50 bg-slate-50/50">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] px-2">Select Format</span>
                   </div>
@@ -100,13 +100,13 @@ export default function Preview({ handleEdit, html }: Props) {
       </div>
 
       {/* Preview Paper */}
-      <div className="editor-paper mx-auto">
+      <div className="agreement-preview-paper mx-auto">
         <div className="absolute top-10 left-0 right-0 flex justify-center opacity-[0.03] pointer-events-none select-none">
           <span className="text-6xl font-black uppercase tracking-[1em]">OFFICIAL</span>
         </div>
         <div
           className="agreement-editor font-eb-garamond"
-          dangerouslySetInnerHTML={{ __html: html as string }}
+          dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : "" }}
         />
       </div>
     </div>

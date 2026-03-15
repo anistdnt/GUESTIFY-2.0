@@ -50,75 +50,67 @@ body {
   page-break-before: always;
 }
 
-/* Paper background / wrapper */
-.editor-wrapper {
+/* ===============================
+   AGREEMENT EDITOR MODE
+   =============================== */
+
+/* ===============================
+   AGREEMENT EDITOR MODE
+   =============================== */
+
+.agreement-editor-container {
+  display: block;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: #f8fafc;
+  position: relative;
+  width: 100%;
+}
+
+.agreement-editor-toolbar {
+  position: sticky;
+  top: 1rem;
+  z-index: 100;
+  width: 95%;
+  max-width: 1100px;
+  margin: 0 auto 2rem auto;
+
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border: 1px solid rgba(226, 232, 240, 1);
+  border-radius: 20px;
+  padding: 12px;
+  
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 12px;
+  
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 4px 6px -4px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 0, 0, 0.02);
+  
+  transition: all 0.3s ease;
 }
 
-/* Toolbar */
-.editor-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(6px);
-
-  border: 1px solid #e4e4e7;
-  border-radius: 8px;
-
-  padding: 6px;
-  margin-bottom: 12px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-}
-
-.preview-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(6px);
-
-  border: 1px solid #e4e4e7;
-  border-radius: 8px;
-
-  padding: 6px;
-  margin-bottom: 12px;
-
-  display: flex;
-  justify-content: end;
-  align-items: center;
-  gap: 4px;
-}
-
-/* Document paper */
-.editor-paper {
+.agreement-editor-paper {
   background: #ffffff;
-  width: 100%;
-  max-width: 850px;
-
-  padding: 100px 120px;
+  width: 95%;
+  max-width: 1100px;
+  padding: 80px 100px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0; /* Slate 200 */
-
+  border: 1px solid #e2e8f0;
   box-shadow: 
     0 1px 3px 0 rgba(0, 0, 0, 0.05),
-    0 20px 25px -5px rgba(0, 0, 0, 0.03),
-    0 10px 10px -5px rgba(0, 0, 0, 0.02);
-  
-  margin-bottom: 60px;
+    0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  margin: 0 auto 100px auto; 
   position: relative;
+  min-height: 1100px;
 }
 
-/* Page Indicator / Header line */
-.editor-paper::before {
+.agreement-editor-paper::before {
   content: "";
   position: absolute;
   top: 40px;
@@ -128,14 +120,72 @@ body {
   background: #f1f5f9;
 }
 
-/* Document Container Wrapper */
-.editor-wrapper {
+/* ===============================
+   AGREEMENT PREVIEW MODE
+   =============================== */
+
+.agreement-preview-container {
+  display: block;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: #f8fafc;
+  position: relative;
+  width: 100%;
+}
+
+.agreement-preview-toolbar {
+  position: sticky;
+  top: 1rem;
+  z-index: 100;
+  width: 95%;
+  max-width: 1100px;
+  margin: 0 auto 2rem auto;
+
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border: 1px solid rgba(226, 232, 240, 1);
+  border-radius: 20px;
+  padding: 12px;
+  
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  padding: 60px 20px;
-  min-height: 100%;
-  background: var(--canvas-bg);
+  gap: 16px;
+  
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 4px 6px -4px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 0, 0, 0.02);
+  
+  transition: all 0.3s ease;
+}
+
+.agreement-preview-paper {
+  background: #ffffff;
+  width: 95%;
+  max-width: 1100px;
+  padding: 80px 100px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  margin: 0 auto 100px auto; 
+  position: relative;
+  min-height: 1100px;
+}
+
+.agreement-preview-paper::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  left: 120px;
+  right: 120px;
+  height: 1px;
+  background: #f1f5f9;
 }
 
 /* Alignment Classes for Tiptap */

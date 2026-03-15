@@ -115,6 +115,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
           if (payload.chunk_type === "done") {
             setLoading(false);
+            setIsStreaming(false); // Reset streaming state
             return;
           }
 
@@ -125,6 +126,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
       }
 
       setLoading(false);
+      setIsStreaming(false); // Ensure reset if done is true but no 'done' chunk
     } catch (err: any) {
       if (err.name === "AbortError") {
         console.log("Generation stopped by user.");
@@ -158,7 +160,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   };
 
   // Final rendering logic: uses flag instead of unreliable regex
-  const html = isRichText ? output : (marked(output) as string);
+  const html = isRichText ? output : (marked.parse(output) as string);
   const draftHtml = draftOutput;
 
   return (
@@ -244,9 +246,9 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
       </div>
 
       {/* RIGHT — Document Canvas */}
-      <div className="flex-1 overflow-auto bg-[#fafafa] flex flex-col">
-        {/* Thinking animation */}
-        {loading && (
+      <div className="flex-1 overflow-auto bg-[#f8fafc]">
+        {/* Thinking animation (only if no output yet) */}
+        {loading && !output && (
           <div className="flex justify-center items-center text-zinc-400 h-[80vh]">
             <div className="flex flex-col items-center gap-3">
               {/* Thinking SVG */}
@@ -303,24 +305,20 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
           </div>
         )}
 
-        {/* Preview */}
-        <div className="flex justify-start mb-2">
-          {!loading && mode === "preview" && output && (
-            <Preview handleEdit={handleEdit} html={html} />
-          )}
-        </div>
+        {/* Preview (Visible during stream/loading if there is output) */}
+        {mode === "preview" && output && (
+          <Preview handleEdit={handleEdit} html={html} />
+        )}
 
         {/* Edit */}
         {!loading && mode === "edit" && (
           <AgreementEditor
-            html={draftHtml}
-            onChange={(newHtml) => {
-              setDraftOutput(newHtml); // Store HTML directly
-            }}
+            html={draftOutput}
+            onChange={(h) => setDraftOutput(h)}
             handleDone={handleDone}
             handleDiscard={handleDiscard}
-            output={output} // This is HTML
-            draftOuput={draftOutput} // This is HTML
+            output={output}
+            draftOutput={draftOutput}
           />
         )}
 
