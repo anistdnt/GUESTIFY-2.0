@@ -14,39 +14,57 @@ export default function ListSection({
   setSection,
 }: Props) {
   return (
-    <div>
-      {/* Prompt History */}
-      <div className="mt-4 flex flex-col h-fit">
-        <h3 className="flex flex-row justify-start items-center gap-2 text-sm font-medium mb-3 text-gray-700">
-          <ClockCounterClockwiseIcon size={22} weight="fill" />
-          <span>Prompt History</span>
+    <div className="space-y-8">
+      <div className="flex items-center gap-3 mb-2">
+        <ClockCounterClockwiseIcon size={22} weight="bold" className="text-violet-500" />
+        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 pt-0.5">
+          History & Memory
         </h3>
-        {promptHistory?.length > 0 ? (
-          <ul className="text-sm text-gray-600 space-y-2 max-h-[70vh] overflow-y-scroll">
-            {promptHistory.map((p, i) => (
-              <li
-                key={i}
-                className="cursor-pointer p-2 bg-zinc-50 rounded break-words flex justify-between items-center"
-              >
-                <span>{p}</span>
-                <span
+      </div>
+      
+      {promptHistory?.length > 0 ? (
+        <div className="space-y-4">
+          {promptHistory.map((p, i) => (
+            <div
+              key={i}
+              className="group bg-white border border-slate-200 hover:border-violet-200 hover:shadow-lg hover:shadow-violet-900/5 p-5 rounded-2xl transition-all duration-300"
+            >
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-600 line-clamp-4 leading-relaxed tracking-wide">
+                    {p}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2">
+                    <div className="px-2.5 py-1 bg-violet-50 rounded-lg text-[9px] font-bold text-violet-600 uppercase tracking-widest border border-violet-100">
+                      Prompt Insight
+                    </div>
+                  </div>
+                </div>
+                <button
                   onClick={() => {
                     setPrompt(p);
                     setSection("home");
                   }}
-                  className="cursor-pointer"
+                  className="p-2.5 bg-white rounded-xl border border-slate-200 text-slate-400 hover:text-violet-600 hover:border-violet-200 hover:shadow-sm transition-all"
+                  title="Reuse intelligence"
                 >
-                  <SwapIcon size={20} weight="fill" />
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="text-gray-500 text-center mt-3">
-            No prompt history found.
+                  <SwapIcon size={18} weight="bold" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="py-24 flex flex-col items-center gap-6 text-center opacity-40">
+          <div className="p-5 bg-slate-100 rounded-full border border-slate-200 text-slate-300">
+            <ClockCounterClockwiseIcon size={48} weight="bold" />
           </div>
-        )}
-      </div>
+          <div className="space-y-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-900">No Record Found</p>
+            <p className="text-[11px] font-medium text-slate-500 max-w-[220px] leading-relaxed uppercase">Your generation history is currently local and ephemeral.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

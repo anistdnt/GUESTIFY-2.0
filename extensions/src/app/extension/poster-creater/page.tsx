@@ -51,7 +51,8 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <div className="text-black">
-        <CanvasEditor name={name} email={email} token={token} />
+        {/* <CanvasEditor name={name} email={email} token={token} /> */}
+        Poster Creater
     </div>
   );
 }
