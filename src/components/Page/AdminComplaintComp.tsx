@@ -6,8 +6,9 @@ import { API } from "@/lib/api_const";
 import toast from "react-hot-toast";
 import Select from "react-select";
 import AdminComplaintCard from "@/components/Complaint/AdminComplaintCard";
-import { useDispatch } from "react-redux";
-import { setModalVisibility } from "@/redux/slices/modalSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setModalVisibility, triggerRefetch } from "@/redux/slices/modalSlice";
+import { RootState } from "@/redux/store";
 import NoDataFound from "@/components/NoDataFound/NoDataFound";
 import { Funnel, ArrowsClockwise } from "@phosphor-icons/react";
 
@@ -29,6 +30,7 @@ export default function AdminComplaintComp({ uid }: { uid: string }) {
   const [selectedPriorities, setSelectedPriorities] = useState<any[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<any[]>([]);
   const dispatch = useDispatch();
+  const isRefetch = useSelector((state: RootState) => state.modal_slice.isRefetch);
 
   const fetchComplaints = async () => {
     try {
@@ -61,18 +63,19 @@ export default function AdminComplaintComp({ uid }: { uid: string }) {
     fetchComplaints();
   }, [selectedPriorities, selectedStatuses]);
 
-  const handleStatusUpdate = async (id: string, newStatus: string) => {
-    try {
-      const res = await api_caller<any>("PATCH", `${API.COMPLAINT.UPDATE}/${id}`, { status: newStatus });
-      if (res.success) {
-        toast.success(`Status updated to ${newStatus}`);
-        setComplaints(prev => prev.map(c => c._id === id ? { ...c, status: newStatus } : c));
-      } else {
-        toast.error(res.message || "Update failed");
-      }
-    } catch (error) {
-      toast.error("Error updating status");
+  useEffect(() => {
+    if (isRefetch) {
+      fetchComplaints();
+      dispatch(triggerRefetch(false));
     }
+  }, [isRefetch]);
+
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    dispatch(setModalVisibility({
+      open: true,
+      type: "complaint_resolution",
+      modalData: { id, status: newStatus }
+    }));
   };
 
   const handleDelete = async (id: string) => {
