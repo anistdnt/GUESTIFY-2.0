@@ -189,7 +189,7 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
       onClick={async () => await handleCloseModal()}
     >
       <div
-        className="relative flex flex-col bg-white p-6 mx-2 rounded-md shadow-lg w-3/4 h-5/6"
+        className="relative flex flex-col bg-white p-6 mx-4 rounded-3xl shadow-lg w-full max-w-5xl h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -297,7 +297,7 @@ function BookingModal({ setshowModal, modalData }: ModalType) {
 
         {previewData && (
           <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-[999] backdrop-blur-md p-4 animate-fadeIn">
-            <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-slideUp">
+          <div className="bg-white w-full max-w-4xl max-h-[90vh] mx-4 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-slideUp">
 
               <div className="relative bg-gradient-to-br from-buttonsSecondary via-buttons to-buttonsHover text-white p-8">
                 <button

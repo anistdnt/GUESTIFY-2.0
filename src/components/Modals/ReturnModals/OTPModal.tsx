@@ -133,7 +133,7 @@ function OTPModal({
       onClick={() => setshowModal(false)}
     >
       <div
-        className="relative flex flex-col gap-3 bg-white p-6 mx-2 rounded-md shadow-lg w-96"
+        className="relative flex flex-col gap-3 bg-white p-6 mx-4 rounded-xl shadow-lg w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-row justify-between items-center">

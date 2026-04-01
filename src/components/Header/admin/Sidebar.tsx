@@ -11,6 +11,7 @@ import {
   SignOut,
   Trash,
   UserCircle,
+  WarningIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -73,6 +74,11 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
         title: "Payments",
         path: `/admin/${userInfo.user_id}/payments`,
         iconEle: <Receipt size={20} />
+      },
+      {
+        title: "Complaints",
+        path: `/admin/${userInfo.user_id}/complaints`,
+        iconEle: <WarningIcon size={20} />
       }
     ],
     tools: [

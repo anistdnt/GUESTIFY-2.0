@@ -22,6 +22,8 @@ import RoomImagePrevModal from "./RoomImagePrevModal";
 import EnlistNewAttraction from "./Attachments/components/Enlist";
 import ViewAttachments from "./Attachments/View";
 import CompareModal from "../MainPageComponents/CompareModal";
+import ComplaintDetailsModal from "./ComplaintDetailsModal";
+import ComplaintResolutionModal from "./ComplaintResolutionModal";
 
 export default function DefaultModal() {
   const type = useSelector((state: RootState) => state.modal_slice.type);
@@ -93,8 +95,15 @@ export default function DefaultModal() {
           { type === "compare" && (
             <CompareModal setshowModal={setshowModal} modalData={modalData}/>
           )}
+          { type === "viewcomplaint" && (
+            <ComplaintDetailsModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
+          { type === "complaint_resolution" && (
+            <ComplaintResolutionModal setshowModal={setshowModal} modalData={modalData}/>
+          )}
         </div>
       )}
     </div>
   );
 }
+

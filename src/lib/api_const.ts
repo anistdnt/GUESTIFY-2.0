@@ -119,6 +119,7 @@ export const API = {
         LIST: "/complaint",
         CREATE: "/complaint",
         UPDATE: "/complaint",
-        DELETE: "/complaint"
+        DELETE: "/complaint",
+        STATUS: "/complaint/:id/status"
     }
 }
