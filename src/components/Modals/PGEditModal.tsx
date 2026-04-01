@@ -57,7 +57,7 @@ function PGEditModal({ setshowModal, modalData }: ModalType) {
       onClick={() => setshowModal(false)}
     >
       <div
-        className="relative flex flex-col gap-3 bg-white p-6 mx-2 rounded-md shadow-lg"
+        className="relative flex flex-col gap-3 bg-white p-6 mx-4 rounded-xl shadow-lg w-full max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-row justify-between items-center">
@@ -75,11 +75,11 @@ function PGEditModal({ setshowModal, modalData }: ModalType) {
           Edit details for{" "}
           <span className="font-semibold">{modalData?.text}</span>
         </p>
-        <div className=" grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {editOptions?.map((opt: EditOptionType, ind: number) => (
             <div
               key={ind}
-              className={`py-8 px-16 border rounded-md cursor-pointer hover:text-blue-400 hover:border-blue-400 flex flex-col justify-center items-center gap-2 ${opt?.class}`}
+              className={`py-6 px-8 border rounded-xl cursor-pointer hover:text-blue-400 hover:border-blue-400 flex flex-col justify-center items-center gap-2 ${opt?.class}`}
               onClick={() => {
                 if(opt?.path){
                   router?.push(opt?.path);

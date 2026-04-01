@@ -20,7 +20,7 @@ export default function ViewModal({ setshowModal, modalData }: ModalType) {
       onClick={() => setshowModal(false)}
     >
       <div
-        className="relative flex flex-col gap-4 bg-white p-6 mx-2 rounded-md shadow-lg min-w-[600px] w-auto max-h-[85vh] overflow-hidden"
+        className="relative flex flex-col gap-4 bg-white p-6 mx-4 rounded-xl shadow-lg w-full max-w-4xl max-h-[85vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

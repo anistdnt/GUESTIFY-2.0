@@ -55,7 +55,7 @@ export default function PaymentSessionStatusModal({
       className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
     >
       <div
-        className="bg-white min-w-[350px] rounded-xl shadow-lg p-6 relative"
+        className="bg-white w-full max-w-md mx-4 rounded-xl shadow-lg p-6 relative"
       >
 
         {/* Content */}

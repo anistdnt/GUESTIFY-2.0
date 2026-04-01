@@ -14,10 +14,11 @@ import { useDispatch } from "react-redux";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 
 interface CompareModalProps {
+  setshowModal: (show: boolean) => void;
   modalData: any;
 }
 
-const CompareModal = ({ modalData }: CompareModalProps) => {
+const CompareModal = ({ setshowModal, modalData }: CompareModalProps) => {
   const dispatch = useDispatch();
 
   /** ---------------- STATES ---------------- */
@@ -158,7 +159,7 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
     <>
       {/* Main Modal */}
       <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 overflow-y-auto p-4">
-        <div className="bg-white w-full max-w-7xl rounded-2xl shadow-2xl my-8">
+        <div className="bg-white w-full max-w-7xl rounded-2xl shadow-2xl my-8 overflow-hidden">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b px-6 py-4 rounded-t-2xl z-10">
             <div className="flex items-center justify-between">
@@ -171,9 +172,7 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
                 </p>
               </div>
               <button
-                onClick={() =>
-                  dispatch(setModalVisibility({ open: false, type: null }))
-                }
+                onClick={() => setshowModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-full"
               >
                 <X size={24} />
@@ -182,7 +181,7 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
           </div>
 
           {/* ---------- TOP 4 PG SLOTS ---------- */}
-          <div className="grid grid-cols-5 gap-6 p-6 bg-gray-50 border-b">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 p-6 bg-gray-50 border-b">
             {compareList.map((pg, idx) => (
               <div
                 key={idx}
@@ -239,8 +238,8 @@ const CompareModal = ({ modalData }: CompareModalProps) => {
           </div>
 
           {/* ---------- COMPARISON TABLE ---------- */}
-          <div className="p-6">
-            <div className="border rounded-xl overflow-hidden">
+          <div className="p-6 overflow-x-auto">
+            <div className="border rounded-xl overflow-hidden min-w-[800px]">
               <Section title="PRICING">
                 <ComparisonRow
                   label="Monthly Rent"

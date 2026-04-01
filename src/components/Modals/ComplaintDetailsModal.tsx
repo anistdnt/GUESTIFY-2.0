@@ -32,7 +32,7 @@ export default function ComplaintDetailsModal({ setshowModal, modalData }: Compl
         onClick={() => setshowModal(false)}
       ></div>
       
-      <div className="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-5 duration-300 max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-5 duration-300 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
           <div className="flex items-center gap-4">
