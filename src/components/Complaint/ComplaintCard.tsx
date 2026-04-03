@@ -3,10 +3,12 @@
 import Image from "next/image";
 import { Warning, CheckCircle, Clock, Trash, PencilSimple, CurrencyInr } from "@phosphor-icons/react";
 import { formatDate } from "@/lib/utils/utilities";
+import { useState } from "react";
+import CommonConfirmationModal from "../Modals/CommonConfirmationModal";
 
 interface ComplaintCardProps {
   complaint: any;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string) => void | Promise<void>;
   onEdit?: (complaint: any) => void;
 }
 
@@ -37,8 +39,22 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 export default function ComplaintCard({ complaint, onDelete, onEdit }: ComplaintCardProps) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (onDelete) {
+      await onDelete(complaint._id);
+    }
+    setShowDeleteModal(false);
+  };
+
   return (
-    <div className="group relative bg-white border border-gray-100 rounded-[2rem] p-4 transition-all duration-500 hover:shadow-2xl hover:shadow-primary-100/10 flex flex-col">
+    <>
+      <div className="group relative bg-white border border-gray-100 rounded-[2rem] p-4 transition-all duration-500 hover:shadow-2xl hover:shadow-primary-100/10 flex flex-col">
       {/* Complaint Image */}
       {complaint.image_url && (
         <div className="relative w-full h-40 overflow-hidden rounded-[1.5rem] bg-gray-50 mb-4">
@@ -88,7 +104,7 @@ export default function ComplaintCard({ complaint, onDelete, onEdit }: Complaint
           {onDelete && (
              <button
               data-tooltip="Delete Complaint"
-              onClick={() => onDelete(complaint._id)}
+              onClick={handleDeleteClick}
               className="p-2 bg-gray-50 text-gray-400 rounded-lg hover:text-red-600 hover:bg-red-50 transition-all"
             >
               <Trash size={16} />
@@ -96,7 +112,6 @@ export default function ComplaintCard({ complaint, onDelete, onEdit }: Complaint
           )}
         </div>
       </div>
-      
       {complaint.pg_id && (
         <div className="mt-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
           <span className="w-1 h-1 rounded-full bg-primary-600"></span>
@@ -104,5 +119,16 @@ export default function ComplaintCard({ complaint, onDelete, onEdit }: Complaint
         </div>
       )}
     </div>
+
+    <CommonConfirmationModal
+      isOpen={showDeleteModal}
+      onClose={() => setShowDeleteModal(false)}
+      onConfirm={handleConfirmDelete}
+      title="Delete Complaint"
+      message="Are you sure you want to permanently delete this complaint? This action cannot be undone."
+      confirmText="Confirm Delete"
+      variant="danger"
+    />
+    </>
   );
 }

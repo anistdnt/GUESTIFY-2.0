@@ -1,7 +1,7 @@
 "use client";
 import { setModalVisibility } from "@/redux/slices/modalSlice";
 import { NavItemsType, UserInfo } from "@/types/admin";
-import { MagnetIcon, PuzzlePieceIcon, Receipt } from "@phosphor-icons/react";
+import { MagnetIcon, PuzzlePieceIcon, Receipt, Users } from "@phosphor-icons/react";
 import {
   BuildingApartment,
   CaretDown,
@@ -82,6 +82,11 @@ export default function Sidebar({ userInfo, isLoggedIn, logout_user }: Props) {
       }
     ],
     tools: [
+      {
+        title: "Visitors",
+        path: `/admin/${userInfo.user_id}/tools/visitors`,
+        iconEle: <Users size={20} />
+      },
       {
         title: "Attractions",
         path: `/admin/${userInfo.user_id}/tools/attractions`,

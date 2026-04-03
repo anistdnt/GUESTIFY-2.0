@@ -73,14 +73,12 @@ export default function ComplaintBoxPage() {
   }, [selectedPriorities]);
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this complaint?")) {
-      const res = await api_caller("DELETE", `${API.COMPLAINT.DELETE}/${id}`);
-      if (res.success) {
-        toast.success("Complaint deleted");
-        fetchComplaints();
-      } else {
-        toast.error(res.message || "Delete failed");
-      }
+    const res = await api_caller("DELETE", `${API.COMPLAINT.DELETE}/${id}`);
+    if (res.success) {
+      toast.success("Complaint deleted");
+      fetchComplaints();
+    } else {
+      toast.error(res.message || "Delete failed");
     }
   };
 
