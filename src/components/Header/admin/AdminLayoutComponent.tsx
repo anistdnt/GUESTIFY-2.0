@@ -47,8 +47,11 @@ export default function AdminLayoutComponent({ children }: Props) {
       dispatch(setUserData({}));
       setuserInfo(null);
       setisLoggedIn(false);
-      router.push("/login");
       toast.success(res.message || "Logged out successfully");
+
+      // Need to reload the page and go to /login, so that the middleware can redirect to the login page
+      window.location.href = "/login";
+      
     } else {
       toast.error(`${res.message} : ${res.error}`);
     }
