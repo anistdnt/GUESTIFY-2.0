@@ -7,7 +7,7 @@ import { Warning, Trash, Info, CheckCircle, X } from "@phosphor-icons/react";
 interface CommonConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   title?: string;
   message?: string;
   confirmText?: string;
@@ -28,6 +28,7 @@ export default function CommonConfirmationModal({
   isLoading = false,
 }: CommonConfirmationModalProps) {
   const [mounted, setMounted] = useState(false);
+  const [internalLoading, setInternalLoading] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -35,13 +36,27 @@ export default function CommonConfirmationModal({
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
+      setInternalLoading(false);
     }
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
+  const handleConfirm = async () => {
+    try {
+      setInternalLoading(true);
+      await onConfirm();
+    } catch (error) {
+      console.error("Confirmation error:", error);
+    } finally {
+      setInternalLoading(false);
+    }
+  };
+
   if (!mounted || !isOpen) return null;
+
+  const loading = isLoading || internalLoading;
 
   const variantStyles = {
     danger: {
@@ -78,7 +93,7 @@ export default function CommonConfirmationModal({
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity cursor-pointer"
-        onClick={onClose}
+        onClick={loading ? undefined : onClose}
       />
 
       {/* Modal Container */}
@@ -88,12 +103,14 @@ export default function CommonConfirmationModal({
       >
         <div className="p-6">
           {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all"
-          >
-            <X size={16} weight="bold" />
-          </button>
+          {!loading && (
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all"
+            >
+              <X size={16} weight="bold" />
+            </button>
+          )}
 
           <div className="flex items-start gap-4 mb-6">
             <div className={`p-3 rounded-2xl ${style.bg} shrink-0`}>
@@ -112,16 +129,17 @@ export default function CommonConfirmationModal({
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-3 rounded-xl bg-gray-50 text-gray-600 font-bold text-xs tracking-widest uppercase hover:bg-gray-100 transition-all font-jakarta active:scale-[0.98]"
+              disabled={loading}
+              className="flex-1 py-3 rounded-xl bg-gray-50 text-gray-600 font-bold text-xs tracking-widest uppercase hover:bg-gray-100 transition-all font-jakarta active:scale-[0.98] disabled:opacity-50"
             >
               {cancelText}
             </button>
             <button
-              onClick={onConfirm}
-              disabled={isLoading}
+              onClick={handleConfirm}
+              disabled={loading}
               className={`flex-[1.5] py-3 rounded-xl text-white font-bold text-xs tracking-widest uppercase transition-all shadow-lg active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${style.btn}`}
             >
-              {isLoading ? (
+              {loading ? (
                 <>
                   <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Wait...

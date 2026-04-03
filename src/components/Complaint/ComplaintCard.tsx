@@ -8,7 +8,7 @@ import CommonConfirmationModal from "../Modals/CommonConfirmationModal";
 
 interface ComplaintCardProps {
   complaint: any;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string) => void | Promise<void>;
   onEdit?: (complaint: any) => void;
 }
 
@@ -45,9 +45,9 @@ export default function ComplaintCard({ complaint, onDelete, onEdit }: Complaint
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (onDelete) {
-      onDelete(complaint._id);
+      await onDelete(complaint._id);
     }
     setShowDeleteModal(false);
   };
