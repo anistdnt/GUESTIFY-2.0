@@ -79,18 +79,16 @@ export default function AdminComplaintComp({ uid }: { uid: string }) {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to permanently delete this complaint?")) {
-      try {
-        const res = await api_caller<any>("DELETE", `${API.COMPLAINT.DELETE}/${id}`);
-        if (res.success) {
-          toast.success("Complaint deleted successfully");
-          setComplaints(prev => prev.filter(c => c._id !== id));
-        } else {
-          toast.error(res.message || "Delete failed");
-        }
-      } catch (error) {
-        toast.error("Error deleting complaint");
+    try {
+      const res = await api_caller<any>("DELETE", `${API.COMPLAINT.DELETE}/${id}`);
+      if (res.success) {
+        toast.success("Complaint deleted successfully");
+        setComplaints(prev => prev.filter(c => c._id !== id));
+      } else {
+        toast.error(res.message || "Delete failed");
       }
+    } catch (error) {
+      toast.error("Error deleting complaint");
     }
   };
 
