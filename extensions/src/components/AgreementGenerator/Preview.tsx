@@ -2,14 +2,16 @@
 
 import { PenNibIcon, CaretDownIcon, ListDashesIcon, ShieldCheckIcon, CloudArrowUpIcon, X } from "@phosphor-icons/react";
 import React, { useState } from "react";
+import { PageSettings } from "@/types/AgreementGenerator";
 
 type Props = {
   handleEdit: () => void;
   handleSave: (customData: { title: string; description: string }) => Promise<void>;
   html: string | Promise<string>;
+  pageSettings: PageSettings;
 };
 
-export default function Preview({ handleEdit, handleSave, html }: Props) {
+export default function Preview({ handleEdit, handleSave, html, pageSettings }: Props) {
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -122,14 +124,33 @@ export default function Preview({ handleEdit, handleSave, html }: Props) {
       </div>
 
       {/* Preview Paper */}
-      <div className="agreement-preview-paper mx-auto">
-        <div className="absolute top-10 left-0 right-0 flex justify-center opacity-[0.03] pointer-events-none select-none">
-          <span className="text-6xl font-black uppercase tracking-[1em]">OFFICIAL</span>
+      <div 
+        className="agreement-preview-paper mx-auto"
+        style={{
+          paddingTop: `${pageSettings.top}mm`,
+          paddingBottom: `${pageSettings.bottom}mm`,
+          paddingLeft: `${pageSettings.left}mm`,
+          paddingRight: `${pageSettings.right}mm`,
+          boxShadow: pageSettings.showBorder ? "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" : "none",
+        }}
+      >
+        <div 
+          className="agreement-frame relative"
+          style={{
+            border: pageSettings.showBorder ? `${pageSettings.borderWidth}px ${pageSettings.borderStyle} black` : "none",
+            height: "100%",
+            width: "100%",
+            padding: pageSettings.showBorder ? "5mm" : "0", // Professional internal gap
+          }}
+        >
+          <div className="absolute top-10 left-0 right-0 flex justify-center opacity-[0.03] pointer-events-none select-none">
+            <span className="text-6xl font-black uppercase tracking-[1em]">OFFICIAL</span>
+          </div>
+          <div
+            className="agreement-editor font-eb-garamond"
+            dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : "" }}
+          />
         </div>
-        <div
-          className="agreement-editor font-eb-garamond"
-          dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : "" }}
-        />
       </div>
 
       {/* Save Template Modal */}

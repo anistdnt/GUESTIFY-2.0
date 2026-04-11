@@ -83,6 +83,8 @@ const FONT_SIZES = [
   { label: "48px", value: "48px" },
 ];
 
+import { Mode, PageSettings, Sections } from "@/types/AgreementGenerator";
+
 type Props = {
   html: string | Promise<string>;
   onChange: (html: string) => void;
@@ -90,6 +92,7 @@ type Props = {
   handleDiscard: () => void;
   output: string;
   draftOutput: string;
+  pageSettings: PageSettings;
 };
 
 const ToolbarButton = ({ 
@@ -119,6 +122,7 @@ export default function AgreementEditor({
   handleDone,
   draftOutput,
   output,
+  pageSettings,
 }: Props) {
   const [, forceUpdate] = useState(0);
 
@@ -278,8 +282,27 @@ export default function AgreementEditor({
         </div>
       </div>
 
-      <div className="agreement-editor-paper mx-auto">
-        <EditorContent editor={editor} />
+      <div 
+        className="agreement-editor-paper mx-auto"
+        style={{
+          paddingTop: `${pageSettings.top}mm`,
+          paddingBottom: `${pageSettings.bottom}mm`,
+          paddingLeft: `${pageSettings.left}mm`,
+          paddingRight: `${pageSettings.right}mm`,
+          boxShadow: pageSettings.showBorder ? "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" : "none",
+        }}
+      >
+        <div 
+          className="agreement-frame"
+          style={{
+            border: pageSettings.showBorder ? `${pageSettings.borderWidth}px ${pageSettings.borderStyle} black` : "none",
+            height: "100%",
+            width: "100%",
+            padding: pageSettings.showBorder ? "5mm" : "0", // Professional internal gap
+          }}
+        >
+          <EditorContent editor={editor} />
+        </div>
       </div>
     </div>
   );

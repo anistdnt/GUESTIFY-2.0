@@ -3,23 +3,23 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { marked } from "marked";
-import TurndownService from "turndown";
 import toast from "react-hot-toast";
 import { API } from "@/app/api/_api_const";
 import Link from "next/link";
 import Image from "next/image";
 import HomeSection from "../AgreementGenerator/Sections/home";
-import { ClockCounterClockwiseIcon, HouseIcon, InfoIcon, List, ListDashesIcon } from "@phosphor-icons/react";
+import { ClockCounterClockwiseIcon, HouseIcon, InfoIcon, List, ListDashesIcon, SlidersHorizontalIcon } from "@phosphor-icons/react";
 import ListSection from "../AgreementGenerator/Sections/list";
+import SettingsSection from "../AgreementGenerator/Sections/settings";
 import Preview from "../AgreementGenerator/Preview";
-import { Mode, Sections } from "@/types/AgreementGenerator";
+import { Mode, PageSettings, Sections } from "@/types/AgreementGenerator";
 import SavedAssets from "../AgreementGenerator/Sections/saved";
 import { setCookie } from "cookies-next/client";
 
 const AgreementEditor = dynamic(() => import("../AgreementGenerator/Editor"), {
   ssr: false,
 });
-const turndown = new TurndownService();
+// Remove TurndownService as it's no longer needed
 marked.setOptions({
   gfm: true,
   breaks: true,
@@ -40,9 +40,19 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   const [mode, setMode] = useState<Mode>("preview");
   const [section, setSection] = useState<Sections>("home");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const [agreementPayload, setAgreementPayload] = useState<any>({});
   const [newsessionId, setNewSessionId] = useState<string>("");
+  const [pageSettings, setPageSettings] = useState<PageSettings>({ 
+    top: 25, 
+    bottom: 25, 
+    left: 25, 
+    right: 25,
+    showBorder: true,
+    borderWidth: 1,
+    borderStyle: "solid"
+  });
 
   const [error, setError] = useState<string>("");
 
@@ -50,6 +60,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     // Setting token in the cookies for further API calls
     setCookie("extensionAccessToken", token, {
       maxAge: 2 * 60 * 60, // 2 hours
@@ -143,6 +154,16 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
     }
   };
 
+  const loadAgreement = (agreement: any) => {
+    setOutput(agreement.content);
+    setAgreementPayload(agreement.metadata.formData);
+    setPageSettings(agreement.metadata.settings || { top: 25, bottom: 25, left: 25, right: 25, showBorder: true, borderWidth: 1, borderStyle: "solid" });
+    setIsRichText(true);
+    setMode("preview");
+    setSection("home");
+    toast.success("Agreement loaded into workspace");
+  };
+
   // -------- Actions-----------
   const handleEdit = () => {
     // When entering edit mode, we convert Markdown to HTML EXACTLY ONCE
@@ -175,12 +196,10 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         title: customData?.title || `Agreement - ${agreementPayload.tenant_name || "Untitled"}`,
         description: customData?.description || "",
         userEmail: email,
-        content: {
-          html: isRichText ? output : (marked.parse(output) as string),
-          markdown: isRichText ? turndown.turndown(output) : output,
-        },
+        content: isRichText ? output : (marked.parse(output) as string),
         metadata: {
-          ...agreementPayload,
+          formData: agreementPayload,
+          settings: pageSettings,
           generatedAt: new Date().toISOString(),
           sessionId: newsessionId,
         },
@@ -270,6 +289,13 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
               <ListDashesIcon size={18} weight={section === "saved" ? "fill" : "bold"} />
               <span>Saved</span>
             </button>
+            <button 
+              onClick={() => setSection("settings")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${section === "settings" ? "bg-white text-violet-600 shadow-md shadow-violet-900/5 ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"}`}
+            >
+              <SlidersHorizontalIcon size={18} weight={section === "settings" ? "fill" : "bold"} />
+              <span>Setup</span>
+            </button>
           </div>
         </div>
 
@@ -303,6 +329,14 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
             {section === "saved" && (
               <SavedAssets 
                 setSection={setSection}
+                loadAgreement={loadAgreement}
+              />
+            )}
+
+            {section === "settings" && (
+              <SettingsSection 
+                pageSettings={pageSettings}
+                setPageSettings={setPageSettings}
               />
             )}
           </div>
@@ -367,18 +401,24 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
         {/* Preview (Visible during stream/loading if there is output) */}
         {mode === "preview" && output && (
-          <Preview handleEdit={handleEdit} handleSave={handleSave} html={html} />
+          <Preview 
+            handleEdit={handleEdit} 
+            handleSave={handleSave} 
+            html={html} 
+            pageSettings={pageSettings}
+          />
         )}
 
         {/* Edit */}
         {!loading && mode === "edit" && (
-          <AgreementEditor
-            html={draftOutput}
-            onChange={(h) => setDraftOutput(h)}
-            handleDone={handleDone}
+          <AgreementEditor 
+            html={draftOutput} 
+            onChange={(h) => setDraftOutput(h)} 
             handleDiscard={handleDiscard}
+            handleDone={handleDone}
             output={output}
             draftOutput={draftOutput}
+            pageSettings={pageSettings}
           />
         )}
 
@@ -387,12 +427,12 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
             <div className="flex flex-col items-center gap-10">
               <div className="relative w-64 h-64 flex items-center justify-center">
                 {/* Cinematic Empty State Stars */}
-                {[...Array(12)].map((_, i) => (
+                {mounted && [...Array(12)].map((_, i) => (
                   <div 
                     key={i}
                     className="absolute w-1 h-1 bg-violet-300 rounded-full animate-sparkle"
                     style={{
-                      top: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`, // Randomized positioning on client only
                       left: `${Math.random() * 100}%`,
                       animationDelay: `${i * 0.3}s`
                     }}
