@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef } from "react";
 import { marked } from "marked";
-import TurndownService from "turndown";
 import toast from "react-hot-toast";
 import { API } from "@/app/api/_api_const";
 import Link from "next/link";
@@ -19,7 +18,7 @@ import { setCookie } from "cookies-next/client";
 const AgreementEditor = dynamic(() => import("../AgreementGenerator/Editor"), {
   ssr: false,
 });
-const turndown = new TurndownService();
+// Remove TurndownService as it's no longer needed
 marked.setOptions({
   gfm: true,
   breaks: true,
@@ -143,6 +142,15 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
     }
   };
 
+  const loadAgreement = (agreement: any) => {
+    setOutput(agreement.content);
+    setAgreementPayload(agreement.metadata.formData);
+    setIsRichText(true);
+    setMode("preview");
+    setSection("home");
+    toast.success("Agreement loaded into workspace");
+  };
+
   // -------- Actions-----------
   const handleEdit = () => {
     // When entering edit mode, we convert Markdown to HTML EXACTLY ONCE
@@ -175,12 +183,9 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         title: customData?.title || `Agreement - ${agreementPayload.tenant_name || "Untitled"}`,
         description: customData?.description || "",
         userEmail: email,
-        content: {
-          html: isRichText ? output : (marked.parse(output) as string),
-          markdown: isRichText ? turndown.turndown(output) : output,
-        },
+        content: isRichText ? output : (marked.parse(output) as string),
         metadata: {
-          ...agreementPayload,
+          formData: agreementPayload,
           generatedAt: new Date().toISOString(),
           sessionId: newsessionId,
         },
@@ -303,6 +308,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
             {section === "saved" && (
               <SavedAssets 
                 setSection={setSection}
+                loadAgreement={loadAgreement}
               />
             )}
           </div>
