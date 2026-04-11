@@ -8,10 +8,11 @@ import { API } from "@/app/api/_api_const";
 import Link from "next/link";
 import Image from "next/image";
 import HomeSection from "../AgreementGenerator/Sections/home";
-import { ClockCounterClockwiseIcon, HouseIcon, InfoIcon, List, ListDashesIcon } from "@phosphor-icons/react";
+import { ClockCounterClockwiseIcon, HouseIcon, InfoIcon, List, ListDashesIcon, SlidersHorizontalIcon } from "@phosphor-icons/react";
 import ListSection from "../AgreementGenerator/Sections/list";
+import SettingsSection from "../AgreementGenerator/Sections/settings";
 import Preview from "../AgreementGenerator/Preview";
-import { Mode, Sections } from "@/types/AgreementGenerator";
+import { Mode, PageSettings, Sections } from "@/types/AgreementGenerator";
 import SavedAssets from "../AgreementGenerator/Sections/saved";
 import { setCookie } from "cookies-next/client";
 
@@ -42,6 +43,15 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
   const [agreementPayload, setAgreementPayload] = useState<any>({});
   const [newsessionId, setNewSessionId] = useState<string>("");
+  const [pageSettings, setPageSettings] = useState<PageSettings>({ 
+    top: 25, 
+    bottom: 25, 
+    left: 25, 
+    right: 25,
+    showBorder: true,
+    borderWidth: 1,
+    borderStyle: "solid"
+  });
 
   const [error, setError] = useState<string>("");
 
@@ -145,6 +155,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   const loadAgreement = (agreement: any) => {
     setOutput(agreement.content);
     setAgreementPayload(agreement.metadata.formData);
+    setPageSettings(agreement.metadata.settings || { top: 25, bottom: 25, left: 25, right: 25, showBorder: true, borderWidth: 1, borderStyle: "solid" });
     setIsRichText(true);
     setMode("preview");
     setSection("home");
@@ -186,6 +197,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         content: isRichText ? output : (marked.parse(output) as string),
         metadata: {
           formData: agreementPayload,
+          settings: pageSettings,
           generatedAt: new Date().toISOString(),
           sessionId: newsessionId,
         },
@@ -275,6 +287,13 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
               <ListDashesIcon size={18} weight={section === "saved" ? "fill" : "bold"} />
               <span>Saved</span>
             </button>
+            <button 
+              onClick={() => setSection("settings")}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-300 ${section === "settings" ? "bg-white text-violet-600 shadow-md shadow-violet-900/5 ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600"}`}
+            >
+              <SlidersHorizontalIcon size={18} weight={section === "settings" ? "fill" : "bold"} />
+              <span>Setup</span>
+            </button>
           </div>
         </div>
 
@@ -309,6 +328,13 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
               <SavedAssets 
                 setSection={setSection}
                 loadAgreement={loadAgreement}
+              />
+            )}
+
+            {section === "settings" && (
+              <SettingsSection 
+                pageSettings={pageSettings}
+                setPageSettings={setPageSettings}
               />
             )}
           </div>
@@ -373,18 +399,24 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
 
         {/* Preview (Visible during stream/loading if there is output) */}
         {mode === "preview" && output && (
-          <Preview handleEdit={handleEdit} handleSave={handleSave} html={html} />
+          <Preview 
+            handleEdit={handleEdit} 
+            handleSave={handleSave} 
+            html={html} 
+            pageSettings={pageSettings}
+          />
         )}
 
         {/* Edit */}
         {!loading && mode === "edit" && (
-          <AgreementEditor
-            html={draftOutput}
-            onChange={(h) => setDraftOutput(h)}
-            handleDone={handleDone}
+          <AgreementEditor 
+            html={draftOutput} 
+            onChange={setOutput} 
             handleDiscard={handleDiscard}
+            handleDone={handleDone}
             output={output}
             draftOutput={draftOutput}
+            pageSettings={pageSettings}
           />
         )}
 

@@ -28,6 +28,7 @@ export default function SavedAssets({ setSection, loadAgreement }: Props) {
           content: "<h1>Standard Lease</h1><p>This agreement is made between...</p>",
           metadata: {
             formData: { tenant_name: "John Doe", owner_name: "Admin" },
+            settings: { top: 25, bottom: 25, left: 25, right: 25, showBorder: true, borderWidth: 1, borderStyle: "solid" },
             generatedAt: new Date().toISOString()
           },
           version: 1,
@@ -41,6 +42,7 @@ export default function SavedAssets({ setSection, loadAgreement }: Props) {
           content: "<h1>Commercial Rental</h1><p>Business lease terms...</p>",
           metadata: {
             formData: { tenant_name: "Tech Solutions Inc", owner_name: "Admin" },
+            settings: { top: 25, bottom: 25, left: 25, right: 25, showBorder: true, borderWidth: 1, borderStyle: "solid" },
             generatedAt: new Date().toISOString()
           },
           version: 1,
