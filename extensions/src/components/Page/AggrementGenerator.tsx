@@ -411,7 +411,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
         {!loading && mode === "edit" && (
           <AgreementEditor 
             html={draftOutput} 
-            onChange={setOutput} 
+            onChange={(h) => setDraftOutput(h)} 
             handleDiscard={handleDiscard}
             handleDone={handleDone}
             output={output}

@@ -131,17 +131,26 @@ export default function Preview({ handleEdit, handleSave, html, pageSettings }: 
           paddingBottom: `${pageSettings.bottom}mm`,
           paddingLeft: `${pageSettings.left}mm`,
           paddingRight: `${pageSettings.right}mm`,
-          border: pageSettings.showBorder ? `${pageSettings.borderWidth}px ${pageSettings.borderStyle} black` : "none",
           boxShadow: pageSettings.showBorder ? "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" : "none",
         }}
       >
-        <div className="absolute top-10 left-0 right-0 flex justify-center opacity-[0.03] pointer-events-none select-none">
-          <span className="text-6xl font-black uppercase tracking-[1em]">OFFICIAL</span>
+        <div 
+          className="agreement-frame relative"
+          style={{
+            border: pageSettings.showBorder ? `${pageSettings.borderWidth}px ${pageSettings.borderStyle} black` : "none",
+            height: "100%",
+            width: "100%",
+            padding: pageSettings.showBorder ? "5mm" : "0", // Professional internal gap
+          }}
+        >
+          <div className="absolute top-10 left-0 right-0 flex justify-center opacity-[0.03] pointer-events-none select-none">
+            <span className="text-6xl font-black uppercase tracking-[1em]">OFFICIAL</span>
+          </div>
+          <div
+            className="agreement-editor font-eb-garamond"
+            dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : "" }}
+          />
         </div>
-        <div
-          className="agreement-editor font-eb-garamond"
-          dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : "" }}
-        />
       </div>
 
       {/* Save Template Modal */}

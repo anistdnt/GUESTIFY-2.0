@@ -289,11 +289,20 @@ export default function AgreementEditor({
           paddingBottom: `${pageSettings.bottom}mm`,
           paddingLeft: `${pageSettings.left}mm`,
           paddingRight: `${pageSettings.right}mm`,
-          border: pageSettings.showBorder ? `${pageSettings.borderWidth}px ${pageSettings.borderStyle} black` : "none",
           boxShadow: pageSettings.showBorder ? "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" : "none",
         }}
       >
-        <EditorContent editor={editor} />
+        <div 
+          className="agreement-frame"
+          style={{
+            border: pageSettings.showBorder ? `${pageSettings.borderWidth}px ${pageSettings.borderStyle} black` : "none",
+            height: "100%",
+            width: "100%",
+            padding: pageSettings.showBorder ? "5mm" : "0", // Professional internal gap
+          }}
+        >
+          <EditorContent editor={editor} />
+        </div>
       </div>
     </div>
   );
