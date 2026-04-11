@@ -40,6 +40,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   const [mode, setMode] = useState<Mode>("preview");
   const [section, setSection] = useState<Sections>("home");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const [agreementPayload, setAgreementPayload] = useState<any>({});
   const [newsessionId, setNewSessionId] = useState<string>("");
@@ -59,6 +60,7 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     // Setting token in the cookies for further API calls
     setCookie("extensionAccessToken", token, {
       maxAge: 2 * 60 * 60, // 2 hours
@@ -425,12 +427,12 @@ export default function AgreementGenerator({ name, token, email }: CompProps) {
             <div className="flex flex-col items-center gap-10">
               <div className="relative w-64 h-64 flex items-center justify-center">
                 {/* Cinematic Empty State Stars */}
-                {[...Array(12)].map((_, i) => (
+                {mounted && [...Array(12)].map((_, i) => (
                   <div 
                     key={i}
                     className="absolute w-1 h-1 bg-violet-300 rounded-full animate-sparkle"
                     style={{
-                      top: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`, // Randomized positioning on client only
                       left: `${Math.random() * 100}%`,
                       animationDelay: `${i * 0.3}s`
                     }}
