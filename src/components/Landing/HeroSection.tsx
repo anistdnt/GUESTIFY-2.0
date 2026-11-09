@@ -36,13 +36,13 @@ const HeroSection = () => {
           >
             Get Started
           </CommonButton>
-          <CommonButton
+          {/* <CommonButton
             href="/listings"
             variant="outline"
             size="lg"
           >
             View Listings
-          </CommonButton>
+          </CommonButton> */}
         </div>
 
         {/* User Avatars and Rating */}
